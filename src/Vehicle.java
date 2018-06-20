@@ -3,10 +3,17 @@ import java.util.*;
 public class Vehicle {
 
     int id, capacity, load, costOfUse;
-    double cost; // this is the sum of the distance travelled times costOfUse
+    double cost; // this is the sum of the distance traveled times costOfUse
     Customer firstCustomer;
     VRP vrp;
 
+    /**
+     * Constructor to create a vehicle for the VRP
+     * @param vrp VRP, instance of the vehicle routing problem it belongs to
+     * @param id int, identifier for the vehicle
+     * @param capacity, int maximum capacity of the vehicle
+     * @param costOfUse, int cost that comes from using the vehicle
+     */
     public Vehicle (VRP vrp,int id, int capacity,int costOfUse){
 	this.vrp = vrp;
 	this.id = id;
@@ -21,6 +28,7 @@ public class Vehicle {
     // capacity & time windows respected
     //
     boolean minCostInsertion(Customer c){
+    //TODO Insert customer at the most beneficial position in the route
 	return false;
     }
 
@@ -29,11 +37,26 @@ public class Vehicle {
     // deliver true if done, false otherwise
     //
     boolean remove(Customer c){
+    	Customer currentCustomer = firstCustomer;
+    	//search for customer c
+    	while(currentCustomer.succ != null) {
+    		if(c.equals(currentCustomer)) {
+    			//if found change the successor of the predecessor
+    			currentCustomer.pred.succ = currentCustomer.succ;
+    			return true;
+    		}
+    		currentCustomer = currentCustomer.succ;
+    	}
 	return false;
     }
 
+    /**
+     * Add the first customer to the vehicle 
+     * @param c Customer
+     */
     void addFirstCustomer(Customer c){
 	firstCustomer = c;
+	//TODO What if the demand of the (first) customer is larger than the capacity of a vehicle?
 	load = c.demand;
 	cost = vrp.distance(null,c) * costOfUse;
 	c.vehicle = this;
