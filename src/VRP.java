@@ -10,6 +10,7 @@ public class VRP {
 	int n, m; // number of customers and number of vehicles
 	int capacity;
 	Customer depot;
+	int latest = 0;
 
 	public VRP(String fname,int numberOfCustomers) throws IOException {
 		n = numberOfCustomers;
@@ -40,10 +41,14 @@ public class VRP {
 			customer[i] = new Customer(custNo,x,y,d,rt,dd,st);
 			customer[i].vrp = this;
 			System.out.println("cust: "+ customer[i]);
+			//determine the latest finish
+			if(dd+st>latest) {
+				latest=dd+st;
+			}
 		}
 		sc.close();
 
-		//calculate the distances between all customers based on the Euclidean distance
+		//calculate the distances between all customers based on the euclidean distance
 		for (int i=0;i<n;i++)
 			for (int j=i+1;j<=n;j++){
 				double deltaX = (double)(customer[i].xCoord - customer[j].xCoord);
@@ -51,14 +56,16 @@ public class VRP {
 				distance[i][j] = distance[j][i] = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
 			}
 
-		//Create one vehicle for each customer 
-		for (int i=0;i<n;i++){
-			vehicle[i] = new Vehicle(this,i,capacity,1);
-			vehicle[i].addFirstCustomer(customer[i+1]);	    
-		}
-
 		//TODO Does this mean that our depot is assumed to be the first entry that we read?
 		depot = customer[0];
+		
+		//Create one vehicle for each customer 
+		for (int i=0;i<n;i++){
+			vehicle[i] = new Vehicle(this,i,capacity,1,depot);
+			//vehicle[i].addFirstCustomer(customer[i+1]);	    
+		}
+
+
 	}
 
 	/**
