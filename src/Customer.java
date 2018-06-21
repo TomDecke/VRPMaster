@@ -35,6 +35,7 @@ public class Customer {
 		return es <= ls;
 	}
 
+	//TODO Think this through. Does it make sense this way?!
 	/**
 	 * Propagate earliest and latest start for the insertion of a customer
 	 * @param y Customer, potential predecessor
@@ -45,14 +46,14 @@ public class Customer {
 		latestStart = Math.min(this.dueDate,z.latestStart - (this.serviceTime + vrp.distance(this,z)));
 		Customer current = this;
 		// propagate latestStart left
-		while (current != null){
+		while (current.pred != null){
 			Customer cPred = current.pred;
 			cPred.latestStart = Math.min(cPred.dueDate,current.latestStart - (cPred.serviceTime + vrp.distance(cPred,current)));
 			current = cPred;
 		}
 		current = this;
 		// propagate earliestStart right
-		while (current != null){
+		while (current.succ != null){
 			Customer cSucc = current.succ;
 			cSucc.earliestStart = Math.max(cSucc.readyTime,current.earliestStart + current.serviceTime + vrp.distance(current,cSucc));
 			current = cSucc;
@@ -69,19 +70,31 @@ public class Customer {
 	public static void main(String[] args)  throws IOException {
 
 		VRP vrp = new VRP(args[0],Integer.parseInt(args[1]));
-		Customer depot = vrp.customer[0];
-		Customer x = vrp.customer[1];
-		Customer y = vrp.customer[2];
-		Customer z = vrp.customer[3];
-		System.out.println(depot);
-		System.out.println(x);
-		System.out.println(y);
-		System.out.println(z);
-		System.out.println("depot-x: "+ vrp.distance(null,x) +" x-y: "+ vrp.distance(x,y) +" y-depot: "+ vrp.distance(y,null));
-		Vehicle v1 = vrp.vehicle[1];
-		v1.addCustomer(y, v1.firstCustomer, v1.lastCustomer);
-		vrp.vehicle[0].show();
-		v1.show();
-		System.out.println(v1.calculateCost());
+//		Customer depot = vrp.customer[0];
+//		Customer x = vrp.customer[1];
+//		Customer y = vrp.customer[2];
+//		Customer z = vrp.customer[3];
+//		System.out.println(depot);
+//		System.out.println(x);
+//		System.out.println(y);
+//		System.out.println(z);
+//		System.out.println("depot-x: "+ vrp.distance(null,x) +" x-y: "+ vrp.distance(x,y) +" y-depot: "+ vrp.distance(y,null));
+//		Vehicle v1 = vrp.vehicle[1];
+//		vrp.vehicle[0].show();
+
+//		v1.minCostInsertion(z);
+//		v1.show();
+//		System.out.println(v1.calculateCost());
+//		v1.minCostInsertion(y);
+//		v1.show();
+//		System.out.println(v1.calculateCost());
+		//TODO figure out what exactly happens at this point - i.e. how can I make the cost for virtual vehicles kick in
+		for(int i = 0 ; i<Integer.parseInt(args[1]); i++) {
+			Vehicle v = vrp.vehicle[i];
+			v.show();
+			System.out.println("Cost for vehicle "+i+": "+v.calculateCost());
+			
+			
+		}
 	}
 }

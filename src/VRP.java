@@ -56,13 +56,18 @@ public class VRP {
 				distance[i][j] = distance[j][i] = Math.sqrt((deltaX * deltaX) + (deltaY * deltaY));
 			}
 
-		//TODO Does this mean that our depot is assumed to be the first entry that we read?
 		depot = customer[0];
 		
-		//Create one vehicle for each customer 
+		//Create one vehicle for each customer and add a customer
 		for (int i=0;i<n;i++){
 			vehicle[i] = new Vehicle(this,i,capacity,1,depot);
-			//vehicle[i].addFirstCustomer(customer[i+1]);	    
+			//Every new vehicle that is created after the number of vehicles given by the benchmark is reached
+			//becomes virtual by the assignment of a high cost of use
+			if(i>m-1) {
+				vehicle[i].costOfUse = 1000;
+			}
+			
+			vehicle[i].minCostInsertion(customer[i]);
 		}
 
 

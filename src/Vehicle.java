@@ -42,31 +42,52 @@ public class Vehicle {
 		if(c.demand+this.load>this.capacity) {
 			return false;
 		}
+		
+		System.out.println("CheckPoint1");
 
-		Customer cPred = firstCustomer;
-		Customer cSucc = cPred.succ;
+		Customer cCurrent = firstCustomer;
+		Customer cSucc = cCurrent.succ;
+		Customer cTmp = null;
 
-		//TODO personally introduced limitation as starting value
-		double minCost = cost/costOfUse*2;
-		Customer cInsert = null;
+		//TODO personally introduced limitation as starting value - needs to be configured
+		double minCost = cost/costOfUse*2 + 1000;
+		Customer cInsertAfter = null;
 
 		//Find the position at which the increment of the distance is the smallest
-		while(cPred.succ != null) {
+		while(cSucc!= null) {
 			//make sure the customer fits in the time window
-			if(c.canBeInsertedBetween(cPred, cSucc)) {
+			if(c.canBeInsertedBetween(cCurrent, cSucc)) {
 				//determine the change in cost, caused by the insertion at the current position
-				double insertionCost = vrp.distance(cPred,c) + vrp.distance(c, cSucc) - vrp.distance(cPred,cSucc);
+				double insertionCost = vrp.distance(cCurrent,c) + vrp.distance(c, cSucc) - vrp.distance(cCurrent,cSucc);
+				System.out.println(minCost + " " + insertionCost);
 				if(insertionCost<minCost) {
-					cInsert = cPred;
-					minCost=insertionCost;
+					cInsertAfter = cCurrent;
+					minCost = insertionCost;
 				}
 			}
-			cPred = cSucc;
-			cSucc = cPred.succ;
+			cTmp = cSucc;
+			cSucc = cSucc.succ;
+			cCurrent = cTmp;
 		}
-		if(cInsert != null) {
-			c.insertBetween(cInsert, cInsert.succ);
-			return addCustomer(c,cInsert,cInsert.succ);
+		
+		//If there is a valid position for the customer, insert him
+		if(cInsertAfter != null) {
+			System.out.println("Checkpoint2");
+
+			
+			//insert the customer into the vehicle
+			Customer cInsertSucc = cInsertAfter.succ;
+			c.pred = cInsertAfter;
+			c.succ = cInsertSucc;
+			cInsertSucc.pred = c;
+			cInsertAfter.succ = c;
+			
+			//propagate the earliest and latest start
+			c.insertBetween(cInsertAfter, cInsertSucc);
+			
+			//increase the load of the vehicle by the customers demand
+			this.load += c.demand;
+			return true;
 		}
 		return false;
 	}
@@ -90,29 +111,7 @@ public class Vehicle {
 		return false;
 	}
 
-	/**
-	 * Adds a customer to the vehicle
-	 * Validity check takes place in @see minCostInsertion.
-	 * @param c
-	 * @param pred
-	 * @param succ
-	 * @return true, if successful
-	 */
-	boolean addCustomer(Customer c, Customer pred, Customer succ) {	
-		Customer current = firstCustomer;
-		while(current != null) {
-			if(current.equals(pred)) {
-				pred.succ=c;
-				c.pred= pred;
-				c.succ = succ;
-				succ.pred = c;
-				capacity+=c.demand;
-				return true;
-			}
-			current = current.succ;
-		}
-		return false;
-	}
+
 
 	/**
 	 * Calculate the cost for this vehicles tour
@@ -133,15 +132,23 @@ public class Vehicle {
 		return distance*this.costOfUse;
 	}
 
+	/**
+	 * @return String, the value of the vehicle's load
+	 */
 	public String toString(){
 		return String.valueOf(load);
 	}
 
+	/**
+	 * Shows the route of the vehicle
+	 */
 	void show(){
 		System.out.print("id(vehicle): "+ id +" ");
 		Customer customer = firstCustomer;
+		System.out.print(customer.custNo);
+		customer = customer.succ;
 		while (customer != null){
-			System.out.print(customer.custNo +" -> ");
+			System.out.print(" -> " + customer.custNo );
 			customer = customer.succ;
 		}
 		System.out.println();
