@@ -21,11 +21,11 @@ public class Vehicle {
 		this.id = id;
 		this.capacity = capacity;
 		this.costOfUse = costOfUse;
-		
+
 		//TODO integrate them into the distance matrix
 		//set up dummy customers who come at the beginning and at the end of a tour 
-		firstCustomer = new Customer(id,depot.xCoord,depot.yCoord,0,0,0,0);
-		lastCustomer = new Customer(id,depot.xCoord,depot.yCoord,0,0,vrp.latest,0);
+		firstCustomer = new Customer(depot.custNo,depot.xCoord,depot.yCoord,0,0,0,0);
+		lastCustomer = new Customer(depot.custNo,depot.xCoord,depot.yCoord,0,0,vrp.latest,0);
 		firstCustomer.succ = lastCustomer;
 		lastCustomer.pred = firstCustomer;
 	}
@@ -37,16 +37,37 @@ public class Vehicle {
 	// capacity & time windows respected
 	//
 	boolean minCostInsertion(Customer c){
+
+		//if the demand is to big, the customer can't be inserted
+		if(c.demand+this.load>this.capacity) {
+			return false;
+		}
+
 		Customer cPred = firstCustomer;
 		Customer cSucc = cPred.succ;
+
+		//TODO personally introduced limitation as starting value
+		double minCost = cost/costOfUse*2;
+		Customer cInsert = null;
+
+		//Find the position at which the increment of the distance is the smallest
 		while(cPred.succ != null) {
+			//make sure the customer fits in the time window
 			if(c.canBeInsertedBetween(cPred, cSucc)) {
-				c.insertBetween(cPred, cSucc);
+				//determine the change in cost, caused by the insertion at the current position
+				double insertionCost = vrp.distance(cPred,c) + vrp.distance(c, cSucc) - vrp.distance(cPred,cSucc);
+				if(insertionCost<minCost) {
+					cInsert = cPred;
+					minCost=insertionCost;
+				}
 			}
 			cPred = cSucc;
 			cSucc = cPred.succ;
 		}
-		//TODO Insert customer at the most beneficial position in the route
+		if(cInsert != null) {
+			c.insertBetween(cInsert, cInsert.succ);
+			return addCustomer(c,cInsert,cInsert.succ);
+		}
 		return false;
 	}
 
@@ -59,8 +80,9 @@ public class Vehicle {
 		//search for customer c
 		while(currentCustomer.succ != null) {
 			if(c.equals(currentCustomer)) {
-				//if found change the successor of the predecessor
+				//if found change the successor of the predecessor and the predecessor of the successor
 				currentCustomer.pred.succ = currentCustomer.succ;
+				currentCustomer.succ.pred = currentCustomer.pred;
 				return true;
 			}
 			currentCustomer = currentCustomer.succ;
@@ -68,28 +90,58 @@ public class Vehicle {
 		return false;
 	}
 
-	//TODO this can probably be removed
 	/**
-	 * Add the first customer to the vehicle 
-	 * @param c Customer
+	 * Adds a customer to the vehicle
+	 * Validity check takes place in @see minCostInsertion.
+	 * @param c
+	 * @param pred
+	 * @param succ
+	 * @return true, if successful
 	 */
-	void addFirstCustomer(Customer c){
-		firstCustomer = c;
-		load = c.demand;
-		cost = vrp.distance(null,c) * costOfUse;
-		c.vehicle = this;
+	boolean addCustomer(Customer c, Customer pred, Customer succ) {	
+		Customer current = firstCustomer;
+		while(current != null) {
+			if(current.equals(pred)) {
+				pred.succ=c;
+				c.pred= pred;
+				c.succ = succ;
+				succ.pred = c;
+				capacity+=c.demand;
+				return true;
+			}
+			current = current.succ;
+		}
+		return false;
 	}
 
+	/**
+	 * Calculate the cost for this vehicles tour
+	 * @return double, the price of the tour
+	 */
+	double calculateCost() {
+		double distance = 0;
+		Customer curr = firstCustomer;
+		Customer succ = firstCustomer.succ;
+		
+		//sum up the traveled distance
+		while(curr!=lastCustomer) {			
+			distance += vrp.distance(curr, succ);
+
+			curr=succ;
+			succ=curr.succ;
+		}
+		return distance*this.costOfUse;
+	}
 
 	public String toString(){
 		return String.valueOf(load);
 	}
 
 	void show(){
-		System.out.print("id: "+ id +" ");
+		System.out.print("id(vehicle): "+ id +" ");
 		Customer customer = firstCustomer;
 		while (customer != null){
-			System.out.print(customer +" -> ");
+			System.out.print(customer.custNo +" -> ");
 			customer = customer.succ;
 		}
 		System.out.println();

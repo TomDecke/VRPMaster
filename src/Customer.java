@@ -27,35 +27,22 @@ public class Customer {
 		latestStart = dueDate;
 	}
 
-	// can we place this customer before customer y?
-	boolean canComeBefore(Customer y){
-		Customer beforeY = y.pred;
-		if (beforeY == null) beforeY = vrp.depot;
-		double es = Math.max(readyTime,beforeY.earliestStart + beforeY.serviceTime + vrp.distance(beforeY,this));
-		double ls = Math.min(dueDate,y.latestStart - (serviceTime + vrp.distance(this,y)));
-		return es <= ls;
-	}
-
-	// can we place this customer after customer y?
-	boolean canComeAfter(Customer y){
-		Customer afterY = y.succ;
-		if (afterY == null) afterY = vrp.depot;
-		double es = Math.max(readyTime,y.earliestStart + y.serviceTime + vrp.distance(y,this));
-		double ls = Math.min(dueDate,afterY.latestStart - (serviceTime + vrp.distance(this,y)));
-		return es <= ls;
-	}
-
 	// assuming this, y and z are all non-null can we
 	// insert this customer between customers y and z?
 	boolean canBeInsertedBetween(Customer y,Customer z){
-		double es = Math.max(readyTime,y.earliestStart + y.serviceTime + vrp.distance(y,this));
-		double ls = Math.min(dueDate,z.latestStart - (serviceTime + vrp.distance(this,z)));
+		double es = Math.max(this.readyTime,y.earliestStart + y.serviceTime + vrp.distance(y,this));
+		double ls = Math.min(this.dueDate,z.latestStart - (this.serviceTime + vrp.distance(this,z)));
 		return es <= ls;
 	}
 
+	/**
+	 * Propagate earliest and latest start for the insertion of a customer
+	 * @param y Customer, potential predecessor
+	 * @param z Customer, potential successor
+	 */
 	void insertBetween(Customer y,Customer z){
-		earliestStart = Math.max(readyTime,y.earliestStart + y.serviceTime + vrp.distance(y,this));
-		latestStart = Math.min(dueDate,z.latestStart - (serviceTime + vrp.distance(this,z)));
+		earliestStart = Math.max(this.readyTime,y.earliestStart + y.serviceTime + vrp.distance(y,this));
+		latestStart = Math.min(this.dueDate,z.latestStart - (this.serviceTime + vrp.distance(this,z)));
 		Customer current = this;
 		// propagate latestStart left
 		while (current != null){
@@ -72,6 +59,9 @@ public class Customer {
 		}
 	}
 
+	/**
+	 * Write the variables of the Customer as String
+	 */
 	public String toString(){
 		return custNo +" "+ xCoord +" "+ yCoord +" "+ demand +" "+ readyTime +" "+ dueDate +" "+ serviceTime;
 	}
@@ -88,11 +78,10 @@ public class Customer {
 		System.out.println(y);
 		System.out.println(z);
 		System.out.println("depot-x: "+ vrp.distance(null,x) +" x-y: "+ vrp.distance(x,y) +" y-depot: "+ vrp.distance(y,null));
+		Vehicle v1 = vrp.vehicle[1];
+		v1.addCustomer(y, v1.firstCustomer, v1.lastCustomer);
 		vrp.vehicle[0].show();
-		vrp.vehicle[1].show();
-		System.out.println(x.canComeBefore(y));
-		System.out.println(y.canComeBefore(x));
-		System.out.println(x.canComeAfter(y));
-		System.out.println(y.canComeAfter(x));
+		v1.show();
+		System.out.println(v1.calculateCost());
 	}
 }
