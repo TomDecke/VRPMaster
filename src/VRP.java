@@ -29,6 +29,7 @@ public class VRP {
 		while (sc.hasNext() && !s.equals("TIME")) s = sc.next();
 		s = "continue";
 		while (sc.hasNext() && !s.equals("TIME"))s = sc.next(); 
+		//TODO why is this <=?
 		for (int i=0;i<=n;i++){
 			int custNo = sc.nextInt();
 			int x = sc.nextInt();
@@ -41,6 +42,7 @@ public class VRP {
 			customer[i] = new Customer(custNo,x,y,d,rt,dd,st);
 			customer[i].vrp = this;
 			System.out.println("cust: "+ customer[i]);
+			
 			//determine the latest finish
 			if(dd+st>latest) {
 				latest=dd+st;
@@ -84,6 +86,19 @@ public class VRP {
 		if (x == null) return distance[0][y.custNo];
 		if (y == null) return distance[0][x.custNo];
 		return distance[x.custNo][y.custNo];
+	}
+	
+	/**
+	 * Calculate the total cost of all vehicles
+	 * @return double, the total cost of travel
+	 */
+	public double calcTotalCost() {
+		double totalCost = 0;
+		//sum up the travel costs for each vehicle
+		for(Vehicle v : vehicle) {
+			totalCost+=v.calculateCost();
+		}
+		return totalCost;
 	}
 
 	public static void main(String[] args)  throws IOException {

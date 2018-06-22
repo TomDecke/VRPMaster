@@ -70,31 +70,36 @@ public class Customer {
 	public static void main(String[] args)  throws IOException {
 
 		VRP vrp = new VRP(args[0],Integer.parseInt(args[1]));
-//		Customer depot = vrp.customer[0];
-//		Customer x = vrp.customer[1];
-//		Customer y = vrp.customer[2];
-//		Customer z = vrp.customer[3];
-//		System.out.println(depot);
-//		System.out.println(x);
-//		System.out.println(y);
-//		System.out.println(z);
+		Customer depot = vrp.customer[0];
+		Customer x = vrp.customer[1];
+		Customer y = vrp.customer[2];
+		Customer z = vrp.customer[3];
+		System.out.println(depot);
+		System.out.println(x);
+		System.out.println(y);
+		System.out.println(z);
 //		System.out.println("depot-x: "+ vrp.distance(null,x) +" x-y: "+ vrp.distance(x,y) +" y-depot: "+ vrp.distance(y,null));
-//		Vehicle v1 = vrp.vehicle[1];
-//		vrp.vehicle[0].show();
+		Vehicle v1 = vrp.vehicle[2];
+		vrp.vehicle[0].show();
+		v1.show();
+		System.out.println(v1.calculateCost());
+		v1.minCostInsertion(x);
+		v1.show();
+		System.out.println(v1.calculateCost());
+		//v1.minCostInsertion(z);
+		v1.show();
+		System.out.println(v1.calculateCost());
+		v1.minCostInsertion(y);
+		v1.show();
+		System.out.println(v1.calculateCost());
 
-//		v1.minCostInsertion(z);
-//		v1.show();
-//		System.out.println(v1.calculateCost());
-//		v1.minCostInsertion(y);
-//		v1.show();
-//		System.out.println(v1.calculateCost());
-		//TODO figure out what exactly happens at this point - i.e. how can I make the cost for virtual vehicles kick in
-		for(int i = 0 ; i<Integer.parseInt(args[1]); i++) {
-			Vehicle v = vrp.vehicle[i];
-			v.show();
-			System.out.println("Cost for vehicle "+i+": "+v.calculateCost());
-			
-			
-		}
+//		for(int i = 0 ; i<Integer.parseInt(args[1]); i++) {
+//			Vehicle v = vrp.vehicle[i];
+//			v.show();
+//			System.out.println("Cost for vehicle "+i+": "+v.calculateCost());
+//			
+//			
+//		}
+		System.out.println(vrp.calcTotalCost());
 	}
 }

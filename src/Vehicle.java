@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Vehicle {
 
-	int id, capacity, load, costOfUse;
+	int id, capacity, load, costOfUse, numCostumer;
 	double cost; // this is the sum of the distance travelled times costOfUse
 	//customers for beginning and end of a tour
 	Customer firstCustomer, lastCustomer;
@@ -21,6 +21,7 @@ public class Vehicle {
 		this.id = id;
 		this.capacity = capacity;
 		this.costOfUse = costOfUse;
+		this.numCostumer = 0;
 
 		//TODO integrate them into the distance matrix
 		//set up dummy customers who come at the beginning and at the end of a tour 
@@ -43,8 +44,43 @@ public class Vehicle {
 			return false;
 		}
 		
-		System.out.println("CheckPoint1");
 
+		Customer cInsertAfter = findBestPosition(c);
+		
+		//If there is a valid position for the customer, insert him
+		if(cInsertAfter != null) {
+
+			
+			//insert the customer into the vehicle
+			Customer cInsertSucc = cInsertAfter.succ;
+			c.pred = cInsertAfter;
+			c.succ = cInsertSucc;
+			cInsertSucc.pred = c;
+			cInsertAfter.succ = c;
+			
+			//propagate the earliest and latest start
+			c.insertBetween(cInsertAfter, cInsertSucc);
+			
+			//increase the load of the vehicle by the customers demand
+			this.load += c.demand;
+			
+			//update the cost of this vehicle
+			this.cost = this.calculateCost();
+			
+			//update the number of customers of the vehicle
+			this.numCostumer++;
+			
+			return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Find the best position for a customer in the vehicle
+	 * @param c Customer, the customer that is to be inserted into the vehicle
+	 * @return Customer, the customer after which the new customer should be inserted 
+	 */
+	public Customer findBestPosition(Customer c) {
 		Customer cCurrent = firstCustomer;
 		Customer cSucc = cCurrent.succ;
 		Customer cTmp = null;
@@ -69,27 +105,7 @@ public class Vehicle {
 			cSucc = cSucc.succ;
 			cCurrent = cTmp;
 		}
-		
-		//If there is a valid position for the customer, insert him
-		if(cInsertAfter != null) {
-			System.out.println("Checkpoint2");
-
-			
-			//insert the customer into the vehicle
-			Customer cInsertSucc = cInsertAfter.succ;
-			c.pred = cInsertAfter;
-			c.succ = cInsertSucc;
-			cInsertSucc.pred = c;
-			cInsertAfter.succ = c;
-			
-			//propagate the earliest and latest start
-			c.insertBetween(cInsertAfter, cInsertSucc);
-			
-			//increase the load of the vehicle by the customers demand
-			this.load += c.demand;
-			return true;
-		}
-		return false;
+		return cInsertAfter;
 	}
 
 	//
@@ -104,6 +120,12 @@ public class Vehicle {
 				//if found change the successor of the predecessor and the predecessor of the successor
 				currentCustomer.pred.succ = currentCustomer.succ;
 				currentCustomer.succ.pred = currentCustomer.pred;
+				
+				//remove the load
+				this.load -= c.demand;
+				
+				//update the number of customers
+				this.numCostumer--;
 				return true;
 			}
 			currentCustomer = currentCustomer.succ;
@@ -121,13 +143,16 @@ public class Vehicle {
 		double distance = 0;
 		Customer curr = firstCustomer;
 		Customer succ = firstCustomer.succ;
+		Customer tmp = null;
 		
 		//sum up the traveled distance
-		while(curr!=lastCustomer) {			
+		while(!lastCustomer.equals(curr)) {			
 			distance += vrp.distance(curr, succ);
 
-			curr=succ;
+			tmp = succ;
 			succ=curr.succ;
+			curr=tmp;
+
 		}
 		return distance*this.costOfUse;
 	}
