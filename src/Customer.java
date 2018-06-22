@@ -69,37 +69,34 @@ public class Customer {
 
 	public static void main(String[] args)  throws IOException {
 
+
 		VRP vrp = new VRP(args[0],Integer.parseInt(args[1]));
+		
+		System.out.println();
+		System.out.println("Customer main:");
+		
 		Customer depot = vrp.customer[0];
 		Customer x = vrp.customer[1];
 		Customer y = vrp.customer[2];
 		Customer z = vrp.customer[3];
-		System.out.println(depot);
-		System.out.println(x);
-		System.out.println(y);
-		System.out.println(z);
+//		System.out.println(depot);
+//		System.out.println(x);
+//		System.out.println(y);
+//		System.out.println(z);
 //		System.out.println("depot-x: "+ vrp.distance(null,x) +" x-y: "+ vrp.distance(x,y) +" y-depot: "+ vrp.distance(y,null));
-		Vehicle v1 = vrp.vehicle[2];
-		vrp.vehicle[0].show();
-		v1.show();
-		System.out.println(v1.calculateCost());
-		v1.minCostInsertion(x);
-		v1.show();
-		System.out.println(v1.calculateCost());
-		//v1.minCostInsertion(z);
-		v1.show();
-		System.out.println(v1.calculateCost());
-		v1.minCostInsertion(y);
-		v1.show();
-		System.out.println(v1.calculateCost());
-
-//		for(int i = 0 ; i<Integer.parseInt(args[1]); i++) {
-//			Vehicle v = vrp.vehicle[i];
-//			v.show();
-//			System.out.println("Cost for vehicle "+i+": "+v.calculateCost());
-//			
-//			
-//		}
-		System.out.println(vrp.calcTotalCost());
+		Vehicle v2 = vrp.vehicle[2];
+		Vehicle v1 = vrp.vehicle[1];
+//		v2.remove(y);
+//		v1.minCostInsertion(y);
+		
+		for(int i = 0 ; i<Integer.parseInt(args[1]); i++) {
+			Vehicle v = vrp.vehicle[i];
+			System.out.println("Customer of vehicle "+v.id +": " +v.firstCustomer.succ.toString());
+			v.show();
+			System.out.println("Cost for vehicle "+v.id+": "+v.calculateCost());
+			
+			
+		}
+		System.out.println("Total cost: " +vrp.calcTotalCost());
 	}
 }

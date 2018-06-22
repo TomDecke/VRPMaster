@@ -36,7 +36,11 @@ public class Vehicle {
 	// in least cost position. Deliver true
 	// if the insertion was possible, i.e.
 	// capacity & time windows respected
-	//
+	/**
+	 * Make sure to remove the customer from the vehicle from which he is coming
+	 * @param c
+	 * @return
+	 */
 	boolean minCostInsertion(Customer c){
 
 		//if the demand is to big, the customer can't be inserted
@@ -95,7 +99,6 @@ public class Vehicle {
 			if(c.canBeInsertedBetween(cCurrent, cSucc)) {
 				//determine the change in cost, caused by the insertion at the current position
 				double insertionCost = vrp.distance(cCurrent,c) + vrp.distance(c, cSucc) - vrp.distance(cCurrent,cSucc);
-				System.out.println(minCost + " " + insertionCost);
 				if(insertionCost<minCost) {
 					cInsertAfter = cCurrent;
 					minCost = insertionCost;

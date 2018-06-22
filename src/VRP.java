@@ -62,14 +62,15 @@ public class VRP {
 		
 		//Create one vehicle for each customer and add a customer
 		for (int i=0;i<n;i++){
-			vehicle[i] = new Vehicle(this,i,capacity,1,depot);
+			//vehicle at array-position 0 gets the id 1
+			vehicle[i] = new Vehicle(this,i+1,capacity,1,depot);
 			//Every new vehicle that is created after the number of vehicles given by the benchmark is reached
 			//becomes virtual by the assignment of a high cost of use
 			if(i>m-1) {
 				vehicle[i].costOfUse = 1000;
 			}
-			
-			vehicle[i].minCostInsertion(customer[i]);
+			//add customer to vehicle and omit the depot
+			vehicle[i].minCostInsertion(customer[i+1]);
 		}
 
 
