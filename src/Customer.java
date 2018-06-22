@@ -98,5 +98,12 @@ public class Customer {
 			
 		}
 		System.out.println("Total cost: " +vrp.calcTotalCost());
+		
+		v2.remove(z);
+		v1.minCostInsertion(z);
+		v1.show();
+		v2.show();
+		System.out.println("Total cost after moving y: " +vrp.calcTotalCost());
+		
 	}
 }

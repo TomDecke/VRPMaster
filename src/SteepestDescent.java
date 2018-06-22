@@ -4,45 +4,75 @@ public class SteepestDescent {
 	private final int PENALTY = 10000;
 	private VRP vrp;
 	private int numCustomers;
-	private double[][] costs;
-	private Customer[][] bestCustomer;
+	private RelocateOption[][] bestMoveMatrix;
 	
 	public SteepestDescent(String textfile, int customers) throws IOException {
 		this.vrp = new VRP(textfile,customers);
-		this.costs = new double[customers+1][customers+1];
-		this.bestCustomer = new Customer[customers+1][customers+1];
+		this.bestMoveMatrix = new RelocateOption[customers][customers];
 		this.numCustomers = customers;
 	}
 	
-	public VRP getVRP() {
-		return this.vrp;
+	
+	/**
+	 * Create the matrix containing the best moves from one vehicle to another
+	 */
+	public void createBMM() {
+		for(int i = 0; i < numCustomers; i++) {
+			for(int j = 0; j < numCustomers; j++) {
+				bestMoveMatrix[i][j] = findMinCustomer(vrp.vehicle[i], vrp.vehicle[j]);
+			}
+		}
 	}
 	
-	public double findCheapestMove() {
+	/**
+	 * Find customer who's moving to another vehicle would have the highest benefit
+	 * @param vFrom Vehicle, vehicle from which a customer is to be taken
+	 * @param vTo Vehicle, vehicle to which a customer is to be moved
+	 * @return ReocationOption, the best option for moving a customer from vFrom to vTo
+	 */
+	public RelocateOption findMinCustomer(Vehicle vFrom, Vehicle vTo) {
+		RelocateOption bestToMove = null;
+		int counter = vFrom.numCostumer;
+		Customer current = vFrom.firstCustomer.succ;
+		while(counter > 0) {
+			
+			vTo.findBestPosition(current);
+			//calc cost
+			//if cost is better than so far, update 
+			current = current.succ;
+			counter--;
+		}
+		//TODO decide on an indexing policy
+		return bestToMove;
 		
+	}
+	
+	/**
+	 * Find the best move in the Matrix of possible moves
+	 * @return RelocateOption, the currently best move in the BMM
+	 */
+	public RelocateOption findCheapestMove() {
+		
+		RelocateOption cheapestMove = null;
 		double cheapest = PENALTY;
-		for(int i = 0; i <= numCustomers; i++ ) {
-			for(int j = 0; j <= numCustomers; j++) {
+		for(int i = 0; i < numCustomers; i++ ) {
+			for(int j = 0; j < numCustomers; j++) {
 				if(i!=j) {
-					double current = costs[i][j];
+					double current = bestMoveMatrix[i][j].getCostOfMove();
 					if(current < cheapest) {
 						cheapest = current;
+						cheapestMove = bestMoveMatrix[i][j];
 					}
 				}
 			}
 		}
 		
-		return cheapest;
+		return cheapestMove;
 	}
 	
-	public void findMinMove(Vehicle v0, Vehicle v1) {
-		Customer bestToMove = null;
-		int counter = v0.numCostumer;
-		Customer current = v0.firstCustomer.succ;
-		while(counter > 0) {
-			v1.findBestPosition(current);
-		}
-		bestCustomer[v0.id][v1.id] = bestToMove;
+
+	public VRP getVRP() {
+		return this.vrp;
 	}
 	
 	
