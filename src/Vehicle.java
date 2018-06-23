@@ -190,7 +190,7 @@ public class Vehicle {
 	 * Shows the route of the vehicle
 	 */
 	void show(){
-		System.out.print("id(vehicle): "+ id +" ");
+		System.out.print("vehicle "+ id +": ");
 		Customer customer = firstCustomer;
 		System.out.print(customer.custNo);
 		customer = customer.succ;

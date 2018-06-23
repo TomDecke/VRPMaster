@@ -44,8 +44,6 @@ public class SteepestDescent {
 		//create an empty move with the current cost of the vehicles
 		//thus prevent the moving of one customer to another vehicle if there would be no benefit
 		RelocateOption bestToMove = new RelocateOption(null, v0.calculateCost() + v1.calculateCost(), v0, v1);
-
-		//TODO System.out.println("Pre - Cost of v" +v0.id +" and v"+ v1.id+" cost: " +bestToMove.getCostOfMove());
 		
 		//start checking from the first customer, who is not the depot-connection
 		Customer current = v0.firstCustomer.succ;
@@ -124,6 +122,9 @@ public class SteepestDescent {
 		
 		//As long as there are improving moves execute them
 		while(relocate.getCostOfMove() < PENALTY) {
+			//TODO remove
+			printBMM();
+			System.out.println(" ");
 			executeRelocation(relocate);
 			//after each move update the matrix and find the next move
 			updateBMM(relocate.getVehicleFrom(), relocate.getVehicleTo());
@@ -186,6 +187,23 @@ public class SteepestDescent {
 			System.out.println("");
 		}
 	}
+	
+	/**
+	 * After executing @see solve() this method can be used to show the number of needed vehicles and the total cost
+	 */
+	public void printResults() {
+		int vehicleCount = 0;
+		for(int i = 0 ; i<numCustomers; i++) {
+			Vehicle v = vrp.vehicle[i];
+			//check if there are still customers in between the dummies
+			if(!v.firstCustomer.succ.equals(v.lastCustomer)) {
+				v.show();
+				vehicleCount++;
+			}
+		}
+		System.out.println("NV: "+ vehicleCount);
+		System.out.println("Distance: " + vrp.calcTotalCost());
+	}
 
 
 	public VRP getVRP() {
@@ -211,5 +229,7 @@ public class SteepestDescent {
 			v.show();
 			System.out.println("Cost for vehicle "+v.id+": "+v.calculateCost());	
 		}
+		System.out.println("Results");
+		stDesc.printResults();
 	}
 }
