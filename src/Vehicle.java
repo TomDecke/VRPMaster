@@ -2,7 +2,7 @@ import java.util.*;
 
 public class Vehicle {
 
-	int id, capacity, load, costOfUse, numCostumer;
+	int id, index, capacity, load, costOfUse, numCostumer;
 	double cost; // this is the sum of the distance travelled times costOfUse
 	//customers for beginning and end of a tour
 	Customer firstCustomer, lastCustomer;
@@ -19,6 +19,7 @@ public class Vehicle {
 	public Vehicle (VRP vrp,int id, int capacity,int costOfUse, Customer depot){
 		this.vrp = vrp;
 		this.id = id;
+		this.index=id-1;
 		this.capacity = capacity;
 		this.costOfUse = costOfUse;
 		this.numCostumer = 0;
@@ -41,13 +42,7 @@ public class Vehicle {
 	 * @param c
 	 * @return
 	 */
-	boolean minCostInsertion(Customer c){
-
-		//if the demand is to big, the customer can't be inserted
-		if(c.demand+this.load>this.capacity) {
-			return false;
-		}
-		
+	boolean minCostInsertion(Customer c){		
 
 		Customer cInsertAfter = findBestPosition(c);
 		
@@ -85,6 +80,12 @@ public class Vehicle {
 	 * @return Customer, the customer after which the new customer should be inserted 
 	 */
 	public Customer findBestPosition(Customer c) {
+		
+		//make sure the vehicle has enough capacity to take the customer
+		if(c.demand+this.load>this.capacity) {
+			return null;
+		}
+		
 		Customer cCurrent = firstCustomer;
 		Customer cSucc = cCurrent.succ;
 		Customer cTmp = null;
@@ -159,6 +160,24 @@ public class Vehicle {
 		}
 		return distance*this.costOfUse;
 	}
+	
+	public double calculateDistance() {
+		double distance = 0;
+		Customer curr = firstCustomer;
+		Customer succ = firstCustomer.succ;
+		Customer tmp = null;
+		
+		//sum up the traveled distance
+		while(!lastCustomer.equals(curr)) {			
+			distance += vrp.distance(curr, succ);
+
+			tmp = succ;
+			succ=curr.succ;
+			curr=tmp;
+
+		}
+		return distance;
+	}
 
 	/**
 	 * @return String, the value of the vehicle's load
@@ -181,4 +200,6 @@ public class Vehicle {
 		}
 		System.out.println();
 	}
+
+
 }
