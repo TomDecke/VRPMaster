@@ -159,6 +159,28 @@ public class Vehicle {
 		}
 		return distance*this.costOfUse;
 	}
+	
+	/**
+	 * Calculate the distance of this vehicles tour
+	 * @return double, the distance of the tour
+	 */
+	double calculateDistance() {
+		double distance = 0;
+		Customer curr = firstCustomer;
+		Customer succ = firstCustomer.succ;
+		Customer tmp = null;
+		
+		//sum up the traveled distance
+		while(!lastCustomer.equals(curr)) {			
+			distance += vrp.distance(curr, succ);
+
+			tmp = succ;
+			succ=curr.succ;
+			curr=tmp;
+
+		}
+		return distance;
+	}
 
 	/**
 	 * @return String, the value of the vehicle's load
@@ -181,4 +203,6 @@ public class Vehicle {
 		}
 		System.out.println();
 	}
+
+	
 }
