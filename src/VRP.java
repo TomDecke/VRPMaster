@@ -67,7 +67,7 @@ public class VRP {
 			//Every new vehicle that is created after the number of vehicles given by the benchmark is reached
 			//becomes virtual by the assignment of a high cost of use
 			if(i>m-1) {
-				vehicle[i].costOfUse = 1000;
+				vehicle[i].costOfUse = 100;
 			}
 			//add customer to vehicle and omit the depot
 			vehicle[i].minCostInsertion(customer[i+1]);

@@ -93,9 +93,7 @@ public class Customer {
 			Vehicle v = vrp.vehicle[i];
 			System.out.println("Customer of vehicle "+v.id +": " +v.firstCustomer.succ.toString());
 			v.show();
-			System.out.println("Cost for vehicle "+v.id+": "+v.calculateCost());
-			
-			
+			System.out.println("Cost for vehicle "+v.id+": "+v.calculateCost());	
 		}
 		System.out.println("Total cost: " +vrp.calcTotalCost());
 		

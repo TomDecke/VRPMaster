@@ -1,5 +1,7 @@
 import java.io.IOException;
 
+import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BEncoderStream;
+
 public class SteepestDescent {
 	private final int PENALTY = 10000;
 	private VRP vrp;
@@ -42,7 +44,9 @@ public class SteepestDescent {
 		//create an empty move with the current cost of the vehicles
 		//thus prevent the moving of one customer to another vehicle if there would be no benefit
 		RelocateOption bestToMove = new RelocateOption(null, v0.calculateCost() + v1.calculateCost(), v0, v1);
-		System.out.println("Cost of v" +v0.id +" and v"+ v1.id+" cost: " +bestToMove.getCostOfMove());
+
+		//TODO System.out.println("Pre - Cost of v" +v0.id +" and v"+ v1.id+" cost: " +bestToMove.getCostOfMove());
+		
 		//start checking from the first customer, who is not the depot-connection
 		Customer current = v0.firstCustomer.succ;
 		while(!current.equals(v0.lastCustomer)) {
@@ -78,6 +82,7 @@ public class SteepestDescent {
 		if(bestToMove.getCToMove() == null) {
 			bestToMove.setCostOfMove(PENALTY);
 		}
+		
 		return bestToMove;
 	}
 
@@ -87,7 +92,7 @@ public class SteepestDescent {
 	 * @return RelocateOption, the currently best move in the BMM
 	 */
 	public RelocateOption findBestMove() {
-		//start comparing with the centre of the matrix
+		//start comparing with the origin of the matrix
 		RelocateOption bestMove = bestMoveMatrix[0][0];
 		double minCost = bestMove.getCostOfMove();
 		
@@ -105,6 +110,57 @@ public class SteepestDescent {
 		}
 
 		return bestMove;
+	}
+	
+	/**
+	 * Runs steepest descent, to find a solution for the vrp-instance
+	 */
+	public void solve() {
+		//create best-move-matrix
+		createBMM();
+		
+		//find the first best move
+		RelocateOption relocate = findBestMove();
+		
+		//As long as there are improving moves execute them
+		while(relocate.getCostOfMove() < PENALTY) {
+			executeRelocation(relocate);
+			//after each move update the matrix and find the next move
+			updateBMM(relocate.getVehicleFrom(), relocate.getVehicleTo());
+			relocate = findBestMove();
+		}
+		
+	}
+	
+	/**
+	 * Executes the relocation of a customer
+	 * @param bestRelocation RelocateOperation, option that is supposed to be executed 
+	 */
+	public void executeRelocation(RelocateOption bestRelocation) {
+		//get the customer which is to be moved
+		Customer cRelocate = bestRelocation.getCToMove();
+		//remove customer from current vehicle
+		bestRelocation.getVehicleFrom().remove(cRelocate);
+		//insert customer into new vehicle
+		bestRelocation.getVehicleTo().minCostInsertion(cRelocate);
+	}
+	
+	/**
+	 * Find the new best customer to move for vehicle-relations that were affected by a change
+	 * @param vFrom Vehicle, vehicle from which a customer was removed
+	 * @param vTo Vehicle, vehicle to which a customer was moved
+	 */
+	public void updateBMM(Vehicle vFrom, Vehicle vTo) {
+		for(int i = 0; i < numCustomers; i++) {
+			Vehicle vCheck = vrp.vehicle[i];
+			//recalculate the giving of customers to another vehicle
+			bestMoveMatrix[vFrom.index][i] = findBestCustomer(vFrom, vCheck);
+			bestMoveMatrix[vTo.index][i] = findBestCustomer(vFrom, vCheck);
+			
+			//recalculate the receiving from other customers
+			bestMoveMatrix[i][vFrom.index] = findBestCustomer(vCheck,vFrom);
+			bestMoveMatrix[i][vTo.index] = findBestCustomer(vCheck, vTo);
+		}
 	}
 	
 	/**
@@ -135,13 +191,25 @@ public class SteepestDescent {
 	public VRP getVRP() {
 		return this.vrp;
 	}
+	
+	public RelocateOption getBestMoveAtPos(int i,int j) {
+		return bestMoveMatrix[i][j];
+	}
 
 
 	public static void main(String[] args) throws IOException{
 		SteepestDescent stDesc = new SteepestDescent(args[0],Integer.parseInt(args[1]));
 		stDesc.createBMM();
-
 		stDesc.printBMM();
-		stDesc.findBestMove().printOption();
+		System.out.println("");
+		stDesc.solve();
+		stDesc.printBMM();
+		
+		for(int i = 0 ; i<Integer.parseInt(args[1]); i++) {
+			Vehicle v = stDesc.getVRP().vehicle[i];
+			System.out.println("Customer of vehicle "+v.id +": " +v.firstCustomer.succ.toString());
+			v.show();
+			System.out.println("Cost for vehicle "+v.id+": "+v.calculateCost());	
+		}
 	}
 }
