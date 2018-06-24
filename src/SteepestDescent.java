@@ -1,6 +1,6 @@
 import java.io.IOException;
 
-import com.sun.xml.internal.messaging.saaj.packaging.mime.util.BEncoderStream;
+
 
 public class SteepestDescent {
 	private final int PENALTY = 10000;
@@ -113,6 +113,7 @@ public class SteepestDescent {
 	/**
 	 * Runs steepest descent, to find a solution for the vrp-instance
 	 */
+	//TODO tidy up
 	public void solve() {
 		//create best-move-matrix
 		createBMM();
@@ -120,15 +121,21 @@ public class SteepestDescent {
 		//find the first best move
 		RelocateOption relocate = findBestMove();
 		
+		int debugCounter = 0;
+		
 		//As long as there are improving moves execute them
 		while(relocate.getCostOfMove() < PENALTY) {
-			//TODO remove
-			printBMM();
-			System.out.println(" ");
+			System.out.println("Pre-Min: "+relocate.getCostOfMove());
 			executeRelocation(relocate);
 			//after each move update the matrix and find the next move
 			updateBMM(relocate.getVehicleFrom(), relocate.getVehicleTo());
 			relocate = findBestMove();
+			//TODO remove
+			debugCounter++;
+			System.out.println(debugCounter);
+			printBMM();
+			System.out.println("Post-Min: "+relocate.getCostOfMove());
+			System.out.println(" ");
 		}
 		
 	}
@@ -181,7 +188,8 @@ public class SteepestDescent {
 					System.out.print("X |");
 				}
 				else {
-					System.out.print("c"+current.custNo+"|");
+					//System.out.print("c"+current.custNo+"|");
+					System.out.print(""+(int)bestMoveMatrix[j][k].getCostOfMove()+"|");
 				}
 			}
 			System.out.println("");
