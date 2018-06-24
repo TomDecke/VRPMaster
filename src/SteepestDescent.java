@@ -28,7 +28,12 @@ public class SteepestDescent {
 		//go through the matrix and determine the best move for each combination 
 		for(int i = 0; i < numCustomers; i++) {
 			for(int j = 0; j < numCustomers; j++) {
-				bestMoveMatrix[i][j] = findBestCustomer(vrp.vehicle[i], vrp.vehicle[j]);
+				if(i==j) {
+					bestMoveMatrix[i][j] = new RelocateOption(null, PENALTY, null, null);
+				}else {
+					bestMoveMatrix[i][j] = findBestCustomer(vrp.vehicle[i], vrp.vehicle[j]);
+				}
+				
 			}
 		}
 	}
@@ -161,13 +166,20 @@ public class SteepestDescent {
 	public void updateBMM(Vehicle vFrom, Vehicle vTo) {
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle vCheck = vrp.vehicle[i];
-			//recalculate the giving of customers to another vehicle
-			bestMoveMatrix[vFrom.index][i] = findBestCustomer(vFrom, vCheck);
-			bestMoveMatrix[vTo.index][i] = findBestCustomer(vFrom, vCheck);
 			
-			//recalculate the receiving from other customers
-			bestMoveMatrix[i][vFrom.index] = findBestCustomer(vCheck,vFrom);
-			bestMoveMatrix[i][vTo.index] = findBestCustomer(vCheck, vTo);
+			//recalculate the giving and receiving of the first vehicle
+			if(vFrom.index!=i) {
+				bestMoveMatrix[vFrom.index][i] = findBestCustomer(vFrom, vCheck);
+				bestMoveMatrix[i][vFrom.index] = findBestCustomer(vCheck,vFrom);
+			}
+
+			
+
+			//recalculate the giving and receiving of the second vehicle
+			if(vTo.index!=i) {
+				bestMoveMatrix[i][vTo.index] = findBestCustomer(vCheck, vTo);
+				bestMoveMatrix[vTo.index][i] = findBestCustomer(vFrom, vCheck);
+			}
 		}
 	}
 	
