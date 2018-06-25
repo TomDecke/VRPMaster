@@ -130,17 +130,31 @@ public class SteepestDescent {
 		
 		//As long as there are improving moves execute them
 		while(relocate.getCostOfMove() < PENALTY) {
-			System.out.println("Pre-Min: "+relocate.getCostOfMove());
-			executeRelocation(relocate);
-			//after each move update the matrix and find the next move
-			updateBMM(relocate.getVehicleFrom(), relocate.getVehicleTo());
-			relocate = findBestMove();
+	
 			//TODO remove
 			debugCounter++;
 			System.out.println(debugCounter);
 			printBMM();
-			System.out.println("Post-Min: "+relocate.getCostOfMove());
+			System.out.print("vFrom - before move: ");
+			relocate.getVehicleFrom().show();
+			
+			System.out.print("vTo - before move: ");
+			relocate.getVehicleTo().show();
+			
+			System.out.print("Move: c" + relocate.getCToMove().custNo);
 			System.out.println(" ");
+			
+			executeRelocation(relocate);
+			
+			System.out.print("vFrom - after move: ");
+			relocate.getVehicleFrom().show();
+			
+			System.out.print("vTo - after move: ");
+			relocate.getVehicleTo().show();
+			
+			//after each move update the matrix and find the next move
+			updateBMM(relocate.getVehicleFrom(), relocate.getVehicleTo());
+			relocate = findBestMove();
 		}
 		
 	}
@@ -166,7 +180,6 @@ public class SteepestDescent {
 	public void updateBMM(Vehicle vFrom, Vehicle vTo) {
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle vCheck = vrp.vehicle[i];
-			
 			//recalculate the giving and receiving of the first vehicle
 			if(vFrom.index!=i) {
 				bestMoveMatrix[vFrom.index][i] = findBestCustomer(vFrom, vCheck);
@@ -187,21 +200,26 @@ public class SteepestDescent {
 	 * Construct the current best move matrix, showing which customer to move from which vehicle to another
 	 */
 	public void printBMM() {
-		System.out.print("\\ |");
+		String format = "\\ |";
+		System.out.print(String.format("%4s",format));
 		for(int i = 0 ; i < numCustomers; i++) {
-			System.out.print("v"+vrp.vehicle[i].id+"|");
+			format = "v"+vrp.vehicle[i].id+"|";
+			System.out.print(String.format("%4s", format));
 		}
 		System.out.println("");
 		for(int j = 0 ; j< numCustomers ; j++) {
-			System.out.print("v"+vrp.vehicle[j].id+"|");
+			format = "v"+vrp.vehicle[j].id+"|";
+			System.out.print(String.format("%4s", format));
 			for(int k = 0; k<numCustomers;k++) {
 				Customer current = bestMoveMatrix[j][k].getCToMove();
 				if (current == null) {
-					System.out.print("X |");
+					System.out.print(String.format("%4s","X |"));
 				}
 				else {
-					//System.out.print("c"+current.custNo+"|");
-					System.out.print(""+(int)bestMoveMatrix[j][k].getCostOfMove()+"|");
+				//	format = ""+(int)bestMoveMatrix[j][k].getCostOfMove()+"|";
+					format ="c"+current.custNo+"|";
+					
+					System.out.print(String.format("%4s", format));
 				}
 			}
 			System.out.println("");
