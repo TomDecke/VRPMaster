@@ -4,6 +4,7 @@ public class Vehicle {
 
 	int id, index, capacity, load, costOfUse, numCostumer;
 	double cost; // this is the sum of the distance travelled times costOfUse
+	private double distance; //distance travelled by the vehicle
 	//customers for beginning and end of a tour
 	Customer firstCustomer, lastCustomer;
 	VRP vrp;
@@ -23,8 +24,8 @@ public class Vehicle {
 		this.capacity = capacity;
 		this.costOfUse = costOfUse;
 		this.numCostumer = 0;
+		this.distance = 0;
 
-		//TODO integrate them into the distance matrix
 		//set up dummy customers who come at the beginning and at the end of a tour 
 		firstCustomer = new Customer(depot.custNo,depot.xCoord,depot.yCoord,0,0,0,0);
 		lastCustomer = new Customer(depot.custNo,depot.xCoord,depot.yCoord,0,0,vrp.latest,0);
@@ -63,8 +64,11 @@ public class Vehicle {
 			//increase the load of the vehicle by the customers demand
 			this.load += c.demand;
 			
+			//update the distance by removing the prior edge and adding the new ones
+			distance += (vrp.distance(cInsertAfter,c) + vrp.distance(c, cInsertSucc) - vrp.distance(cInsertAfter,cInsertSucc));
+			
 			//update the cost of this vehicle
-			this.cost = this.calculateCost();
+			this.cost = this.distance * this.costOfUse;
 			
 			//update the number of customers of the vehicle
 			this.numCostumer++;
@@ -73,6 +77,7 @@ public class Vehicle {
 		}
 		return false;
 	}
+	
 	
 	/**
 	 * Find the best position for a customer in the vehicle
@@ -121,12 +126,20 @@ public class Vehicle {
 		//search for customer c
 		while(currentCustomer.succ != null) {
 			if(c.equals(currentCustomer)) {
+				Customer cPred =  currentCustomer.pred;
+				Customer cSucc = currentCustomer.succ;
 				//if found change the successor of the predecessor and the predecessor of the successor
-				currentCustomer.pred.succ = currentCustomer.succ;
-				currentCustomer.succ.pred = currentCustomer.pred;
+				currentCustomer.pred.succ = cSucc;
+				currentCustomer.succ.pred = cPred;
 				
 				//remove the load
 				this.load -= c.demand;
+				
+				//update distance, by removing edges to former customer and adding new edge between now-neighbors
+				distance += vrp.distance(cPred, cSucc) - vrp.distance(cPred, currentCustomer) - vrp.distance(currentCustomer, cSucc);
+				
+				//recalculate the cost
+				this.cost = this.distance * this.costOfUse;
 				
 				//update the number of customers
 				this.numCostumer--;
@@ -136,48 +149,7 @@ public class Vehicle {
 		}
 		return false;
 	}
-
-
-
-	/**
-	 * Calculate the cost for this vehicles tour
-	 * @return double, the price of the tour
-	 */
-	double calculateCost() {
-		double distance = 0;
-		Customer curr = firstCustomer;
-		Customer succ = firstCustomer.succ;
-		Customer tmp = null;
-		
-		//sum up the traveled distance
-		while(!lastCustomer.equals(curr)) {			
-			distance += vrp.distance(curr, succ);
-
-			tmp = succ;
-			succ=curr.succ;
-			curr=tmp;
-
-		}
-		return distance*this.costOfUse;
-	}
 	
-	public double calculateDistance() {
-		double distance = 0;
-		Customer curr = firstCustomer;
-		Customer succ = firstCustomer.succ;
-		Customer tmp = null;
-		
-		//sum up the traveled distance
-		while(!lastCustomer.equals(curr)) {			
-			distance += vrp.distance(curr, succ);
-
-			tmp = succ;
-			succ=curr.succ;
-			curr=tmp;
-
-		}
-		return distance;
-	}
 
 	/**
 	 * @return String, the value of the vehicle's load
@@ -189,7 +161,7 @@ public class Vehicle {
 	/**
 	 * Shows the route of the vehicle
 	 */
-	void show(){
+	public void show(){
 		System.out.print("vehicle "+ id +": ");
 		Customer customer = firstCustomer;
 		System.out.print(customer.custNo);
@@ -200,6 +172,13 @@ public class Vehicle {
 		}
 		System.out.println();
 	}
+	
+	public double getDistance() {
+		return this.distance;
+	}
 
+	public void setDistance(double distance) {
+		this.distance=distance;
+	}
 
 }

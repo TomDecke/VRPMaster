@@ -97,7 +97,7 @@ public class VRP {
 		double totalCost = 0;
 		//sum up the travel costs for each vehicle
 		for(Vehicle v : vehicle) {
-			totalCost+=v.calculateCost();
+			totalCost+=v.cost;
 		}
 		return totalCost;
 	}
