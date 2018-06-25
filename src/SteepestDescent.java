@@ -107,7 +107,7 @@ public class SteepestDescent {
 				double currentCost = currentMove.getCostOfMove();
 				if(currentMove.getCToMove()!=null && currentCost < minCost) {
 					minCost = currentCost;
-					bestMove = bestMoveMatrix[i][j];
+					bestMove = currentMove;
 				}
 			}
 		}
@@ -164,11 +164,13 @@ public class SteepestDescent {
 	public void executeRelocation(RelocateOption bestRelocation) {
 		//get the customer which is to be moved
 		Customer cRelocate = bestRelocation.getCToMove();
-		//remove customer from current vehicle
-		//TODO remove
-		System.out.println(bestRelocation.getVehicleFrom().remove(cRelocate));
-		//insert customer into new vehicle
-		bestRelocation.getVehicleTo().minCostInsertion(cRelocate);
+		
+		//remove customer from current vehicle if it exists
+		if(bestRelocation.getVehicleFrom().remove(cRelocate)) {
+			//insert customer into new vehicle
+			bestRelocation.getVehicleTo().minCostInsertion(cRelocate);
+		}
+
 	}
 	
 	/**
