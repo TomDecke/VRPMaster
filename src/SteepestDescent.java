@@ -1,7 +1,12 @@
 import java.io.IOException;
+import java.util.ArrayList;
 
 
-
+/**
+ * 
+ * @author Tom Decke
+ *
+ */
 public class SteepestDescent {
 	private final int PENALTY = 10000;
 	private VRP vrp;
@@ -126,14 +131,14 @@ public class SteepestDescent {
 		RelocateOption relocate = findBestMove();
 		
 		//TODO remove
-		int debugCounter = 0;
+		int iterationCounter = 0;
 		
 		//As long as there are improving moves execute them
 		while(relocate.getCostOfMove() < PENALTY) {
 	
 			//TODO remove
-			debugCounter++;
-			System.out.println(debugCounter);
+			iterationCounter++;
+			System.out.println(iterationCounter);
 			printBMM();
 			System.out.print("vFrom - before move: ");
 			relocate.getVehicleFrom().show();
@@ -228,7 +233,7 @@ public class SteepestDescent {
 	}
 	
 	/**
-	 * After executing @see solve() this method can be used to show the number of needed vehicles and the total cost
+	 * After executing @see solve(), this method can be used to show the number of needed vehicles and the total cost
 	 */
 	public void printResults() {
 		int vehicleCount = 0;
@@ -243,6 +248,30 @@ public class SteepestDescent {
 		System.out.println("NV: "+ vehicleCount);
 		System.out.println("Distance: " + vrp.calcTotalCost());
 	}
+	
+	/**
+	 * After executing @see solve(), this method can be used to obtain the vehicles, which are present in the solution 
+	 * @return ArrayList<Vehicle>, list of vehicles with nodes
+	 */
+	public ArrayList<Vehicle> getVehicles(){
+		ArrayList<Vehicle> vehicles = new ArrayList<Vehicle>();
+		for(int i = 0 ; i<numCustomers; i++) {
+			Vehicle v = vrp.vehicle[i];
+			//check if there are still customers in between the dummies
+			if(!v.firstCustomer.succ.equals(v.lastCustomer)) {
+				vehicles.add(v);
+			}
+		}
+		return vehicles;
+	}
+	
+	/**
+	 * After executing @see solve(), this method can be used to obtain the cost of the solution
+	 * @return double, the 
+	 */
+	public double getTotalCost() {
+		return vrp.calcTotalCost();
+	}
 
 
 	public VRP getVRP() {
@@ -251,6 +280,10 @@ public class SteepestDescent {
 	
 	public RelocateOption getBestMoveAtPos(int i,int j) {
 		return bestMoveMatrix[i][j];
+	}
+	
+	public int getNumCustomers() {
+		return this.numCustomers;
 	}
 
 
@@ -275,5 +308,8 @@ public class SteepestDescent {
 		}
 		System.out.println("Results");
 		stDesc.printResults();
+		
+		TestSolution ts = new TestSolution(stDesc.getVRP(), stDesc.getTotalCost(), stDesc.getVehicles());
+		System.out.println(ts.runTest());
 	}
 }

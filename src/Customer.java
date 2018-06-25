@@ -1,6 +1,11 @@
 import java.util.*;
 import java.io.*;
 
+/**
+ * 
+ * @author Patrick Prosser
+ *
+ */
 public class Customer {
 
 	int custNo, xCoord, yCoord, demand, readyTime, dueDate, serviceTime;

@@ -1,5 +1,10 @@
 import java.util.*;
 
+/**
+ * 
+ * @author Patrick Prosser
+ *
+ */
 public class Vehicle {
 
 	int id, index, capacity, load, costOfUse, numCostumer;
