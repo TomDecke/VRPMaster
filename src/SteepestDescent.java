@@ -165,7 +165,8 @@ public class SteepestDescent {
 		//get the customer which is to be moved
 		Customer cRelocate = bestRelocation.getCToMove();
 		//remove customer from current vehicle
-		bestRelocation.getVehicleFrom().remove(cRelocate);
+		//TODO remove
+		System.out.println(bestRelocation.getVehicleFrom().remove(cRelocate));
 		//insert customer into new vehicle
 		bestRelocation.getVehicleTo().minCostInsertion(cRelocate);
 	}
