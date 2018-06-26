@@ -34,7 +34,6 @@ public class VRP {
 		while (sc.hasNext() && !s.equals("TIME")) s = sc.next();
 		s = "continue";
 		while (sc.hasNext() && !s.equals("TIME"))s = sc.next(); 
-		//TODO why is this <=?
 		for (int i=0;i<=n;i++){
 			int custNo = sc.nextInt();
 			int x = sc.nextInt();

@@ -34,10 +34,10 @@ public class RelocateOption {
 
 	public void printOption() {
 		if(cToMove != null) {
-			System.out.println("Move c"+cToMove.custNo+" from v" +vehicleFrom.id + " to v" + vehicleTo.id+ " at cost:"+costOfMove);
+			System.out.println("Move c"+cToMove.custNo+" from v" +vehicleFrom.id + " to v" + vehicleTo.id+ " at cost: "+costOfMove);
 		}
 		else {
-			System.out.println("Move cX from v" +vehicleFrom.id + " to v" + vehicleTo.id+ " at cost:"+costOfMove);	
+			System.out.println("Move cX from v" +vehicleFrom.id + " to v" + vehicleTo.id+ " at cost: "+costOfMove);	
 		}
 	}
 }

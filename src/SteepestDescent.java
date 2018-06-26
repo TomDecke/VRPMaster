@@ -242,11 +242,13 @@ public class SteepestDescent {
 			//check if there are still customers in between the dummies
 			if(!v.firstCustomer.succ.equals(v.lastCustomer)) {
 				v.show();
+				System.out.println("Distance Vehicle: " + v.cost);
 				vehicleCount++;
 			}
 		}
 		System.out.println("NV: "+ vehicleCount);
 		System.out.println("Distance: " + vrp.calcTotalCost());
+		System.out.println(" ");
 	}
 	
 	/**
@@ -294,6 +296,7 @@ public class SteepestDescent {
 	 */
 	public static void main(String[] args) throws IOException{
 		SteepestDescent stDesc = new SteepestDescent(args[0],Integer.parseInt(args[1]));
+		VRP vrp = new VRP(args[0],Integer.parseInt(args[1]));
 		stDesc.createBMM();
 		stDesc.printBMM();
 		System.out.println("");
@@ -306,10 +309,13 @@ public class SteepestDescent {
 			v.show();
 			System.out.println("Cost for vehicle "+v.id+": "+v.cost);	
 		}
-		System.out.println("Results");
+		
+		System.out.println(" ");
+		System.out.println("Results:");
 		stDesc.printResults();
 		
-		TestSolution ts = new TestSolution(stDesc.getVRP(), stDesc.getTotalCost(), stDesc.getVehicles());
+		TestSolution ts = new TestSolution(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+		System.out.println("Test:");
 		System.out.println(ts.runTest());
 	}
 }
