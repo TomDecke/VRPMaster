@@ -18,9 +18,9 @@ public class Vehicle {
 	 * Constructor to create a vehicle for the VRP
 	 * @param vrp VRP, instance of the vehicle routing problem it belongs to
 	 * @param id int, identifier for the vehicle
-	 * @param capacity, int maximum capacity of the vehicle
-	 * @param costOfUse, int cost that comes from using the vehicle
-	 * @param depot, Customer that functions as the depot
+	 * @param capacity int, maximum capacity of the vehicle
+	 * @param costOfUse int, cost that comes from using the vehicle
+	 * @param depot Customer, customer that functions as the depot
 	 */
 	public Vehicle (VRP vrp,int id, int capacity,int costOfUse, Customer depot){
 		this.vrp = vrp;
@@ -100,7 +100,7 @@ public class Vehicle {
 		Customer cSucc = cCurrent.succ;
 		Customer cTmp = null;
 
-		//TODO personally introduced limitation as starting value - needs to be configured
+		//TODO personally introduced limitation as starting value
 		double minCost = cost/costOfUse*2 + 1000;
 		Customer cInsertAfter = null;
 
@@ -128,6 +128,7 @@ public class Vehicle {
 	//
 	boolean remove(Customer c){
 		Customer currentCustomer = firstCustomer;
+		
 		//search for customer c
 		while(currentCustomer.succ != null) {
 			if(c.equals(currentCustomer)) {
@@ -140,7 +141,7 @@ public class Vehicle {
 				//remove the load
 				this.load -= c.demand;
 				
-				//update distance, by removing edges to former customer and adding new edge between now-neighbors
+				//update distance, by removing edges to former customer and adding new edge between now-neighbours
 				distance += vrp.distance(cPred, cSucc) - vrp.distance(cPred, currentCustomer) - vrp.distance(currentCustomer, cSucc);
 				
 				//recalculate the cost

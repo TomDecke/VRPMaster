@@ -80,9 +80,9 @@ public class Customer {
 		System.out.println();
 		System.out.println("Customer main:");
 		
-		Customer depot = vrp.customer[0];
-		Customer x = vrp.customer[1];
-		Customer y = vrp.customer[2];
+//		Customer depot = vrp.customer[0];
+//		Customer x = vrp.customer[1];
+//		Customer y = vrp.customer[2];
 		Customer z = vrp.customer[3];
 //		System.out.println(depot);
 //		System.out.println(x);
