@@ -15,7 +15,6 @@ public class VRP {
 	int n, m; // number of customers and number of vehicles
 	int capacity;
 	Customer depot;
-	int latest = 0;
 
 	public VRP(String fname,int numberOfCustomers) throws IOException {
 		n = numberOfCustomers;
@@ -46,11 +45,7 @@ public class VRP {
 			customer[i] = new Customer(custNo,x,y,d,rt,dd,st);
 			customer[i].vrp = this;
 			System.out.println("cust: "+ customer[i]);
-			
-			//determine the latest finish
-			if(dd+st>latest) {
-				latest=dd+st;
-			}
+
 		}
 		sc.close();
 

@@ -62,6 +62,8 @@ public class SteepestDescent {
 
 			//find the best place to insert the customer in the other tour
 			Customer insertAfter = v1.findBestPosition(current);
+			
+			//if insertAfter is not null current has a position into which it can be inserted
 			if(insertAfter != null) {
 				//determine how the total distance of v0 would change
 				double newDistV0 = v0.getDistance() + vrp.distance(current.pred, current.succ) 
@@ -69,8 +71,9 @@ public class SteepestDescent {
 				- vrp.distance(current, current.succ);
 
 				//determine how the total distance of v1 would change
-				double newDistV1 = v1.getDistance() + vrp.distance(insertAfter, current)
-				+ vrp.distance(current, insertAfter.succ) - vrp.distance(insertAfter, insertAfter.succ);
+				double newDistV1 = v1.getDistance() - vrp.distance(insertAfter, insertAfter.succ)
+				+ vrp.distance(insertAfter, current)
+				+ vrp.distance(current, insertAfter.succ);
 
 				//the change in cost, if this move was to be made
 				double resultingCost = newDistV0 * v0.costOfUse + newDistV1 * v1.costOfUse;
@@ -124,19 +127,19 @@ public class SteepestDescent {
 	 * Runs steepest descent, to find a solution for the vrp-instance
 	 */
 	public void solve() {
+		
 		//create best-move-matrix
 		createBMM();
 		
 		//find the first best move
 		RelocateOption relocate = findBestMove();
 		
-		//TODO remove
 		int iterationCounter = 0;
 		
 		//As long as there are improving moves execute them
 		while(relocate.getCostOfMove() < PENALTY) {
 	
-			//TODO remove
+			//Visualize the relocation on the console
 			iterationCounter++;
 			System.out.println(iterationCounter);
 			printBMM();
@@ -149,6 +152,7 @@ public class SteepestDescent {
 			//relocate the customer
 			executeRelocation(relocate);
 			
+			//Visualize the relocation on the console
 			System.out.print("vFrom - after move: ");
 			relocate.getVehicleFrom().show();
 			System.out.print("vTo - after move: ");
@@ -192,8 +196,6 @@ public class SteepestDescent {
 				bestMoveMatrix[i][vFrom.index] = findBestCustomer(vCheck,vFrom);
 			}
 
-			
-
 			//recalculate the giving and receiving of the second vehicle
 			if(vTo.index!=i) {
 				bestMoveMatrix[i][vTo.index] = findBestCustomer(vCheck, vTo);
@@ -203,9 +205,11 @@ public class SteepestDescent {
 	}
 	
 	/**
-	 * Construct the current best move matrix, showing which customer to move from which vehicle to another
+	 * Construct the current best move matrix, showing which customer to move from which vehicle to an other
 	 */
 	public void printBMM() {
+		
+		//create the top line of the matrix with vehicle-id's
 		String format = "\\ |";
 		System.out.print(String.format("%4s",format));
 		for(int i = 0 ; i < numCustomers; i++) {
@@ -213,6 +217,8 @@ public class SteepestDescent {
 			System.out.print(String.format("%4s", format));
 		}
 		System.out.println("");
+		
+		//print the move options line by line
 		for(int j = 0 ; j< numCustomers ; j++) {
 			format = "v"+vrp.vehicle[j].id+"|";
 			System.out.print(String.format("%4s", format));
@@ -253,7 +259,7 @@ public class SteepestDescent {
 	
 	/**
 	 * After executing @see solve(), this method can be used to obtain the vehicles, which are present in the solution 
-	 * @return ArrayList<Vehicle>, list of vehicles with nodes
+	 * @return ArrayList<Vehicle>, list of vehicles with customers
 	 */
 	public ArrayList<Vehicle> getVehicles(){
 		ArrayList<Vehicle> vehicles = new ArrayList<Vehicle>();
@@ -269,23 +275,19 @@ public class SteepestDescent {
 	
 	/**
 	 * After executing @see solve(), this method can be used to obtain the cost of the solution
-	 * @return double, the 
+	 * @return double, the total cost of the solution
 	 */
 	public double getTotalCost() {
 		return vrp.calcTotalCost();
 	}
 
 
+	/**
+	 * Accessor for the VRP
+	 * @return VRP, the VRP-instance of the class
+	 */
 	public VRP getVRP() {
 		return this.vrp;
-	}
-	
-	public RelocateOption getBestMoveAtPos(int i,int j) {
-		return bestMoveMatrix[i][j];
-	}
-	
-	public int getNumCustomers() {
-		return this.numCustomers;
 	}
 
 
@@ -316,6 +318,13 @@ public class SteepestDescent {
 		
 		TestSolution ts = new TestSolution(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		System.out.println("Test:");
-		System.out.println(ts.runTest());
+		if(ts.runTest()) {
+			System.out.println(" ");
+			System.out.println("valid solution");
+		}
+		else {
+			System.out.println(" ");
+			System.out.println("invalid solution");		
+		}
 	}
 }

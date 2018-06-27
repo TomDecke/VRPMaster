@@ -33,7 +33,7 @@ public class Vehicle {
 
 		//set up dummy customers who come at the beginning and at the end of a tour 
 		firstCustomer = new Customer(depot.custNo,depot.xCoord,depot.yCoord,0,0,0,0);
-		lastCustomer = new Customer(depot.custNo,depot.xCoord,depot.yCoord,0,0,vrp.latest,0);
+		lastCustomer = new Customer(depot.custNo,depot.xCoord,depot.yCoord,0,0,depot.dueDate,0);
 		firstCustomer.succ = lastCustomer;
 		lastCustomer.pred = firstCustomer;
 	}
@@ -87,7 +87,7 @@ public class Vehicle {
 	/**
 	 * Find the best position for a customer in the vehicle
 	 * @param c Customer, the customer that is to be inserted into the vehicle
-	 * @return Customer, the customer after which the new customer should be inserted 
+	 * @return Customer, the customer after which the new customer should be inserted or null if it can't be inserted
 	 */
 	public Customer findBestPosition(Customer c) {
 		

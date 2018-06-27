@@ -97,7 +97,6 @@ public class TestSolution {
 				cCur = cSucc;
 				cSucc = cCur.succ;
 			}
-			System.out.println("");
 
 			//make sure the vehicle does not carry more goods than it has capacity
 			if(carriedLoad > v.capacity) {
@@ -105,8 +104,11 @@ public class TestSolution {
 				return false;
 			}
 
+			
 			//sum up the total cost of the solution for later comparison
 			totalDist += vehicleDist * v.costOfUse;
+			System.out.println("Total distance so far: " + totalDist);
+			System.out.println("");
 		}
 
 		//check if all customers have been visited
