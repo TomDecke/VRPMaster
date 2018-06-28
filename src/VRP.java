@@ -44,7 +44,7 @@ public class VRP {
 			//create customer for read data and add it to the array
 			customer[i] = new Customer(custNo,x,y,d,rt,dd,st);
 			customer[i].vrp = this;
-			System.out.println("cust: "+ customer[i]);
+			//System.out.println("cust: "+ customer[i]);
 
 		}
 		sc.close();

@@ -1,6 +1,5 @@
 import java.util.*;
 import java.io.*;
-
 /**
  * Verify a tour for a given tsp. Takes two command line arguments:
  * a tsp file and a tour file where a tour file is permutation of integers 0 to n-1
