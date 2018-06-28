@@ -24,7 +24,7 @@ public class SteepestDescent {
 	public SteepestDescent(String textfile, int customers) throws IOException {
 		this.vrp = new VRP(textfile,customers);
 		this.out = textfile.substring(0, textfile.length()-4);
-		this.out += "_Solutiont.txt";
+		this.out += "_Solution.txt";
 		this.bestMoveMatrix = new RelocateOption[customers][customers];
 		this.numCustomers = customers;
 	}
@@ -265,7 +265,7 @@ public class SteepestDescent {
 	}
 	
 	/**
-	 * Write the results to a textfile
+	 * Write the results to a text-file
 	 */
 	public void printResultsToFile() {
 		//create a writer

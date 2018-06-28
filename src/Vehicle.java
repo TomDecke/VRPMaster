@@ -163,6 +163,11 @@ public class Vehicle {
 				//remove the load
 				this.load -= c.demand;
 				
+				//remove pointers of the customer
+				c.vehicle = null;
+				c.pred = null;
+				c.succ = null;
+				
 				//update distance, by removing edges to former customer and adding new edge between now-neighbours
 				distance += vrp.distance(cPred, cSucc) - vrp.distance(cPred, currentCustomer) - vrp.distance(currentCustomer, cSucc);
 				
