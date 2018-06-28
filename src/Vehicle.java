@@ -33,7 +33,9 @@ public class Vehicle {
 
 		//set up dummy customers who come at the beginning and at the end of a tour 
 		firstCustomer = new Customer(depot.custNo,depot.xCoord,depot.yCoord,0,0,0,0);
+		firstCustomer.vehicle = this;
 		lastCustomer = new Customer(depot.custNo,depot.xCoord,depot.yCoord,0,0,depot.dueDate,0);
+		lastCustomer.vehicle = this;
 		firstCustomer.succ = lastCustomer;
 		lastCustomer.pred = firstCustomer;
 	}
@@ -55,6 +57,8 @@ public class Vehicle {
 		//If there is a valid position for the customer, insert him
 		if(cInsertAfter != null) {
 
+			//tell the customer he now belongs to this vehicle
+			c.vehicle = this;
 			
 			//insert the customer into the vehicle
 			Customer cInsertSucc = cInsertAfter.succ;

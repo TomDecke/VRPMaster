@@ -7,6 +7,7 @@ import java.util.ArrayList;
  */
 //TODO would it make sense to make this static?
 public class TestSolution {
+	private final double DERIVATION = 1E-10;
 
 	private VRP vrp;
 	private double solDist;
@@ -56,6 +57,14 @@ public class TestSolution {
 
 			//Check the route of the vehicle
 			while(!cCur.equals(v.lastCustomer)) {
+				
+				//check if the customer actually is in the vehicle
+				if(!v.equals(cCur.vehicle)) {
+					System.out.println(cCur);
+					System.out.println(v);
+					System.out.println("Customer in wrong vehicle");
+					return false;
+				}
 
 				//compute and print the distance between the current customers
 				double distTraveled = vrp.distance(cCur, cSucc);
@@ -122,7 +131,7 @@ public class TestSolution {
 		}
 
 		//check for derivation between solution and control
-		if(totalDist != solDist) {
+		if(Math.abs(totalDist - solDist) > DERIVATION) {
 			System.out.println("The distance of the solutions differ by: "+Math.abs(totalDist - solDist));
 			return false;
 		}

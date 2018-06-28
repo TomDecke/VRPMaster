@@ -1,3 +1,4 @@
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -9,6 +10,7 @@ import java.util.ArrayList;
  */
 public class SteepestDescent {
 	private final int PENALTY = 10000;
+	private String out;
 	private VRP vrp;
 	private int numCustomers;
 	private RelocateOption[][] bestMoveMatrix;
@@ -21,6 +23,8 @@ public class SteepestDescent {
 	 */
 	public SteepestDescent(String textfile, int customers) throws IOException {
 		this.vrp = new VRP(textfile,customers);
+		this.out = textfile.substring(0, textfile.length()-4);
+		this.out += "_Solutiont.txt";
 		this.bestMoveMatrix = new RelocateOption[customers][customers];
 		this.numCustomers = customers;
 	}
@@ -163,6 +167,9 @@ public class SteepestDescent {
 			updateBMM(relocate.getVehicleFrom(), relocate.getVehicleTo());
 			relocate = findBestMove();
 		}
+		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+		printResultsToConsole();
+		printResultsToFile();
 		
 	}
 	
@@ -241,7 +248,7 @@ public class SteepestDescent {
 	/**
 	 * After executing @see solve(), this method can be used to show the number of needed vehicles and the total cost
 	 */
-	public void printResults() {
+	public void printResultsToConsole() {
 		int vehicleCount = 0;
 		for(int i = 0 ; i<numCustomers; i++) {
 			Vehicle v = vrp.vehicle[i];
@@ -255,6 +262,35 @@ public class SteepestDescent {
 		System.out.println("NV: "+ vehicleCount);
 		System.out.println("Distance: " + vrp.calcTotalCost());
 		System.out.println(" ");
+	}
+	
+	/**
+	 * Write the results to a textfile
+	 */
+	public void printResultsToFile() {
+		//create a writer
+		FileWriter writer;
+		try {
+			writer 	= new FileWriter(out);
+			//write the cost of the solution
+			writer.write(""+getTotalCost()+"\n");
+			
+			//write the customers of each vehicle as a route
+			for(Vehicle v : getVehicles()) {
+				StringBuilder sBuild = new StringBuilder();
+				Customer customer = v.firstCustomer;
+				while (customer != null){
+					sBuild.append(customer.custNo + " ");
+					customer = customer.succ;
+				}
+				sBuild.append(String.format("%n"));
+				//write the tour of the vehicle
+				writer.write(sBuild.toString());
+			}
+			writer.close();
+		}catch(IOException ioe) {
+			System.out.println("Error whilst writing");
+		}
 	}
 	
 	/**
@@ -314,7 +350,9 @@ public class SteepestDescent {
 		
 		System.out.println(" ");
 		System.out.println("Results:");
-		stDesc.printResults();
+		stDesc.printResultsToConsole();
+		
+		//stDesc.printResultsToFile();
 		
 		TestSolution ts = new TestSolution(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		System.out.println("Test:");
