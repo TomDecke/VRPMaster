@@ -8,14 +8,11 @@ import java.util.ArrayList;
 //TODO would it make sense to make this static?
 public class TestSolution {
 
-	//Allowed derivation between solution and recomputation
-	private final int DERIVATION = 1;
-
 	private VRP vrp;
 	private double solDist;
 	private ArrayList<Vehicle> solVehicles;
-	//TODO should I hav this for every vehicle, to test if the distribution agrees with the vehicle?
-	private boolean[] cVisited;
+	//TODO should I have this for every vehicle, to test if the distribution agrees with the vehicle?
+	private int[] cVisited;
 
 	/**
 	 * Constructor to create a test instance
@@ -27,7 +24,7 @@ public class TestSolution {
 		this.vrp = vrp;
 		this.solDist = solDist;
 		this.solVehicles = vehicles;
-		cVisited = new boolean[vrp.customer.length];
+		cVisited = new int[vrp.customer.length];
 	}
 
 	/**
@@ -63,7 +60,7 @@ public class TestSolution {
 				//compute and print the distance between the current customers
 				double distTraveled = vrp.distance(cCur, cSucc);
 				System.out.println("Distance from " + cCur.custNo + " to "+ cSucc.custNo +": "+ distTraveled);
-				
+
 				//add the distance to the overall distance and show the intermediate distance
 				vehicleDist += distTraveled;
 				System.out.println(vehicleDist);
@@ -88,7 +85,7 @@ public class TestSolution {
 				leave = start + cCur.serviceTime;
 
 				//mark the customer as visited
-				cVisited[cCur.custNo] = true;
+				cVisited[cCur.custNo] += 1;
 
 				//increase the load of the vehicle
 				carriedLoad += cCur.demand;
@@ -104,7 +101,7 @@ public class TestSolution {
 				return false;
 			}
 
-			
+
 			//sum up the total cost of the solution for later comparison
 			totalDist += vehicleDist * v.costOfUse;
 			System.out.println("Total distance so far: " + totalDist);
@@ -112,17 +109,20 @@ public class TestSolution {
 		}
 
 		//check if all customers have been visited
-		for(boolean b : cVisited) {
-			if(!b) {
+		for (int i = 0; i < cVisited.length ; i++) {
+			int visits = cVisited[i];
+			
+			if(visits == 0) {
 				System.out.println("Did not visit all customers");
+				return false;
+			}else if(visits > 1 && i!=0) {
+				System.out.println("Re-visited a customer");
 				return false;
 			}
 		}
 
-		//TODO re-think
 		//check for derivation between solution and control
-		//allow minor derivation which might come from computational inaccuracy
-		if(Math.abs(totalDist - solDist) > DERIVATION) {
+		if(totalDist != solDist) {
 			System.out.println("The distance of the solutions differ by: "+Math.abs(totalDist - solDist));
 			return false;
 		}

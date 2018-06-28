@@ -40,27 +40,41 @@ public class Customer {
 		return es <= ls;
 	}
 
-	//TODO Think this through. Does it make sense this way?!
 	/**
 	 * Propagate earliest and latest start for the insertion of a customer
 	 * @param y Customer, potential predecessor
 	 * @param z Customer, potential successor
+	 * @throws TimeConstraintViolationException 
 	 */
-	void insertBetween(Customer y,Customer z){
+	void insertBetween(Customer y,Customer z) throws TimeConstraintViolationException{
 		earliestStart = Math.max(this.readyTime,y.earliestStart + y.serviceTime + vrp.distance(y,this));
 		latestStart = Math.min(this.dueDate,z.latestStart - (this.serviceTime + vrp.distance(this,z)));
+		propagateLatestStart();
+		propagateEarliestStart();
+	}
+	
+	public void propagateLatestStart() throws TimeConstraintViolationException{
 		Customer current = this;
 		// propagate latestStart left
 		while (current.pred != null){
 			Customer cPred = current.pred;
 			cPred.latestStart = Math.min(cPred.dueDate,current.latestStart - (cPred.serviceTime + vrp.distance(cPred,current)));
+			if(cPred.earliestStart > cPred.latestStart) {
+				throw new TimeConstraintViolationException("Updated latest start comes before current earliest start");
+			}
 			current = cPred;
 		}
-		current = this;
+	}
+	
+	public void propagateEarliestStart() throws TimeConstraintViolationException {
+		Customer current = this;
 		// propagate earliestStart right
 		while (current.succ != null){
 			Customer cSucc = current.succ;
 			cSucc.earliestStart = Math.max(cSucc.readyTime,current.earliestStart + current.serviceTime + vrp.distance(current,cSucc));
+			if(cSucc.earliestStart > cSucc.latestStart) {
+				throw new TimeConstraintViolationException("Updated earliest start comes before current latest start");
+			}
 			current = cSucc;
 		}
 	}

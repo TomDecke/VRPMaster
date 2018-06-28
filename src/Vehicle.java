@@ -64,7 +64,11 @@ public class Vehicle {
 			cInsertAfter.succ = c;
 			
 			//propagate the earliest and latest start
-			c.insertBetween(cInsertAfter, cInsertSucc);
+			try {
+				c.insertBetween(cInsertAfter, cInsertSucc);
+			} catch (TimeConstraintViolationException e) {
+				System.out.println(e.getMessage());
+			}
 			
 			//increase the load of the vehicle by the customers demand
 			this.load += c.demand;
@@ -134,9 +138,23 @@ public class Vehicle {
 			if(c.equals(currentCustomer)) {
 				Customer cPred =  currentCustomer.pred;
 				Customer cSucc = currentCustomer.succ;
+				
 				//if found change the successor of the predecessor and the predecessor of the successor
-				currentCustomer.pred.succ = cSucc;
-				currentCustomer.succ.pred = cPred;
+				cPred.succ = cSucc;
+				cSucc.pred = cPred;
+				
+				//re-propagate earliest and latest start
+				try {
+					//propagate earliest start 
+					cSucc.propagateEarliestStart();
+				
+					//propagate latest start 
+					cPred.propagateLatestStart();
+					
+				} catch (TimeConstraintViolationException e) {
+					System.out.println(e.getMessage());
+				}
+
 				
 				//remove the load
 				this.load -= c.demand;
