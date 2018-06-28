@@ -33,12 +33,7 @@ public class SteepestDescent {
 		//go through the matrix and determine the best move for each combination 
 		for(int i = 0; i < numCustomers; i++) {
 			for(int j = 0; j < numCustomers; j++) {
-				if(i==j) {
-					bestMoveMatrix[i][j] = new RelocateOption(null, PENALTY, null, null);
-				}else {
-					bestMoveMatrix[i][j] = findBestCustomer(vrp.vehicle[i], vrp.vehicle[j]);
-				}
-				
+				bestMoveMatrix[i][j] = findBestCustomer(vrp.vehicle[i], vrp.vehicle[j]);				
 			}
 		}
 	}
@@ -49,38 +44,38 @@ public class SteepestDescent {
 	 * @param vTo Vehicle, vehicle to which a customer is to be moved
 	 * @return RelocationOption, the best option for moving a customer from vFrom to vTo
 	 */
-	public RelocateOption findBestCustomer(Vehicle v0, Vehicle v1) {
-
-//		System.out.println("v"+v0.id +" + v"+v1.id + " = "+v0.cost + v1.cost);
+	public RelocateOption findBestCustomer(Vehicle vFrom, Vehicle vTo) {
+		
 		//create an empty move with the current cost of the vehicles
 		//thus prevent the moving of one customer to another vehicle if there would be no benefit
-		RelocateOption bestToMove = new RelocateOption(null, v0.cost + v1.cost, v0, v1);
+		RelocateOption bestToMove = new RelocateOption(null, vFrom.cost + vTo.cost, vFrom, vTo);
+		double originalCost = vFrom.cost + vTo.cost;
 		
 		//start checking from the first customer, who is not the depot-connection
-		Customer current = v0.firstCustomer.succ;
-		while(!current.equals(v0.lastCustomer)) {
+		Customer current = vFrom.firstCustomer.succ;
+		while(!current.equals(vFrom.lastCustomer)) {
 
 			//find the best place to insert the customer in the other tour
-			Customer insertAfter = v1.findBestPosition(current);
+			Customer insertAfter = vTo.findBestPosition(current);
 			
 			//if insertAfter is not null current has a position into which it can be inserted
 			if(insertAfter != null) {
-				//determine how the total distance of v0 would change
-				double newDistV0 = v0.getDistance() + vrp.distance(current.pred, current.succ) 
+				//determine how the total distance of vFrom would change
+				double newDistVFrom = vFrom.getDistance() + vrp.distance(current.pred, current.succ) 
 				- vrp.distance(current.pred, current)
 				- vrp.distance(current, current.succ);
 
-				//determine how the total distance of v1 would change
-				double newDistV1 = v1.getDistance() - vrp.distance(insertAfter, insertAfter.succ)
+				//determine how the total distance of vTo would change
+				double newDistVTo = vTo.getDistance() - vrp.distance(insertAfter, insertAfter.succ)
 				+ vrp.distance(insertAfter, current)
 				+ vrp.distance(current, insertAfter.succ);
 
 				//the change in cost, if this move was to be made
-				double resultingCost = newDistV0 * v0.costOfUse + newDistV1 * v1.costOfUse;
+				double resultingCost = newDistVFrom * vFrom.costOfUse + newDistVTo * vTo.costOfUse;
 
 				//if this move is cheaper, take it up
 				if(resultingCost < bestToMove.getCostOfMove()) {
-					bestToMove = new RelocateOption(current,resultingCost,v0,v1);
+					bestToMove = new RelocateOption(current,resultingCost,vFrom,vTo);
 
 				}
 			}
@@ -191,16 +186,12 @@ public class SteepestDescent {
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle vCheck = vrp.vehicle[i];
 			//recalculate the giving and receiving of the first vehicle
-			if(vFrom.index!=i) {
-				bestMoveMatrix[vFrom.index][i] = findBestCustomer(vFrom, vCheck);
-				bestMoveMatrix[i][vFrom.index] = findBestCustomer(vCheck,vFrom);
-			}
+			bestMoveMatrix[vFrom.index][i] = findBestCustomer(vFrom, vCheck);
+			bestMoveMatrix[i][vFrom.index] = findBestCustomer(vCheck,vFrom);
 
 			//recalculate the giving and receiving of the second vehicle
-			if(vTo.index!=i) {
-				bestMoveMatrix[i][vTo.index] = findBestCustomer(vCheck, vTo);
-				bestMoveMatrix[vTo.index][i] = findBestCustomer(vFrom, vCheck);
-			}
+			bestMoveMatrix[i][vTo.index] = findBestCustomer(vCheck, vTo);
+			bestMoveMatrix[vTo.index][i] = findBestCustomer(vFrom, vCheck);
 		}
 	}
 	
