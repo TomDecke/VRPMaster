@@ -1,6 +1,11 @@
 import java.util.*;
 import java.io.*;
 
+/**
+ * 
+ * @author Patrick Prosser
+ *
+ */
 public class VRP {
 
 	String name;
@@ -10,7 +15,6 @@ public class VRP {
 	int n, m; // number of customers and number of vehicles
 	int capacity;
 	Customer depot;
-	int latest = 0;
 
 	public VRP(String fname,int numberOfCustomers) throws IOException {
 		n = numberOfCustomers;
@@ -29,7 +33,6 @@ public class VRP {
 		while (sc.hasNext() && !s.equals("TIME")) s = sc.next();
 		s = "continue";
 		while (sc.hasNext() && !s.equals("TIME"))s = sc.next(); 
-		//TODO why is this <=?
 		for (int i=0;i<=n;i++){
 			int custNo = sc.nextInt();
 			int x = sc.nextInt();
@@ -42,11 +45,7 @@ public class VRP {
 			customer[i] = new Customer(custNo,x,y,d,rt,dd,st);
 			customer[i].vrp = this;
 			System.out.println("cust: "+ customer[i]);
-			
-			//determine the latest finish
-			if(dd+st>latest) {
-				latest=dd+st;
-			}
+
 		}
 		sc.close();
 
@@ -67,7 +66,7 @@ public class VRP {
 			//Every new vehicle that is created after the number of vehicles given by the benchmark is reached
 			//becomes virtual by the assignment of a high cost of use
 			if(i>m-1) {
-				vehicle[i].costOfUse = 1000;
+				vehicle[i].costOfUse = 100;
 			}
 			//add customer to vehicle and omit the depot
 			vehicle[i].minCostInsertion(customer[i+1]);
@@ -97,7 +96,7 @@ public class VRP {
 		double totalCost = 0;
 		//sum up the travel costs for each vehicle
 		for(Vehicle v : vehicle) {
-			totalCost+=v.calculateCost();
+			totalCost+=v.cost;
 		}
 		return totalCost;
 	}
