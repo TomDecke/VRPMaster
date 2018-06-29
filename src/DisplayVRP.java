@@ -9,6 +9,7 @@ import java.util.*;
  */
 public class DisplayVRP {
 	
+	private String vrpInstance;
 	private int xMax, xMin, yMax, yMin;
 	private VRP vrp;
 	private double costSol;
@@ -17,6 +18,7 @@ public class DisplayVRP {
 	public DisplayVRP(String vrpInstance, int numCost, String sol) {
 		
 		try {
+			this.vrpInstance = vrpInstance;
 			this.vrp = new VRP(vrpInstance,numCost);
 			vehicles = new ArrayList<int[]>();
 			
@@ -63,6 +65,8 @@ public class DisplayVRP {
 					yMin = currentY;
 				}
 			}
+			//Add buffer in the lower dimension to accommodate text
+			yMin -= 5;
 			
 			
 
@@ -82,13 +86,16 @@ public class DisplayVRP {
 		return this.costSol;
 	}
 	
+	/**
+	 * Plots the cities of a VRP-instance
+	 */
 	public void plotVRPInstance() {
 		//set up a new plot
 		StdDraw.clear(StdDraw.WHITE);
 		StdDraw.setXscale(xMin, xMax);
 	    StdDraw.setYscale(yMin, yMax);
 	    
-	    //determine customer size and print them to the map
+	    //set customer size and print them to the map
 	    StdDraw.setPenRadius(0.005);
 	    for(Customer c : vrp.customer){
 	    	StdDraw.point(c.xCoord, c.yCoord);
@@ -97,13 +104,17 @@ public class DisplayVRP {
 	    StdDraw.show(0);
 	}
 	
+	/**
+	 * Draw the 
+	 */
 	public void plotVRPSolution() {
 		//set up a new plot
 		StdDraw.clear(StdDraw.WHITE);
 		StdDraw.setXscale(xMin, xMax);
 	    StdDraw.setYscale(yMin, yMax);
 	    
-	    StdDraw.textLeft(xMin,yMin,String.format("Distance %.3f", costSol));
+	    StdDraw.textLeft(xMin,yMin,vrpInstance);
+	    StdDraw.textRight(xMax,yMin,String.format("Distance: %.3f", costSol));
 	    
 	    //determine customer size and print them to the map
 	    StdDraw.setPenRadius(0.005);
@@ -111,13 +122,17 @@ public class DisplayVRP {
 	    	StdDraw.point(c.xCoord, c.yCoord);
 	    }
 	    StdDraw.setPenRadius(0.0005);
+	    int colourCount = 0;
 	    for(int[] vehicle : vehicles) {
-		    StdDraw.setPenColor(new Color((int)(Math.random() * 0x1000000)));
+	    	//choose a random color for the vehicle route StdDraw.setPenColor(new Color((int)(Math.random() * 0x1000000)));
+		    
+		    StdDraw.setPenColor(MyColours.getColour((colourCount)));
 	    	for(int i = 0; i< vehicle.length-1; i++) {
 	    		Customer cCur = vrp.customer[vehicle[i]];
 	    		Customer cSucc = vrp.customer[vehicle[i+1]];
 	    		StdDraw.line(cCur.xCoord, cCur.yCoord, cSucc.xCoord, cSucc.yCoord);
 	    	}
+	    	colourCount++;
 	    }
 	    
 	    
