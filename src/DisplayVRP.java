@@ -124,7 +124,7 @@ public class DisplayVRP {
 		StdDraw.setXscale(xMin, xMax);
 	    StdDraw.setYscale(yMin, yMax);
 	    
-	    StdDraw.textLeft(xMin,yMin,vrpInstance);
+	    StdDraw.textLeft(xMin,yMin,vrpInstance.substring(vrpInstance.length()-20, vrpInstance.length()));
 	    StdDraw.textRight(xMax,yMin,String.format("Distance: %.3f", costSol));
 	    
 	    //determine customer size and print them to the map
