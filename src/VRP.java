@@ -2,7 +2,7 @@ import java.util.*;
 import java.io.*;
 
 /**
- * 
+ * Class to model a VRP-instance
  * @author Patrick Prosser
  *
  */
@@ -101,9 +101,12 @@ public class VRP {
 		return totalCost;
 	}
 
+	/**
+	 * Main method for testing
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args)  throws IOException {
 
-		VRP vrp = new VRP(args[0],Integer.parseInt(args[1]));
-		 System.out.print(vrp.customer[8] +" // this is a customer printed ");
 	}
 }

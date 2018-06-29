@@ -5,14 +5,12 @@ import java.util.ArrayList;
  * @author Tom Decke
  *
  */
-//TODO would it make sense to make this static?
 public class TestSolution {
-	private final double DERIVATION = 1E-10;
+	private static final double DERIVATION = 1E-10;
 
 	private VRP vrp;
 	private double solDist;
 	private ArrayList<Vehicle> solVehicles;
-	//TODO should I have this for every vehicle, to test if the distribution agrees with the vehicle?
 	private int[] cVisited;
 
 	/**
@@ -33,6 +31,7 @@ public class TestSolution {
 	 * @return boolean, whether or not the solution is valid
 	 */
 	public boolean runTest() {
+		
 
 		//distance of all vehicles
 		double totalDist = 0; 

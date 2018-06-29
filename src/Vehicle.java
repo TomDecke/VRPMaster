@@ -1,7 +1,9 @@
 import java.util.*;
 
+import addOns.TimeConstraintViolationException;
+
 /**
- * 
+ * Class modelling a vehicle for a VRP-instance
  * @author Patrick Prosser
  *
  */
@@ -40,15 +42,13 @@ public class Vehicle {
 		lastCustomer.pred = firstCustomer;
 	}
 
-	//
-	// Insert customer c into vehicle's tour
-	// in least cost position. Deliver true
-	// if the insertion was possible, i.e.
-	// capacity & time windows respected
 	/**
-	 * Make sure to remove the customer from the vehicle from which he is coming
-	 * @param c
-	 * @return
+	 * Insert customer c into vehicle's tour
+	 * in least cost position. Deliver true
+	 * if the insertion was possible, i.e.
+	 * capacity & time windows respected
+	 * @param c Customer, the customer which is to be inserted 
+	 * @return boolean, whether or not the insertion was successful
 	 */
 	boolean minCostInsertion(Customer c){		
 
@@ -130,10 +130,11 @@ public class Vehicle {
 		return cInsertAfter;
 	}
 
-	//
-	// Remove customer c from vehicle's tour
-	// deliver true if done, false otherwise
-	//
+	/**
+	 * Remove a customer from the vehicle's tour
+	 * @param c Customer, the customer which should be removed
+	 * @return boolean, true if successful, false otherwise
+	 */
 	boolean remove(Customer c){
 		Customer currentCustomer = firstCustomer;
 		
@@ -185,6 +186,7 @@ public class Vehicle {
 	
 
 	/**
+	 * Get the load of the vehicle as String
 	 * @return String, the value of the vehicle's load
 	 */
 	public String toString(){
@@ -206,10 +208,18 @@ public class Vehicle {
 		System.out.println();
 	}
 	
+	/**
+	 * Accessor for the distance travelled by this vehicle 
+	 * @return double, the distance
+	 */
 	public double getDistance() {
 		return this.distance;
 	}
 
+	/**
+	 * Mutator for the distance
+	 * @param distance double, the new distance
+	 */
 	public void setDistance(double distance) {
 		this.distance=distance;
 	}

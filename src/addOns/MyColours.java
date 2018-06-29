@@ -1,3 +1,4 @@
+package addOns;
 import java.awt.Color;
 
 public class MyColours {		

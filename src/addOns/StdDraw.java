@@ -1,24 +1,5 @@
-/*************************************************************************
- *  Compilation:  javac StdDraw.java
- *  Execution:    java StdDraw
- *
- *  Standard drawing library. This class provides a basic capability for
- *  creating drawings with your programs. It uses a simple graphics model that
- *  allows you to create drawings consisting of points, lines, and curves
- *  in a window on your computer and to save the drawings to a file.
- *
- *  Todo
- *  ----
- *    -  Add support for gradient fill, etc.
- *
- *  Remarks
- *  -------
- *    -  don't use AffineTransform for rescaling since it inverts
- *       images and strings
- *    -  careful using setFont in inner loop within an animation -
- *       it can cause flicker
- *
- *************************************************************************/
+package addOns;
+
 
 import java.io.*;
 import java.net.*;

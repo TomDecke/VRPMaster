@@ -2,6 +2,9 @@ import java.awt.Color;
 import java.io.*;
 import java.util.*;
 
+import addOns.MyColours;
+import addOns.StdDraw;
+
 /**
  * Class to visualize the solution of a VRP-instance
  * @author Tom Decke
@@ -79,9 +82,6 @@ public class DisplayVRP {
 			//Add buffer in the lower dimension to accommodate text
 			yMin -= 5;
 			
-			
-
-
 			reader.close();
 			sc.close();
 			
@@ -93,8 +93,20 @@ public class DisplayVRP {
 
 	}
 	
+	/**
+	 * Accessor for the cost of the solution
+	 * @return double, the cost
+	 */
 	public double getCostSol() {
 		return this.costSol;
+	}
+	
+	/**
+	 * Accessor for the vehicles
+	 * @return ArrayList<int[]>
+	 */
+	public ArrayList<int[]> getVehicles(){
+		return vehicles;
 	}
 	
 	/**
@@ -116,7 +128,7 @@ public class DisplayVRP {
 	}
 	
 	/**
-	 * Draw the 
+	 * Draw the solution
 	 */
 	public void plotVRPSolution() {
 		//set up a new plot
@@ -159,19 +171,11 @@ public class DisplayVRP {
 	    StdDraw.show(0);
 	}
 	
+	/**
+	 * Main method for testing
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		DisplayVRP dVRP = new DisplayVRP(args[0], Integer.parseInt(args[1]), args[2]);
 
-		System.out.println("Costs: " + dVRP.getCostSol());
-		for (int[] sa : dVRP.vehicles) {
-			for (int s : sa) {
-				System.out.print(s);
-				System.out.print(" ");
-			}
-			System.out.println(" ");
-		}
-		
-		dVRP.plotVRPInstance();
-		dVRP.plotVRPSolution();
 	}
 }
