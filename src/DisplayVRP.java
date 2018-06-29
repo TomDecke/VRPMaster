@@ -11,16 +11,22 @@ public class DisplayVRP {
 	
 	private String vrpInstance;
 	private int xMax, xMin, yMax, yMin;
+	private int xDepot, yDepot;
 	private VRP vrp;
 	private double costSol;
+	private int numCust;
+	private int numVehicles;
 	private ArrayList<int[]> vehicles; 
 	
-	public DisplayVRP(String vrpInstance, int numCost, String sol) {
+	public DisplayVRP(String vrpInstance, int numCust, String sol) {
 		
 		try {
 			this.vrpInstance = vrpInstance;
-			this.vrp = new VRP(vrpInstance,numCost);
+			this.vrp = new VRP(vrpInstance,numCust);
 			vehicles = new ArrayList<int[]>();
+			
+			this.xDepot = vrp.depot.xCoord;
+			this.yDepot = vrp.depot.yCoord;
 			
 			//create reader to take in the solution
 			FileReader reader;
@@ -28,20 +34,25 @@ public class DisplayVRP {
 			reader = new FileReader(sol);
 			sc = new Scanner(reader);
 
-			//get the cost proposed by the solution
-			if(sc.hasNextLine()) {
-				costSol = Double.parseDouble(sc.nextLine());	
-			}
-			//get the routes proposed by the solution
-			while(sc.hasNextLine()) {
-				//read the vehicle and copy it's customers into an int-array
-				String[] cInfo =sc.nextLine().split(" ");
-				int[] customers = new int[cInfo.length];
-				for(int i = 0; i < cInfo.length; i++) {
-					customers[i] = Integer.parseInt(cInfo[i]);
+			//read number of customers and needed vehicles, then move to the next line
+			numCust = sc.nextInt();
+			numVehicles = sc.nextInt();
+			sc.nextLine();
+			
+			int vCount = 0;
+			while(sc.hasNextLine() && vCount < numVehicles) {
+				String[] vArray = sc.nextLine().split("[ ]+");
+				int[] customers = new int[vArray.length-1];
+				for (int i = 0; i < vArray.length-1; i++) {
+					customers[i] = Integer.parseInt(vArray[i]);
 				}
 				vehicles.add(customers);
+				vCount++;
 			}
+			//retrieve the cost
+			String[] tmp = sc.nextLine().split(" ");
+			costSol = Double.parseDouble(tmp[2]);
+			
 			
 			//Get the size of the map
 			xMax = vrp.customer[0].xCoord;
@@ -124,14 +135,23 @@ public class DisplayVRP {
 	    StdDraw.setPenRadius(0.0005);
 	    int colourCount = 0;
 	    for(int[] vehicle : vehicles) {
-	    	//choose a random color for the vehicle route StdDraw.setPenColor(new Color((int)(Math.random() * 0x1000000)));
-		    
+	    	//choose a random color for the vehicle route - StdDraw.setPenColor(new Color((int)(Math.random() * 0x1000000)));
 		    StdDraw.setPenColor(MyColours.getColour((colourCount)));
+		    
+		    //draw the line from the depot to the first customer
+		    int firstCustomer = vehicle[0];
+		    StdDraw.line(xDepot, yDepot,vrp.customer[firstCustomer].xCoord,vrp.customer[firstCustomer].yCoord);
+		    
+		    //draw the tour-intermediates
 	    	for(int i = 0; i< vehicle.length-1; i++) {
 	    		Customer cCur = vrp.customer[vehicle[i]];
 	    		Customer cSucc = vrp.customer[vehicle[i+1]];
 	    		StdDraw.line(cCur.xCoord, cCur.yCoord, cSucc.xCoord, cSucc.yCoord);
 	    	}
+	    	
+	    	//draw the line from the last customer back to the depot
+	    	int lastCustomer = vehicle[vehicle.length-1];
+		    StdDraw.line(vrp.customer[lastCustomer].xCoord,vrp.customer[lastCustomer].yCoord,xDepot, yDepot);
 	    	colourCount++;
 	    }
 	    

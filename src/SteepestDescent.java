@@ -14,6 +14,7 @@ public class SteepestDescent {
 	private VRP vrp;
 	private int numCustomers;
 	private RelocateOption[][] bestMoveMatrix;
+	
 
 	/**
 	 * Constructor for the steepest descent
@@ -249,7 +250,15 @@ public class SteepestDescent {
 	 * After executing @see solve(), this method can be used to show the number of needed vehicles and the total cost
 	 */
 	public void printResultsToConsole() {
-		int vehicleCount = 0;
+		
+
+		System.out.println("NV: "+ this.getVehicleCount());
+		System.out.println("Distance: " + vrp.calcTotalCost());
+		System.out.println(" ");
+	}
+	
+	private int getVehicleCount() {
+		int vehicleCount = 0; //number of vehicles needed in the solution
 		for(int i = 0 ; i<numCustomers; i++) {
 			Vehicle v = vrp.vehicle[i];
 			//check if there are still customers in between the dummies
@@ -259,9 +268,7 @@ public class SteepestDescent {
 				vehicleCount++;
 			}
 		}
-		System.out.println("NV: "+ vehicleCount);
-		System.out.println("Distance: " + vrp.calcTotalCost());
-		System.out.println(" ");
+		return vehicleCount;
 	}
 	
 	/**
@@ -273,20 +280,21 @@ public class SteepestDescent {
 		try {
 			writer 	= new FileWriter(out);
 			//write the cost of the solution
-			writer.write(""+getTotalCost()+"\n");
+			writer.write(""+vrp.m +" "+this.getVehicleCount()+"\n");
 			
 			//write the customers of each vehicle as a route
 			for(Vehicle v : getVehicles()) {
 				StringBuilder sBuild = new StringBuilder();
-				Customer customer = v.firstCustomer;
-				while (customer != null){
+				Customer customer = v.firstCustomer.succ;
+				while (customer != v.lastCustomer){
 					sBuild.append(customer.custNo + " ");
 					customer = customer.succ;
 				}
-				sBuild.append(String.format("%n"));
+				sBuild.append(String.format(" -1%n"));
 				//write the tour of the vehicle
 				writer.write(sBuild.toString());
 			}
+			writer.write("total cost: "+getTotalCost());
 			writer.close();
 		}catch(IOException ioe) {
 			System.out.println("Error whilst writing");
