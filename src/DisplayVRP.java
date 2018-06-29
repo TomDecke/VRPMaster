@@ -132,7 +132,7 @@ public class DisplayVRP {
 	 */
 	public void plotVRPSolution() {
 		//set up a new plot
-		StdDraw.clear(StdDraw.WHITE);
+		StdDraw.clear(StdDraw.LIGHT_GRAY);
 		StdDraw.setXscale(xMin, xMax);
 	    StdDraw.setYscale(yMin, yMax);
 	    
@@ -140,7 +140,7 @@ public class DisplayVRP {
 	    StdDraw.textRight(xMax,yMin,String.format("Distance: %.3f", costSol));
 	    
 	    //determine customer size and print them to the map
-	    StdDraw.setPenRadius(0.005);
+	    StdDraw.setPenRadius(0.008);
 	    for(Customer c : vrp.customer){
 	    	StdDraw.point(c.xCoord, c.yCoord);
 	    }
@@ -176,6 +176,11 @@ public class DisplayVRP {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-
+		String vrpInstance = "H:\\Masterthesis\\visualization\\r101.txt";
+		int numCust = 100;
+		String sol = "H:\\Masterthesis\\visualization\\r101-100.txt";
+		DisplayVRP distVRP = new DisplayVRP(vrpInstance, numCust, sol);
+		distVRP.plotVRPSolution();
+		
 	}
 }

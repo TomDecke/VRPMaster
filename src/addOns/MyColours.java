@@ -8,13 +8,13 @@ public class MyColours {
 		num = num%9;
 		switch(num){
 		case 0:
-			c = Color.BLUE;
+			c = Color.BLACK;
 			break;
 		case 1:
 			c = Color.RED;
 			break;
 		case 2:
-			c = Color.GREEN;
+			c = Color.WHITE;
 			break;
 		case 3:
 			c = Color.MAGENTA;
@@ -26,13 +26,13 @@ public class MyColours {
 			c = Color.ORANGE;
 			break;
 		case 6:
-			c = Color.PINK;
+			c = Color.DARK_GRAY;
 			break;
 		case 7:
-			c = Color.CYAN;
+			c = Color.BLUE;
 			break;
 		case 8:
-			c = Color.DARK_GRAY;
+			c = Color.GRAY;
 			break;
 	}
 		return c;

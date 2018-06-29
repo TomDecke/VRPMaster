@@ -8,31 +8,21 @@ import java.util.ArrayList;
 public class TestSolution {
 	private static final double DERIVATION = 1E-10;
 
-	private VRP vrp;
-	private double solDist;
-	private ArrayList<Vehicle> solVehicles;
-	private int[] cVisited;
-
 	/**
-	 * Constructor to create a test instance
+	 * Runs the test for the solution
 	 * @param vrp VRP, the given problem
 	 * @param solDist double, the proposed solution (distance)
 	 * @param vehicles ArrayList<Vehicle>, the proposed solution (vehicle routes)
-	 */
-	public TestSolution(VRP vrp, double solDist, ArrayList<Vehicle> vehicles) {
-		this.vrp = vrp;
-		this.solDist = solDist;
-		this.solVehicles = vehicles;
-		cVisited = new int[vrp.customer.length];
-	}
-
-	/**
-	 * Runs the test for the solution
 	 * @return boolean, whether or not the solution is valid
 	 */
-	public boolean runTest() {
+	public static boolean runTest(VRP vrpIn, double solDistIn, ArrayList<Vehicle> vehicles) {
 		
-
+		//create variables for the input
+		VRP vrp = vrpIn;
+		double solDist = solDistIn;
+		ArrayList<Vehicle> solVehicles = vehicles;
+		int[] cVisited = new int[vrp.customer.length] ;		
+		
 		//distance of all vehicles
 		double totalDist = 0; 
 
@@ -116,7 +106,7 @@ public class TestSolution {
 			System.out.println("");
 		}
 
-		//check if all customers have been visited
+		//check if all customers have been visited exactly once
 		for (int i = 0; i < cVisited.length ; i++) {
 			int visits = cVisited[i];
 			
@@ -130,6 +120,7 @@ public class TestSolution {
 		}
 
 		//check for derivation between solution and control
+		//allow minor derivation, which might be due to computational errors
 		if(Math.abs(totalDist - solDist) > DERIVATION) {
 			System.out.println("The distance of the solutions differ by: "+Math.abs(totalDist - solDist));
 			return false;

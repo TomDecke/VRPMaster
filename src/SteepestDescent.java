@@ -133,8 +133,10 @@ public class SteepestDescent {
 	 */
 	public void solve() {
 		
-		//create best-move-matrix
+		//create best-move-matrix and print it to the console
 		createBMM();
+		printBMM();
+		System.out.println(" ");
 		
 		//find the first best move
 		RelocateOption relocate = findBestMove();
@@ -168,7 +170,9 @@ public class SteepestDescent {
 			updateBMM(relocate.getVehicleFrom(), relocate.getVehicleTo());
 			relocate = findBestMove();
 		}
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+		//print the last BMM
+		printBMM();
+		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
 		printResultsToConsole();
 		printResultsToFile();
 		
