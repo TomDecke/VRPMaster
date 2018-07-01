@@ -69,7 +69,7 @@ public class VRP {
 				vehicle[i].costOfUse = 100;
 			}
 			//add customer to vehicle and omit the depot
-			vehicle[i].minCostInsertion(customer[i+1]);
+			vehicle[i].insertBetween(customer[i+1], vehicle[i].firstCustomer, vehicle[i].lastCustomer);
 		}
 
 

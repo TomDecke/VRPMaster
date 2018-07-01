@@ -1,23 +1,11 @@
+/CostAdjustment.class
 /Customer.class
-/DisplayTSP.class
 /DisplayVRP.class
-/MyColours.class
+/MainVRP.class
+/Relocate.class
 /RelocateOption.class
-/StdDraw.class
 /SteepestDescent.class
-/TSP.class
-/TSPException.class
 /TestSolution.class
-<<<<<<< HEAD
-/SimpleSolomon.txt
-=======
-/TimeConstraintViolationException.class
 /VRP.class
 /Vehicle.class
-/Verify.class
 /addOns/
-/MainVRP.class
-/TestSolomon_Solution.txt
->>>>>>> master
-/CostAdjustment.class
-/Relocate.class

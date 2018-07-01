@@ -7,6 +7,8 @@ public class RelocateOption {
 	private Vehicle vehicleFrom;
 	private Vehicle vehicleTo;
 	private Customer cToMove;
+	Customer cPred;
+	Customer cSucc;
 	private double costOfMove;
 
 	/**

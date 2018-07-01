@@ -47,88 +47,86 @@ public class Vehicle {
 	 * in least cost position. Deliver true
 	 * if the insertion was possible, i.e.
 	 * capacity & time windows respected
-	 * @param c Customer, the customer which is to be inserted 
+	 * @param cInsert Customer, the customer which is to be inserted 
 	 * @return boolean, whether or not the insertion was successful
 	 */
-	boolean minCostInsertion(Customer c){		
+	boolean insertBetween(Customer cInsert, Customer cPred, Customer cSucc){		
 
-		Customer cInsertAfter = findBestPosition(c);
-		
-		//If there is a valid position for the customer, insert him
-		if(cInsertAfter != null) {
 
-			//tell the customer he now belongs to this vehicle
-			c.vehicle = this;
-			
-			//insert the customer into the vehicle
-			Customer cInsertSucc = cInsertAfter.succ;
-			c.pred = cInsertAfter;
-			c.succ = cInsertSucc;
-			cInsertSucc.pred = c;
-			cInsertAfter.succ = c;
-			
-			//propagate the earliest and latest start
-			try {
-				c.insertBetween(cInsertAfter, cInsertSucc);
-			} catch (TimeConstraintViolationException e) {
-				System.out.println(e.getMessage());
-			}
-			
-			//increase the load of the vehicle by the customers demand
-			this.load += c.demand;
-			
-			//update the distance by removing the prior edge and adding the new ones
-			distance += (vrp.distance(cInsertAfter,c) + vrp.distance(c, cInsertSucc) - vrp.distance(cInsertAfter,cInsertSucc));
-			
-			//update the cost of this vehicle
-			this.cost = this.distance * this.costOfUse;
-			
-			//update the number of customers of the vehicle
-			this.numCostumer++;
-			
+		//tell the customer he now belongs to this vehicle
+		cInsert.vehicle = this;
+
+		//insert the customer into the vehicle
+		cInsert.pred = cPred;
+		cInsert.succ = cSucc;
+		cSucc.pred = cInsert;
+		cPred.succ = cInsert;
+
+		//propagate the earliest and latest start
+		try {
+			cInsert.insertBetween(cPred, cSucc);
+		} catch (TimeConstraintViolationException e) {
+			System.out.println(e.getMessage());
+		}
+
+		//increase the load of the vehicle by the customers demand
+		this.load += cInsert.demand;
+
+		//update the distance by removing the prior edge and adding the new ones
+		distance += (vrp.distance(cPred,cInsert) + vrp.distance(cInsert, cSucc) - vrp.distance(cPred,cSucc));
+
+		//update the cost of this vehicle
+		this.cost = this.distance * this.costOfUse;
+
+		//update the number of customers of the vehicle
+		this.numCostumer++;
+
+		return true;
+	}
+
+	public boolean canAccomodate(Customer c) {
+		if(this.capacity < this.load + c.demand) {
+			return false;
+		}
+		else {
 			return true;
 		}
-		return false;
 	}
-	
-	
-	/**
-	 * Find the best position for a customer in the vehicle
-	 * @param c Customer, the customer that is to be inserted into the vehicle
-	 * @return Customer, the customer after which the new customer should be inserted or null if it can't be inserted
-	 */
-	public Customer findBestPosition(Customer c) {
-		
-		//make sure the vehicle has enough capacity to take the customer
-		if(c.demand+this.load>this.capacity) {
-			return null;
-		}
-		
-		Customer cCurrent = firstCustomer;
-		Customer cSucc = cCurrent.succ;
-		Customer cTmp = null;
 
-		//TODO personally introduced limitation as starting value
-		double minCost = cost/costOfUse*2 + 1000;
-		Customer cInsertAfter = null;
-
-		//Find the position at which the increment of the distance is the smallest
-		while(cSucc!= null) {
-			//make sure the customer fits in the time window
-			if(c.canBeInsertedBetween(cCurrent, cSucc)) {
-				//determine the change in cost, caused by the insertion at the current position
-				double insertionCost = vrp.distance(cCurrent,c) + vrp.distance(c, cSucc) - vrp.distance(cCurrent,cSucc);
-				if(insertionCost<minCost) {
-					cInsertAfter = cCurrent;
-					minCost = insertionCost;
-				}
-			}
-			cTmp = cSucc;
-			cSucc = cSucc.succ;
-			cCurrent = cTmp;
-		}
-		return cInsertAfter;
-	}
+//	/**
+//	 * Find the best position for a customer in the vehicle
+//	 * @param c Customer, the customer that is to be inserted into the vehicle
+//	 * @return Customer, the customer after which the new customer should be inserted or null if it can't be inserted
+//	 */
+//	public Customer findBestPosition(Customer c) {
+//
+//
+//
+//		Customer cCurrent = firstCustomer;
+//		Customer cSucc = cCurrent.succ;
+//		Customer cTmp = null;
+//
+//		//TODO personally introduced limitation as starting value
+//		double minCost = cost/costOfUse*2 + 1000;
+//		Customer cInsertAfter = null;
+//
+//		//Find the position at which the increment of the distance is the smallest
+//		while(cSucc!= null) {
+//			//make sure the customer fits in the time window
+//			if(c.canBeInsertedBetween(cCurrent, cSucc)) {
+//				//determine the change in cost, caused by the insertion at the current position
+//				double insertionCost = vrp.distance(cCurrent,c) + vrp.distance(c, cSucc) - vrp.distance(cCurrent,cSucc);
+//				if(insertionCost<minCost) {
+//					cInsertAfter = cCurrent;
+//					minCost = insertionCost;
+//				}
+//			}
+//			cTmp = cSucc;
+//			cSucc = cSucc.succ;
+//			cCurrent = cTmp;
+//		}
+//		return cInsertAfter;
+//	}
 
 	/**
 	 * Remove a customer from the vehicle's tour
@@ -137,44 +135,44 @@ public class Vehicle {
 	 */
 	boolean remove(Customer c){
 		Customer currentCustomer = firstCustomer;
-		
+
 		//search for customer c
 		while(currentCustomer.succ != null) {
 			if(c.equals(currentCustomer)) {
 				Customer cPred =  currentCustomer.pred;
 				Customer cSucc = currentCustomer.succ;
-				
+
 				//if found change the successor of the predecessor and the predecessor of the successor
 				cPred.succ = cSucc;
 				cSucc.pred = cPred;
-				
+
 				//re-propagate earliest and latest start
 				try {
 					//propagate earliest start 
 					cSucc.propagateEarliestStart();
-				
+
 					//propagate latest start 
 					cPred.propagateLatestStart();
-					
+
 				} catch (TimeConstraintViolationException e) {
 					System.out.println(e.getMessage());
 				}
 
-				
+
 				//remove the load
 				this.load -= c.demand;
-				
+
 				//remove pointers of the customer
 				c.vehicle = null;
 				c.pred = null;
 				c.succ = null;
-				
+
 				//update distance, by removing edges to former customer and adding new edge between now-neighbours
 				distance += vrp.distance(cPred, cSucc) - vrp.distance(cPred, currentCustomer) - vrp.distance(currentCustomer, cSucc);
-				
+
 				//recalculate the cost
 				this.cost = this.distance * this.costOfUse;
-				
+
 				//update the number of customers
 				this.numCostumer--;
 				return true;
@@ -207,7 +205,7 @@ public class Vehicle {
 		System.out.println();
 	}
 
-	
+
 	/**
 	 * Accessor for the distance travelled by this vehicle 
 	 * @return double, the distance
