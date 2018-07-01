@@ -5,34 +5,24 @@ import java.util.ArrayList;
  * @author Tom Decke
  *
  */
-//TODO would it make sense to make this static?
 public class TestSolution {
-
-	private VRP vrp;
-	private double solDist;
-	private ArrayList<Vehicle> solVehicles;
-	//TODO should I have this for every vehicle, to test if the distribution agrees with the vehicle?
-	private int[] cVisited;
-
-	/**
-	 * Constructor to create a test instance
-	 * @param vrp VRP, the given problem
-	 * @param solDist double, the proposed solution (distance)
-	 * @param vehicles ArrayList<Vehicle>, the proposed solution (vehicle routes)
-	 */
-	public TestSolution(VRP vrp, double solDist, ArrayList<Vehicle> vehicles) {
-		this.vrp = vrp;
-		this.solDist = solDist;
-		this.solVehicles = vehicles;
-		cVisited = new int[vrp.customer.length];
-	}
+	private static final double DERIVATION = 1E-10;
 
 	/**
 	 * Runs the test for the solution
+	 * @param vrp VRP, the given problem
+	 * @param solDist double, the proposed solution (distance)
+	 * @param vehicles ArrayList<Vehicle>, the proposed solution (vehicle routes)
 	 * @return boolean, whether or not the solution is valid
 	 */
-	public boolean runTest() {
-
+	public static boolean runTest(VRP vrpIn, double solDistIn, ArrayList<Vehicle> vehicles) {
+		
+		//create variables for the input
+		VRP vrp = vrpIn;
+		double solDist = solDistIn;
+		ArrayList<Vehicle> solVehicles = vehicles;
+		int[] cVisited = new int[vrp.customer.length] ;		
+		
 		//distance of all vehicles
 		double totalDist = 0; 
 
@@ -56,6 +46,14 @@ public class TestSolution {
 
 			//Check the route of the vehicle
 			while(!cCur.equals(v.lastCustomer)) {
+				
+				//check if the customer actually is in the vehicle
+				if(!v.equals(cCur.vehicle)) {
+					System.out.println(cCur);
+					System.out.println(v);
+					System.out.println("Customer in wrong vehicle");
+					return false;
+				}
 
 				//compute and print the distance between the current customers
 				double distTraveled = vrp.distance(cCur, cSucc);
@@ -108,7 +106,7 @@ public class TestSolution {
 			System.out.println("");
 		}
 
-		//check if all customers have been visited
+		//check if all customers have been visited exactly once
 		for (int i = 0; i < cVisited.length ; i++) {
 			int visits = cVisited[i];
 			
@@ -122,7 +120,8 @@ public class TestSolution {
 		}
 
 		//check for derivation between solution and control
-		if(totalDist != solDist) {
+		//allow minor derivation, which might be due to computational errors
+		if(Math.abs(totalDist - solDist) > DERIVATION) {
 			System.out.println("The distance of the solutions differ by: "+Math.abs(totalDist - solDist));
 			return false;
 		}

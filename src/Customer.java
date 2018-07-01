@@ -1,8 +1,11 @@
 import java.util.*;
+
+import addOns.TimeConstraintViolationException;
+
 import java.io.*;
 
 /**
- * 
+ * Class modelling a customer for a VRP-instance
  * @author Patrick Prosser
  *
  */
@@ -52,7 +55,7 @@ public class Customer {
 		propagateLatestStart();
 		propagateEarliestStart();
 	}
-	
+
 	public void propagateLatestStart() throws TimeConstraintViolationException{
 		Customer current = this;
 		// propagate latestStart left
@@ -65,7 +68,7 @@ public class Customer {
 			current = cPred;
 		}
 	}
-	
+
 	public void propagateEarliestStart() throws TimeConstraintViolationException {
 		Customer current = this;
 		// propagate earliestStart right
@@ -86,41 +89,12 @@ public class Customer {
 		return custNo +" "+ xCoord +" "+ yCoord +" "+ demand +" "+ readyTime +" "+ dueDate +" "+ serviceTime;
 	}
 
+	/**
+	 * Main method for testing
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args)  throws IOException {
-
-
-		VRP vrp = new VRP(args[0],Integer.parseInt(args[1]));
-		
-		System.out.println();
-		System.out.println("Customer main:");
-		
-//		Customer depot = vrp.customer[0];
-//		Customer x = vrp.customer[1];
-//		Customer y = vrp.customer[2];
-		Customer z = vrp.customer[3];
-//		System.out.println(depot);
-//		System.out.println(x);
-//		System.out.println(y);
-//		System.out.println(z);
-//		System.out.println("depot-x: "+ vrp.distance(null,x) +" x-y: "+ vrp.distance(x,y) +" y-depot: "+ vrp.distance(y,null));
-		Vehicle v2 = vrp.vehicle[2];
-		Vehicle v1 = vrp.vehicle[1];
-//		v2.remove(y);
-//		v1.minCostInsertion(y);
-		
-		for(int i = 0 ; i<Integer.parseInt(args[1]); i++) {
-			Vehicle v = vrp.vehicle[i];
-			System.out.println("Customer of vehicle "+v.id +": " +v.firstCustomer.succ.toString());
-			v.show();
-			System.out.println("Cost for vehicle "+v.id+": "+v.cost);	
-		}
-		System.out.println("Total cost: " +vrp.calcTotalCost());
-		
-		v2.remove(z);
-		v1.minCostInsertion(z);
-		v1.show();
-		v2.show();
-		System.out.println("Total cost after moving y: " +vrp.calcTotalCost());
 		
 	}
 }

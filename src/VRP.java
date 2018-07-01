@@ -2,7 +2,7 @@ import java.util.*;
 import java.io.*;
 
 /**
- * 
+ * Class to model a VRP-instance
  * @author Patrick Prosser
  *
  */
@@ -44,7 +44,7 @@ public class VRP {
 			//create customer for read data and add it to the array
 			customer[i] = new Customer(custNo,x,y,d,rt,dd,st);
 			customer[i].vrp = this;
-			System.out.println("cust: "+ customer[i]);
+			//System.out.println("cust: "+ customer[i]);
 
 		}
 		sc.close();
@@ -101,9 +101,12 @@ public class VRP {
 		return totalCost;
 	}
 
+	/**
+	 * Main method for testing
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args)  throws IOException {
 
-		VRP vrp = new VRP(args[0],Integer.parseInt(args[1]));
-		 System.out.print(vrp.customer[8] +" // this is a customer printed ");
 	}
 }

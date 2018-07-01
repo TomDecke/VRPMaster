@@ -1,7 +1,9 @@
 import java.util.*;
 
+import addOns.TimeConstraintViolationException;
+
 /**
- * 
+ * Class modelling a vehicle for a VRP-instance
  * @author Patrick Prosser
  *
  */
@@ -33,20 +35,20 @@ public class Vehicle {
 
 		//set up dummy customers who come at the beginning and at the end of a tour 
 		firstCustomer = new Customer(depot.custNo,depot.xCoord,depot.yCoord,0,0,0,0);
+		firstCustomer.vehicle = this;
 		lastCustomer = new Customer(depot.custNo,depot.xCoord,depot.yCoord,0,0,depot.dueDate,0);
+		lastCustomer.vehicle = this;
 		firstCustomer.succ = lastCustomer;
 		lastCustomer.pred = firstCustomer;
 	}
 
-	//
-	// Insert customer c into vehicle's tour
-	// in least cost position. Deliver true
-	// if the insertion was possible, i.e.
-	// capacity & time windows respected
 	/**
-	 * Make sure to remove the customer from the vehicle from which he is coming
-	 * @param c
-	 * @return
+	 * Insert customer c into vehicle's tour
+	 * in least cost position. Deliver true
+	 * if the insertion was possible, i.e.
+	 * capacity & time windows respected
+	 * @param c Customer, the customer which is to be inserted 
+	 * @return boolean, whether or not the insertion was successful
 	 */
 	boolean minCostInsertion(Customer c){		
 
@@ -55,6 +57,8 @@ public class Vehicle {
 		//If there is a valid position for the customer, insert him
 		if(cInsertAfter != null) {
 
+			//tell the customer he now belongs to this vehicle
+			c.vehicle = this;
 			
 			//insert the customer into the vehicle
 			Customer cInsertSucc = cInsertAfter.succ;
@@ -126,10 +130,11 @@ public class Vehicle {
 		return cInsertAfter;
 	}
 
-	//
-	// Remove customer c from vehicle's tour
-	// deliver true if done, false otherwise
-	//
+	/**
+	 * Remove a customer from the vehicle's tour
+	 * @param c Customer, the customer which should be removed
+	 * @return boolean, true if successful, false otherwise
+	 */
 	boolean remove(Customer c){
 		Customer currentCustomer = firstCustomer;
 		
@@ -159,6 +164,11 @@ public class Vehicle {
 				//remove the load
 				this.load -= c.demand;
 				
+				//remove pointers of the customer
+				c.vehicle = null;
+				c.pred = null;
+				c.succ = null;
+				
 				//update distance, by removing edges to former customer and adding new edge between now-neighbours
 				distance += vrp.distance(cPred, cSucc) - vrp.distance(cPred, currentCustomer) - vrp.distance(currentCustomer, cSucc);
 				
@@ -175,6 +185,7 @@ public class Vehicle {
 	}
 
 	/**
+	 * Get the load of the vehicle as String
 	 * @return String, the value of the vehicle's load
 	 */
 	public String toString(){
@@ -197,10 +208,18 @@ public class Vehicle {
 	}
 
 	
+	/**
+	 * Accessor for the distance travelled by this vehicle 
+	 * @return double, the distance
+	 */
 	public double getDistance() {
 		return this.distance;
 	}
 
+	/**
+	 * Mutator for the distance
+	 * @param distance double, the new distance
+	 */
 	public void setDistance(double distance) {
 		this.distance=distance;
 	}

@@ -1,3 +1,4 @@
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -9,9 +10,11 @@ import java.util.ArrayList;
  */
 public class SteepestDescent {
 	private final int PENALTY = 10000;
+	private String out;
 	private VRP vrp;
 	private int numCustomers;
 	private RelocateOption[][] bestMoveMatrix;
+	
 
 	/**
 	 * Constructor for the steepest descent
@@ -21,6 +24,8 @@ public class SteepestDescent {
 	 */
 	public SteepestDescent(String textfile, int customers) throws IOException {
 		this.vrp = new VRP(textfile,customers);
+		this.out = textfile.substring(0, textfile.length()-4);
+		this.out += "_Solution.txt";
 		this.bestMoveMatrix = new RelocateOption[customers][customers];
 		this.numCustomers = customers;
 	}
@@ -123,8 +128,10 @@ public class SteepestDescent {
 	 */
 	public void solve() {
 		
-		//create best-move-matrix
+		//create best-move-matrix and print it to the console
 		createBMM();
+		printBMM();
+		System.out.println(" ");
 		
 		//find the first best move
 		RelocateOption relocate = findBestMove();
@@ -158,6 +165,11 @@ public class SteepestDescent {
 			updateBMM(relocate.getVehicleFrom(), relocate.getVehicleTo());
 			relocate = findBestMove();
 		}
+		//print the last BMM
+		printBMM();
+		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
+		printResultsToConsole();
+		printResultsToFile();
 		
 	}
 	
@@ -232,8 +244,16 @@ public class SteepestDescent {
 	/**
 	 * After executing @see solve(), this method can be used to show the number of needed vehicles and the total cost
 	 */
-	public void printResults() {
-		int vehicleCount = 0;
+	public void printResultsToConsole() {
+		
+
+		System.out.println("NV: "+ this.getVehicleCount());
+		System.out.println("Distance: " + vrp.calcTotalCost());
+		System.out.println(" ");
+	}
+	
+	private int getVehicleCount() {
+		int vehicleCount = 0; //number of vehicles needed in the solution
 		for(int i = 0 ; i<numCustomers; i++) {
 			Vehicle v = vrp.vehicle[i];
 			//check if there are still customers in between the dummies
@@ -243,9 +263,37 @@ public class SteepestDescent {
 				vehicleCount++;
 			}
 		}
-		System.out.println("NV: "+ vehicleCount);
-		System.out.println("Distance: " + vrp.calcTotalCost());
-		System.out.println(" ");
+		return vehicleCount;
+	}
+	
+	/**
+	 * Write the results to a text-file
+	 */
+	public void printResultsToFile() {
+		//create a writer
+		FileWriter writer;
+		try {
+			writer 	= new FileWriter(out);
+			//write the cost of the solution
+			writer.write(""+vrp.m +" "+this.getVehicleCount()+"\n");
+			
+			//write the customers of each vehicle as a route
+			for(Vehicle v : getVehicles()) {
+				StringBuilder sBuild = new StringBuilder();
+				Customer customer = v.firstCustomer.succ;
+				while (customer != v.lastCustomer){
+					sBuild.append(customer.custNo + " ");
+					customer = customer.succ;
+				}
+				sBuild.append(String.format(" -1%n"));
+				//write the tour of the vehicle
+				writer.write(sBuild.toString());
+			}
+			writer.write("total cost: "+getTotalCost());
+			writer.close();
+		}catch(IOException ioe) {
+			System.out.println("Error whilst writing");
+		}
 	}
 	
 	/**
@@ -283,39 +331,11 @@ public class SteepestDescent {
 
 
 	/**
-	 * Main method
+	 * Main method for testing
 	 * @param args
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException{
-		SteepestDescent stDesc = new SteepestDescent(args[0],Integer.parseInt(args[1]));
-		VRP vrp = new VRP(args[0],Integer.parseInt(args[1]));
-		stDesc.createBMM();
-		stDesc.printBMM();
-		System.out.println("");
-		stDesc.solve();
-		stDesc.printBMM();
-		
-		for(int i = 0 ; i<Integer.parseInt(args[1]); i++) {
-			Vehicle v = stDesc.getVRP().vehicle[i];
-			System.out.println("Customer of vehicle "+v.id +": " +v.firstCustomer.succ.toString());
-			v.show();
-			System.out.println("Cost for vehicle "+v.id+": "+v.cost);	
-		}
-		
-		System.out.println(" ");
-		System.out.println("Results:");
-		stDesc.printResults();
-		
-		TestSolution ts = new TestSolution(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
-		System.out.println("Test:");
-		if(ts.runTest()) {
-			System.out.println(" ");
-			System.out.println("valid solution");
-		}
-		else {
-			System.out.println(" ");
-			System.out.println("invalid solution");		
-		}
+	
 	}
 }
