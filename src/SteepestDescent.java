@@ -51,10 +51,15 @@ public class SteepestDescent {
 	 */
 	public RelocateOption findBestCustomer(Vehicle vFrom, Vehicle vTo) {
 		
+
 		//create an empty move with the current cost of the vehicles
 		//thus prevent the moving of one customer to another vehicle if there would be no benefit
 		RelocateOption bestToMove = new RelocateOption(null, vFrom.cost + vTo.cost, vFrom, vTo);
-		double originalCost = vFrom.cost + vTo.cost;
+
+		//if the vehicles are the same, then there is only one cost
+		if(vFrom.equals(vTo)) {
+			bestToMove.setCostOfMove(vFrom.cost);
+		}
 		
 		//start checking from the first customer, who is not the depot-connection
 		Customer current = vFrom.firstCustomer.succ;
@@ -62,6 +67,9 @@ public class SteepestDescent {
 
 			//find the best place to insert the customer in the other tour
 			Customer insertAfter = vTo.findBestPosition(current);
+			
+
+
 			
 			//if insertAfter is not null current has a position into which it can be inserted
 			if(insertAfter != null) {
@@ -75,8 +83,17 @@ public class SteepestDescent {
 				+ vrp.distance(insertAfter, current)
 				+ vrp.distance(current, insertAfter.succ);
 
+				//catch computational inaccuracy
+				if(newDistVFrom < 1E-10) {
+					newDistVFrom = 0;
+				}
+				if(newDistVTo < 1E-10) {
+					newDistVTo = 0;
+				}
+				
 				//the change in cost, if this move was to be made
 				double resultingCost = newDistVFrom * vFrom.costOfUse + newDistVTo * vTo.costOfUse;
+				
 
 				//if this move is cheaper, take it up
 				if(resultingCost < bestToMove.getCostOfMove()) {
@@ -97,31 +114,6 @@ public class SteepestDescent {
 		return bestToMove;
 	}
 
-
-	/**
-	 * Find the best move in the Matrix of possible moves
-	 * @return RelocateOption, the currently best move in the BMM
-	 */
-	public RelocateOption findBestMove() {
-		//start comparing with the origin of the matrix
-		RelocateOption bestMove = bestMoveMatrix[0][0];
-		double minCost = bestMove.getCostOfMove();
-		
-		RelocateOption currentMove = bestMove;
-		//go through the matrix and find the move with minimal cost
-		for(int i = 0; i < numCustomers; i++ ) {
-			for(int j = 0; j < numCustomers; j++) {
-				currentMove = bestMoveMatrix[i][j];
-				double currentCost = currentMove.getCostOfMove();
-				if(currentMove.getCToMove()!=null && currentCost < minCost) {
-					minCost = currentCost;
-					bestMove = currentMove;
-				}
-			}
-		}
-
-		return bestMove;
-	}
 	
 	/**
 	 * Runs steepest descent, to find a solution for the vrp-instance
@@ -173,6 +165,33 @@ public class SteepestDescent {
 		
 	}
 	
+	
+	/**
+	 * Find the best move in the Matrix of possible moves
+	 * @return RelocateOption, the currently best move in the BMM
+	 */
+	public RelocateOption findBestMove() {
+		//start comparing with the origin of the matrix
+		RelocateOption bestMove = bestMoveMatrix[0][0];
+		double minCost = bestMove.getCostOfMove();
+		
+		RelocateOption currentMove = bestMove;
+		//go through the matrix and find the move with minimal cost
+		for(int i = 0; i < numCustomers; i++ ) {
+			for(int j = 0; j < numCustomers; j++) {
+				currentMove = bestMoveMatrix[i][j];
+				double currentCost = currentMove.getCostOfMove();
+				if(currentMove.getCToMove()!=null && currentCost < minCost) {
+					minCost = currentCost;
+					bestMove = currentMove;
+				}
+			}
+		}
+
+		return bestMove;
+	}
+	
+	
 	/**
 	 * Executes the relocation of a customer
 	 * @param bestRelocation RelocateOperation, option that is supposed to be executed 
@@ -186,8 +205,8 @@ public class SteepestDescent {
 			//insert customer into new vehicle
 			bestRelocation.getVehicleTo().minCostInsertion(cRelocate);
 		}
-
 	}
+	
 	
 	/**
 	 * Find the new best customer to move for vehicle-relations that were affected by a change
@@ -206,6 +225,7 @@ public class SteepestDescent {
 			bestMoveMatrix[vTo.index][i] = findBestCustomer(vFrom, vCheck);
 		}
 	}
+	
 	
 	/**
 	 * Construct the current best move matrix, showing which customer to move from which vehicle to an other
@@ -241,31 +261,17 @@ public class SteepestDescent {
 		}
 	}
 	
+	
 	/**
 	 * After executing @see solve(), this method can be used to show the number of needed vehicles and the total cost
 	 */
 	public void printResultsToConsole() {
-		
-
 		System.out.println("NV: "+ this.getVehicleCount());
 		System.out.println("Distance: " + vrp.calcTotalCost());
 		System.out.println(" ");
 	}
 	
-	private int getVehicleCount() {
-		int vehicleCount = 0; //number of vehicles needed in the solution
-		for(int i = 0 ; i<numCustomers; i++) {
-			Vehicle v = vrp.vehicle[i];
-			//check if there are still customers in between the dummies
-			if(!v.firstCustomer.succ.equals(v.lastCustomer)) {
-				v.show();
-				System.out.println("Distance Vehicle: " + v.cost);
-				vehicleCount++;
-			}
-		}
-		return vehicleCount;
-	}
-	
+
 	/**
 	 * Write the results to a text-file
 	 */
@@ -296,6 +302,26 @@ public class SteepestDescent {
 		}
 	}
 	
+	
+	/**
+	 * Determine the number of vehicles that are needed in the solution
+	 * @return int, the number of vehicles
+	 */
+	private int getVehicleCount() {
+		int vehicleCount = 0; //number of vehicles needed in the solution
+		for(int i = 0 ; i<numCustomers; i++) {
+			Vehicle v = vrp.vehicle[i];
+			//check if there are still customers in between the dummies
+			if(!v.firstCustomer.succ.equals(v.lastCustomer)) {
+				v.show();
+				System.out.println("Distance Vehicle: " + v.cost);
+				vehicleCount++;
+			}
+		}
+		return vehicleCount;
+	}
+	
+	
 	/**
 	 * After executing @see solve(), this method can be used to obtain the vehicles, which are present in the solution 
 	 * @return ArrayList<Vehicle>, list of vehicles with customers
@@ -311,6 +337,7 @@ public class SteepestDescent {
 		}
 		return vehicles;
 	}
+	
 	
 	/**
 	 * After executing @see solve(), this method can be used to obtain the cost of the solution
@@ -336,6 +363,13 @@ public class SteepestDescent {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException{
-	
+		String in = args[0];
+		int num = Integer.parseInt(args[1]);
+		SteepestDescent stDesc = new SteepestDescent(in, num);
+		VRP stVRP = stDesc.getVRP();
+		System.out.println(2*(stVRP.distance(stVRP.depot, stVRP.customer[8])));
+		VRP vrp = new VRP (in,num);
+		stDesc.solve();
+		TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 	}
 }
