@@ -218,7 +218,7 @@ public class SteepestDescent {
 	}
 	
 	/**
-	 * executes a two-opt move for a vehicle
+	 * executes a two-opt move for a vehicle if possible
 	 * @param v Vehicle, the vehicle which is to be checked for crossings
 	 * @return boolean, whether or not an optimization took place
 	 */
@@ -230,14 +230,18 @@ public class SteepestDescent {
 		while(!c2.equals(v.lastCustomer)) {
 			
 			
-			Customer c3 = v.firstCustomer;
+			Customer c3 = c2;
 			Customer c4 = c3.succ;
-			//compare each route with all other routes
+			//compare each route with all following routes
 			while(!c4.equals(v.lastCustomer)) {
 				
 				//check if the routes cross
 				if(lineCollision(c1, c2, c3, c4)) {
+					//check time window
+					
 					//TODO figure out the exchange
+					double newCost = cCost - vrp.distance(c1, c2) - vrp.distance(c3, c4)
+							+ vrp.distance(c1, c3) + vrp.distance(c2, c4);
 					// - c1c2 -c3c4
 					// + c1c3 + c2c4 || + c1c4 + c2c3
 				}
@@ -253,6 +257,19 @@ public class SteepestDescent {
 		return false;
 	}
 	
+	public boolean testReverse(Vehicle v, Customer newStart, Customer newEnd) {
+		//create a new vehicle based on the passed vehicle
+		Vehicle testV = new Vehicle(v.vrp, 0, v.capacity, v.costOfUse, this.vrp.depot);
+		
+		Customer cCur = v.firstCustomer.succ;
+		while(!cCur.equals(newStart)) {
+			
+		}
+		
+		
+		return false;
+	}
+	
 	/**
 	 * Determine if the routes from c1c2 and c3c4 cross each other
 	 * the solution is taken from 
@@ -265,6 +282,7 @@ public class SteepestDescent {
 	 */
 	public boolean lineCollision(Customer c1, Customer c2, Customer c3, Customer c4  ) {
 		
+		//extract the coordinates of the routes
 		double xC1 = c1.xCoord;
 		double yC1 = c1.yCoord;
 		double xC2 = c2.xCoord;
@@ -295,6 +313,7 @@ public class SteepestDescent {
 		double c1c2 = ((xC4-xC3)*(yC1-yC3) - (yC4-yC3)*(xC1-xC3))/denom;
 		double c3c4 = ((xC2-xC1)*(yC1-yC3) - (yC2-yC1)*(xC1-xC3))/denom;
 		
+		//check if the crossing happens between the end points of both routes
 		return (c1c2 >= 0 && c1c2 <= 1) && (c3c4 >= 0 && c3c4 <= 1);
 	}
 	

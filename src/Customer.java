@@ -35,6 +35,7 @@ public class Customer {
 		latestStart = dueDate;
 	}
 
+
 	// assuming this, y and z are all non-null can we
 	// insert this customer between customers y and z?
 	boolean canBeInsertedBetween(Customer y,Customer z){
@@ -89,6 +90,20 @@ public class Customer {
 		return custNo +" "+ xCoord +" "+ yCoord +" "+ demand +" "+ readyTime +" "+ dueDate +" "+ serviceTime;
 	}
 
+	/**
+	 * Creates a copy of the customer (without reference to other customers)
+	 * @return Customer, a new customer object with the same information
+	 */
+	public Customer copy() {
+		Customer nC = new Customer(this.custNo,this.xCoord,this.yCoord,this.demand,this.readyTime,this.dueDate,this.serviceTime);
+		nC.vehicle = this.vehicle;
+		nC.vrp = this.vrp;
+		nC.earliestStart = this.earliestStart;
+		nC.latestStart = this.latestStart;
+		return nC;
+	}
+
+	
 	/**
 	 * Main method for testing
 	 * @param args
