@@ -10,6 +10,7 @@ import java.util.ArrayList;
  */
 public class SteepestDescent {
 	private final int PENALTY = 10000;
+	private final double EPSILON = 1E-8;
 	private String out;
 	private VRP vrp;
 	private int numCustomers;
@@ -214,6 +215,87 @@ public class SteepestDescent {
 				bestMoveMatrix[vTo.index][i] = findBestCustomer(vFrom, vCheck);
 			}
 		}
+	}
+	
+	/**
+	 * executes a two-opt move for a vehicle
+	 * @param v Vehicle, the vehicle which is to be checked for crossings
+	 * @return boolean, whether or not an optimization took place
+	 */
+	public boolean twoOpt(Vehicle v) {
+		double cCost = v.cost;
+		Customer c1 = v.firstCustomer;
+		Customer c2 = c1.succ;
+		//go through all routes
+		while(!c2.equals(v.lastCustomer)) {
+			
+			
+			Customer c3 = v.firstCustomer;
+			Customer c4 = c3.succ;
+			//compare each route with all other routes
+			while(!c4.equals(v.lastCustomer)) {
+				
+				//check if the routes cross
+				if(lineCollision(c1, c2, c3, c4)) {
+					//TODO figure out the exchange
+					// - c1c2 -c3c4
+					// + c1c3 + c2c4 || + c1c4 + c2c3
+				}
+				
+				c3 = c4;
+				c4 = c4.succ;
+			}
+			//move to the next route
+			c1 = c2;
+			c2 = c2.succ;
+		}
+		//no crossing occurred, thus 
+		return false;
+	}
+	
+	/**
+	 * Determine if the routes from c1c2 and c3c4 cross each other
+	 * the solution is taken from 
+	 * https://www.spieleprogrammierer.de/wiki/2D-Kollisionserkennung#Kollision_zwischen_zwei_Strecken (01.07.2018)
+	 * @param c1 Customer, containing the starting point of c1c2 
+	 * @param c2 Customer, containing the end point of c1c2
+	 * @param c3 Customer, containing the starting point of c3c4
+	 * @param c4 Customer, containing the end point of c3c4
+	 * @return
+	 */
+	public boolean lineCollision(Customer c1, Customer c2, Customer c3, Customer c4  ) {
+		
+		double xC1 = c1.xCoord;
+		double yC1 = c1.yCoord;
+		double xC2 = c2.xCoord;
+		double yC2 = c2.yCoord;
+		double xC3 = c3.xCoord;
+		double yC3 = c3.yCoord;
+		double xC4 = c4.xCoord;
+		double yC4 = c4.yCoord;
+		
+		//check if the routes are contiguous
+		if((xC1 == xC3 && yC1 == yC3) || (xC1 == xC4 && yC1 == yC4)) {
+			//the start point of c1c2 is identical with either c3 or c4
+			return false;
+		}
+		else if((xC2 == xC3 && yC2 == yC3) || (xC2 == xC4 && yC2 == yC4)) {
+			//the end point of c1c2 is identical with either c3 or c4
+			return false;
+		}
+		
+		//calculate the denominator
+		double denom = (yC4-yC3) * (xC2-xC1) - (xC4-xC3) * (yC2-yC1);
+		
+		//If the solution is close to 0 the routes are parallel
+		if(Math.abs(denom)<EPSILON) {
+			return false;
+		}
+		
+		double c1c2 = ((xC4-xC3)*(yC1-yC3) - (yC4-yC3)*(xC1-xC3))/denom;
+		double c3c4 = ((xC2-xC1)*(yC1-yC3) - (yC2-yC1)*(xC1-xC3))/denom;
+		
+		return (c1c2 >= 0 && c1c2 <= 1) && (c3c4 >= 0 && c3c4 <= 1);
 	}
 	
 	/**
