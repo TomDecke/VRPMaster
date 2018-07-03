@@ -223,6 +223,23 @@ public class Vehicle {
 	 * @throws IOException
 	 */
 	public static void main(String[] args)  throws IOException {
+		
+		//get the input
+		String fileIn = args[0];
+		int numCustomer = Integer.parseInt(args[1]);
+	
+		SteepestDescent stDesc = new SteepestDescent(fileIn,numCustomer);
+
+		//run the solver
+		System.out.println("");
+		stDesc.solve();
+		
+		System.out.println("Copy test: ");
+		Vehicle v1 = stDesc.getVehicles().get(0);
+		v1.show();
+		System.out.println("Actual copy:");
+		Vehicle vC = v1.copy();
+		vC.show();
 
 	}
 }

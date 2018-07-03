@@ -33,25 +33,20 @@ public class MainVRP {
 		System.out.println("Test:");
 		boolean valid = TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		
-//		//if the solution is valid display it otherwise display a failure-message
-//		if(valid) {
-//			//determine the name of the output-file
-//			String fileOut = fileIn.substring(0, fileIn.length()-4);
-//			fileOut += "_Solution.txt";
-//			DisplayVRP dVRP = new DisplayVRP(fileIn, numCustomer, fileOut);
-//			dVRP.plotVRPSolution();
-//		}
-//		else {
-//			System.out.println(" ");
-//			System.err.println("invalid solution");		
-//		}
+		//if the solution is valid display it otherwise display a failure-message
+		if(valid) {
+			//determine the name of the output-file
+			String fileOut = fileIn.substring(0, fileIn.length()-4);
+			fileOut += "_Solution.txt";
+			DisplayVRP dVRP = new DisplayVRP(fileIn, numCustomer, fileOut);
+			dVRP.plotVRPSolution();
+		}
+		else {
+			System.out.println(" ");
+			System.err.println("invalid solution");		
+		}
 		
-		System.out.println("Copy test: ");
-		Vehicle v1 = stDesc.getVehicles().get(0);
-		v1.show();
-		System.out.println("Actual copy:");
-		Vehicle vC = v1.copy();
-		vC.show();
+
 
 	}
 }

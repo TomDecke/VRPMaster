@@ -2,6 +2,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import addOns.TimeConstraintViolationException;
+
 
 /**
  * 
@@ -39,7 +41,11 @@ public class SteepestDescent {
 		//go through the matrix and determine the best move for each combination 
 		for(int i = 0; i < numCustomers; i++) {
 			for(int j = 0; j < numCustomers; j++) {
-				bestMoveMatrix[i][j] = findBestCustomer(vrp.vehicle[i], vrp.vehicle[j]);				
+				if(i==j) {
+					bestMoveMatrix[i][j] = new RelocateOption(null, PENALTY,vrp.vehicle[i], vrp.vehicle[j]);
+				}else {
+					bestMoveMatrix[i][j] = findBestCustomer(vrp.vehicle[i], vrp.vehicle[j]);
+				}				
 			}
 		}
 	}
@@ -226,12 +232,16 @@ public class SteepestDescent {
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle vCheck = vrp.vehicle[i];
 			//recalculate the giving and receiving of the first vehicle
-			bestMoveMatrix[vFrom.index][i] = findBestCustomer(vFrom, vCheck);
-			bestMoveMatrix[i][vFrom.index] = findBestCustomer(vCheck,vFrom);
+			if(vFrom.index!=i) {
+				bestMoveMatrix[vFrom.index][i] = findBestCustomer(vFrom, vCheck);
+				bestMoveMatrix[i][vFrom.index] = findBestCustomer(vCheck,vFrom);
+			}
 
-			//recalculate the giving and receiving of the second vehicle
-			bestMoveMatrix[i][vTo.index] = findBestCustomer(vCheck, vTo);
-			bestMoveMatrix[vTo.index][i] = findBestCustomer(vFrom, vCheck);
+			if(vTo.index!=i) {
+				//recalculate the giving and receiving of the second vehicle
+				bestMoveMatrix[i][vTo.index] = findBestCustomer(vCheck, vTo);
+				bestMoveMatrix[vTo.index][i] = findBestCustomer(vFrom, vCheck);
+			}
 		}
 	}
 
@@ -256,11 +266,12 @@ public class SteepestDescent {
 
 				//check if the routes cross
 				if(lineCollision(c1, c2, c3, c4)) {
+					System.out.println("They cross o.o");
 					//check time window
-
+					//					System.out.println(testReverse(v, c3, c2));
 					//TODO figure out the exchange
-					double newCost = cCost - vrp.distance(c1, c2) - vrp.distance(c3, c4)
-							+ vrp.distance(c1, c3) + vrp.distance(c2, c4);
+					//					double newCost = cCost - vrp.distance(c1, c2) - vrp.distance(c3, c4)
+					//							+ vrp.distance(c1, c3) + vrp.distance(c2, c4);
 					// - c1c2 -c3c4
 					// + c1c3 + c2c4 || + c1c4 + c2c3
 				}
@@ -276,55 +287,60 @@ public class SteepestDescent {
 		return false;
 	}
 
+	/**
+	 * Test if the reversing of the route between two customers would yield a cost-improvement
+	 * @param v Vehicle, the vehicle which drives the route
+	 * @param newStart Customer, the customer which is the new start for the reversal
+	 * @param newEnd Customer, the customer which is the new end for the reversal
+	 * @return boolean, true, if reversing is possible and improves the cost, false otherwise
+	 */
 	public boolean testReverse(Vehicle v, Customer newStart, Customer newEnd) {
-		
+
 		//create a new vehicle based on the passed vehicle
 		Vehicle testV = v.copy();
 
-		Customer cPred = testV.firstCustomer;
-		Customer cCur = cPred.succ;
-		Customer last = testV.lastCustomer;
-
-		//copy the first part to a route to a new vehicle
-		while(!cCur.equals(newEnd)) {
-			testV.insertBetween(cCur, cPred, last);
-
-			//move to the next customer
-			cPred = cCur;
-			cCur = cCur.succ;
+		//find new start and new end in the new vehicle
+		Customer current = testV.firstCustomer;
+		while(!current.equals(testV.lastCustomer)) {
+			if(current.custNo == newStart.custNo) {
+				newStart = current;
+			}
+			if(current.custNo == newEnd.custNo) {
+				newEnd = current;
+			}
+			current = current.succ;
 		}
 
-		//add the middle part in reversed orderS
-		cCur = newStart;
-		while(!cCur.equals(newEnd)) {
-			if(cCur.canBeInsertedBetween(cPred, last)) {
-				testV.insertBetween(cCur, cPred, last);
+		Customer last = newStart.succ;
+		Customer limit = newEnd.pred;
+		ArrayList<Customer> customers = new ArrayList<Customer>();
+
+		//read the customers which are to be reversed in reversed order
+		Customer cCur = newStart;
+		while(!cCur.equals(limit)) {
+			customers.add(cCur);
+			testV.remove(cCur);
+			cCur = cCur.pred;
+		}
+
+		Customer cPred = limit;
+		for(Customer c : customers) {
+			if(c.canBeInsertedBetween(cPred, last)) {
+				testV.insertBetween(c, cPred, last);
 			}
 			else {
 				return false;
 			}
+			cPred = c;
 
-
-			cPred = cCur;
-			cCur = cCur.pred;	
-		}
-
-		//copy the last part to a new vehicle
-		cPred = newEnd;
-		cCur = newStart.succ;
-		while(!cCur.equals(last)) {
-			if(cCur.canBeInsertedBetween(cPred, last)) {
-				testV.insertBetween(cCur, cPred, last);
-			}
-			else {
-				return false;
-			}
 		}
 
 		if(testV.cost < v.cost) {
-			System.out.println("Success");
+			return true;
 		}
-		return true;
+		else {
+			return false;
+		}
 	}
 
 	/**
@@ -514,11 +530,15 @@ public class SteepestDescent {
 		int num = Integer.parseInt(args[1]);
 		SteepestDescent stDesc = new SteepestDescent(in, num);
 		VRP stVRP = stDesc.getVRP();
-		System.out.println(2*(stVRP.distance(stVRP.depot, stVRP.customer[8])));
+
 		VRP vrp = new VRP (in,num);
 		stDesc.solve();
-		TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+		//TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
+
+		for(Vehicle v : stDesc.getVehicles()) {
+			stDesc.twoOpt(v);
+		}
 	}
 }
