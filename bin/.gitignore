@@ -1,11 +1,24 @@
 /CostAdjustment.class
 /Customer.class
 /DisplayVRP.class
+<<<<<<< HEAD
 /MainVRP.class
 /Relocate.class
+=======
+/SimpleSolomon.txt
+/SimpleSolomon_Solution.txt
+/TestSolomon.txt
+/TestSolomon_Solution.txt
+/addOns/
+/MainVRP.class
+>>>>>>> master
 /RelocateOption.class
 /SteepestDescent.class
 /TestSolution.class
 /VRP.class
 /Vehicle.class
+<<<<<<< HEAD
 /addOns/
+=======
+/C101_Solution.txt
+>>>>>>> master
