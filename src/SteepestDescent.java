@@ -68,17 +68,17 @@ public class SteepestDescent {
 
 			//if the vehicle can accommodate the customer find the best position for him
 			if(vTo.canAccomodate(cFrom)) {
-				
+
 				//determine how the total distance of vFrom would change
 				double newDistVFrom = vFrom.getDistance() + vrp.distance(cFrom.pred, cFrom.succ) 
 				- vrp.distance(cFrom.pred, cFrom)
 				- vrp.distance(cFrom, cFrom.succ);
-				
+
 				//catch computational inaccuracy
 				if(newDistVFrom < 1E-10) {
 					newDistVFrom = 0;
 				}
-				
+
 				Customer cToPred = vTo.firstCustomer;
 				Customer cToSucc = cToPred.succ;
 				while(!cToPred.equals(vTo.lastCustomer)) {
@@ -247,24 +247,24 @@ public class SteepestDescent {
 		Customer c2 = c1.succ;
 		//go through all routes
 		while(!c2.equals(v.lastCustomer)) {
-			
-			
+
+
 			Customer c3 = c2;
 			Customer c4 = c3.succ;
 			//compare each route with all following routes
 			while(!c4.equals(v.lastCustomer)) {
-				
+
 				//check if the routes cross
 				if(lineCollision(c1, c2, c3, c4)) {
 					//check time window
-					
+
 					//TODO figure out the exchange
 					double newCost = cCost - vrp.distance(c1, c2) - vrp.distance(c3, c4)
 							+ vrp.distance(c1, c3) + vrp.distance(c2, c4);
 					// - c1c2 -c3c4
 					// + c1c3 + c2c4 || + c1c4 + c2c3
 				}
-				
+
 				c3 = c4;
 				c4 = c4.succ;
 			}
@@ -275,20 +275,58 @@ public class SteepestDescent {
 		//no crossing occurred, thus 
 		return false;
 	}
-	
+
 	public boolean testReverse(Vehicle v, Customer newStart, Customer newEnd) {
+		
 		//create a new vehicle based on the passed vehicle
-		Vehicle testV = new Vehicle(v.vrp, 0, v.capacity, v.costOfUse, this.vrp.depot);
-		
-		Customer cCur = v.firstCustomer.succ;
-		while(!cCur.equals(newStart)) {
-			
+		Vehicle testV = v.copy();
+
+		Customer cPred = testV.firstCustomer;
+		Customer cCur = cPred.succ;
+		Customer last = testV.lastCustomer;
+
+		//copy the first part to a route to a new vehicle
+		while(!cCur.equals(newEnd)) {
+			testV.insertBetween(cCur, cPred, last);
+
+			//move to the next customer
+			cPred = cCur;
+			cCur = cCur.succ;
 		}
-		
-		
-		return false;
+
+		//add the middle part in reversed orderS
+		cCur = newStart;
+		while(!cCur.equals(newEnd)) {
+			if(cCur.canBeInsertedBetween(cPred, last)) {
+				testV.insertBetween(cCur, cPred, last);
+			}
+			else {
+				return false;
+			}
+
+
+			cPred = cCur;
+			cCur = cCur.pred;	
+		}
+
+		//copy the last part to a new vehicle
+		cPred = newEnd;
+		cCur = newStart.succ;
+		while(!cCur.equals(last)) {
+			if(cCur.canBeInsertedBetween(cPred, last)) {
+				testV.insertBetween(cCur, cPred, last);
+			}
+			else {
+				return false;
+			}
+		}
+
+		if(testV.cost < v.cost) {
+			System.out.println("Success");
+		}
+		return true;
 	}
-	
+
 	/**
 	 * Determine if the routes from c1c2 and c3c4 cross each other
 	 * the solution is taken from 
@@ -300,7 +338,7 @@ public class SteepestDescent {
 	 * @return
 	 */
 	public boolean lineCollision(Customer c1, Customer c2, Customer c3, Customer c4  ) {
-		
+
 		//extract the coordinates of the routes
 		double xC1 = c1.xCoord;
 		double yC1 = c1.yCoord;
@@ -310,7 +348,7 @@ public class SteepestDescent {
 		double yC3 = c3.yCoord;
 		double xC4 = c4.xCoord;
 		double yC4 = c4.yCoord;
-		
+
 		//check if the routes are contiguous
 		if((xC1 == xC3 && yC1 == yC3) || (xC1 == xC4 && yC1 == yC4)) {
 			//the start point of c1c2 is identical with either c3 or c4
@@ -320,22 +358,22 @@ public class SteepestDescent {
 			//the end point of c1c2 is identical with either c3 or c4
 			return false;
 		}
-		
+
 		//calculate the denominator
 		double denom = (yC4-yC3) * (xC2-xC1) - (xC4-xC3) * (yC2-yC1);
-		
+
 		//If the solution is close to 0 the routes are parallel
 		if(Math.abs(denom)<EPSILON) {
 			return false;
 		}
-		
+
 		double c1c2 = ((xC4-xC3)*(yC1-yC3) - (yC4-yC3)*(xC1-xC3))/denom;
 		double c3c4 = ((xC2-xC1)*(yC1-yC3) - (yC2-yC1)*(xC1-xC3))/denom;
-		
+
 		//check if the crossing happens between the end points of both routes
 		return (c1c2 >= 0 && c1c2 <= 1) && (c3c4 >= 0 && c3c4 <= 1);
 	}
-	
+
 	/**
 	 * Construct the current best move matrix, showing which customer to move from which vehicle to an other
 	 */

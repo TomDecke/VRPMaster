@@ -100,16 +100,17 @@ public class Customer {
 		nC.vrp = this.vrp;
 		nC.earliestStart = this.earliestStart;
 		nC.latestStart = this.latestStart;
+		
 		return nC;
 	}
 
-	
+
 	/**
 	 * Main method for testing
 	 * @param args
 	 * @throws IOException
 	 */
 	public static void main(String[] args)  throws IOException {
-		
+
 	}
 }

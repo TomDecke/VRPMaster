@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.*;
 
 import addOns.TimeConstraintViolationException;
@@ -40,6 +41,34 @@ public class Vehicle {
 		lastCustomer.vehicle = this;
 		firstCustomer.succ = lastCustomer;
 		lastCustomer.pred = firstCustomer;
+	}
+	
+	/**
+	 * Creates a copy of this vehicle
+	 * @return Vehicle the copy
+	 */
+	public Vehicle copy() {
+		//take the values of this vehicle for the copy
+		Vehicle nV = new Vehicle(this.vrp, this.id, this.capacity, this.costOfUse, this.vrp.depot);
+		nV.load = this.load;
+		nV.cost = this.cost;
+		nV.setDistance(this.distance);
+		
+		//copy the customers into the vehicle
+		Customer cPred = nV.firstCustomer;
+		Customer cCur = this.firstCustomer.succ;
+		while(!cCur.equals(this.lastCustomer)) {
+			Customer cCopy = cCur.copy();
+			cPred.succ = cCopy;
+			cCopy.pred = cPred;
+			
+			//move to the next one
+			cPred = cCopy;
+			cCur = cCur.succ;
+		}
+		cPred.succ = nV.lastCustomer;
+		nV.lastCustomer.pred = cPred; 
+		return nV;
 	}
 
 	/**
@@ -93,40 +122,6 @@ public class Vehicle {
 		}
 	}
 
-//	/**
-//	 * Find the best position for a customer in the vehicle
-//	 * @param c Customer, the customer that is to be inserted into the vehicle
-//	 * @return Customer, the customer after which the new customer should be inserted or null if it can't be inserted
-//	 */
-//	public Customer findBestPosition(Customer c) {
-//
-//
-//
-//		Customer cCurrent = firstCustomer;
-//		Customer cSucc = cCurrent.succ;
-//		Customer cTmp = null;
-//
-//		//TODO personally introduced limitation as starting value
-//		double minCost = cost/costOfUse*2 + 1000;
-//		Customer cInsertAfter = null;
-//
-//		//Find the position at which the increment of the distance is the smallest
-//		while(cSucc!= null) {
-//			//make sure the customer fits in the time window
-//			if(c.canBeInsertedBetween(cCurrent, cSucc)) {
-//				//determine the change in cost, caused by the insertion at the current position
-//				double insertionCost = vrp.distance(cCurrent,c) + vrp.distance(c, cSucc) - vrp.distance(cCurrent,cSucc);
-//				if(insertionCost<minCost) {
-//					cInsertAfter = cCurrent;
-//					minCost = insertionCost;
-//				}
-//			}
-//			cTmp = cSucc;
-//			cSucc = cSucc.succ;
-//			cCurrent = cTmp;
-//		}
-//		return cInsertAfter;
-//	}
 
 	/**
 	 * Remove a customer from the vehicle's tour
@@ -222,4 +217,12 @@ public class Vehicle {
 		this.distance=distance;
 	}
 
+	/**
+	 * Main method for testing
+	 * @param args
+	 * @throws IOException
+	 */
+	public static void main(String[] args)  throws IOException {
+
+	}
 }
