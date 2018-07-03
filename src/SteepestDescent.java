@@ -252,7 +252,6 @@ public class SteepestDescent {
 	 * @return boolean, whether or not an optimization took place
 	 */
 	public boolean twoOpt(Vehicle v) {
-		double cCost = v.cost;
 		Customer c1 = v.firstCustomer;
 		Customer c2 = c1.succ;
 		//go through all routes
@@ -262,18 +261,12 @@ public class SteepestDescent {
 			Customer c3 = c2;
 			Customer c4 = c3.succ;
 			//compare each route with all following routes
-			while(!c4.equals(v.lastCustomer)) {
+			while(!c3.equals(v.lastCustomer)) {
 
 				//check if the routes cross
 				if(lineCollision(c1, c2, c3, c4)) {
-					System.out.println("They cross o.o");
 					//check time window
-					//					System.out.println(testReverse(v, c3, c2));
-					//TODO figure out the exchange
-					//					double newCost = cCost - vrp.distance(c1, c2) - vrp.distance(c3, c4)
-					//							+ vrp.distance(c1, c3) + vrp.distance(c2, c4);
-					// - c1c2 -c3c4
-					// + c1c3 + c2c4 || + c1c4 + c2c3
+					System.out.println(testReverse(v, c3, c2));
 				}
 
 				c3 = c4;
@@ -290,45 +283,66 @@ public class SteepestDescent {
 	/**
 	 * Test if the reversing of the route between two customers would yield a cost-improvement
 	 * @param v Vehicle, the vehicle which drives the route
-	 * @param newStart Customer, the customer which is the new start for the reversal
-	 * @param newEnd Customer, the customer which is the new end for the reversal
+	 * @param nS Customer, the customer which is the new start for the reversal
+	 * @param nE Customer, the customer which is the new end for the reversal
 	 * @return boolean, true, if reversing is possible and improves the cost, false otherwise
 	 */
 	public boolean testReverse(Vehicle v, Customer newStart, Customer newEnd) {
 
+		Customer nS = newStart.copy();
+		Customer nE = newEnd.copy();
 		//create a new vehicle based on the passed vehicle
 		Vehicle testV = v.copy();
 
+		System.out.println("Reverse vehicle: ");
+		testV.show();
+	
 		//find new start and new end in the new vehicle
 		Customer current = testV.firstCustomer;
 		while(!current.equals(testV.lastCustomer)) {
-			if(current.custNo == newStart.custNo) {
-				newStart = current;
+			if(current.custNo == nS.custNo) {
+				nS = current;
+				nS.succ = current.succ;
+				nS.pred = current.pred;
 			}
-			if(current.custNo == newEnd.custNo) {
-				newEnd = current;
+			if(current.custNo == nE.custNo) {
+				nE = current;
+				nE.succ = current.succ;
+				nE.pred = current.pred;
 			}
 			current = current.succ;
 		}
 
-		Customer last = newStart.succ;
-		Customer limit = newEnd.pred;
+		Customer last = nS.succ;
+		Customer limit = nE.pred;
 		ArrayList<Customer> customers = new ArrayList<Customer>();
 
+		
 		//read the customers which are to be reversed in reversed order
-		Customer cCur = newStart;
+		Customer cCur = nS;
 		while(!cCur.equals(limit)) {
 			customers.add(cCur);
-			testV.remove(cCur);
+			
+			//move on to the next customer
 			cCur = cCur.pred;
+			
+			//remove the customer of this visit
+			testV.remove(cCur.succ);
+			
 		}
 
+		testV.show();
+//		for(Customer c : customers) {
+//			System.out.println(c.custNo);
+//		}
+		
 		Customer cPred = limit;
 		for(Customer c : customers) {
 			if(c.canBeInsertedBetween(cPred, last)) {
 				testV.insertBetween(c, cPred, last);
 			}
 			else {
+				System.out.println("Time window violation");
 				return false;
 			}
 			cPred = c;
@@ -336,9 +350,11 @@ public class SteepestDescent {
 		}
 
 		if(testV.cost < v.cost) {
+
 			return true;
 		}
 		else {
+			System.out.println("No cost improvement");
 			return false;
 		}
 	}
