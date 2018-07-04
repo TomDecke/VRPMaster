@@ -42,11 +42,11 @@ public class SteepestDescent {
 		//go through the matrix and determine the best move for each combination 
 		for(int i = 0; i < numCustomers; i++) {
 			for(int j = 0; j < numCustomers; j++) {
-				if(i==j) {
-					bestMoveMatrix[i][j] = new RelocateOption(null, PENALTY,vrp.vehicle[i], vrp.vehicle[j]);
-				}else {
+//				if(i==j) {
+//					bestMoveMatrix[i][j] = new RelocateOption(null, 0,vrp.vehicle[i], vrp.vehicle[j]);
+//				}else {
 					bestMoveMatrix[i][j] = findBestCustomer(vrp.vehicle[i], vrp.vehicle[j]);
-				}				
+//				}				
 			}
 		}
 	}
@@ -126,15 +126,12 @@ public class SteepestDescent {
 	 */
 	public RelocateOption findBestCustomer(Vehicle vFrom, Vehicle vTo) {
 
-
-		//create an empty move with the current cost of the vehicles
+		double cCost = vFrom.cost + vTo.cost;
+		
+		//create an empty move with no improvement
 		//thus prevent the moving of one customer to another vehicle if there would be no benefit
-		RelocateOption bestToMove = new RelocateOption(null, vFrom.cost + vTo.cost, vFrom, vTo);
+		RelocateOption bestToMove = new RelocateOption(null, 0, vFrom, vTo);
 
-		//if the vehicles are the same, then there is only one cost
-		if(vFrom.equals(vTo)) {
-			bestToMove.setCostOfMove(vFrom.cost);
-		}
 
 		//start checking from the first customer, who is not the depot-connection
 		Customer cFrom = vFrom.firstCustomer.succ;
@@ -149,7 +146,7 @@ public class SteepestDescent {
 				- vrp.distance(cFrom, cFrom.succ);
 
 				//catch computational inaccuracy
-				if(newDistVFrom < 1E-10) {
+				if(newDistVFrom < EPSILON) {
 					newDistVFrom = 0;
 				}
 
@@ -165,20 +162,22 @@ public class SteepestDescent {
 									+ vrp.distance(cFrom, cToSucc);
 
 
-							if(newDistVTo < 1E-10) {
+							//catch computational inaccuracy
+							if(newDistVTo < EPSILON) {
 								newDistVTo = 0;
 							}
 
-							//the change in cost, if this move was to be made
+							//the new cost for the vehicles, if this move was to be made
 							double resultingCost = newDistVFrom * vFrom.costOfUse + newDistVTo * vTo.costOfUse;
-
+							
+							//the change in cost
+							double deltaCost =  resultingCost - cCost;
 
 							//if this move is cheaper, take it up
-							if(resultingCost < bestToMove.getCostOfMove()) {
-								bestToMove = new RelocateOption(cFrom,resultingCost,vFrom,vTo);
+							if(deltaCost < bestToMove.getCostOfMove()) {
+								bestToMove = new RelocateOption(cFrom,deltaCost,vFrom,vTo);
 								bestToMove.cPred = cToPred;
 								bestToMove.cSucc = cToSucc;
-
 							}
 						}
 					}
@@ -190,11 +189,6 @@ public class SteepestDescent {
 			//go to the next customer
 			cFrom = cFrom.succ;
 
-		}
-
-		//if there is no customer who's movement could lead to optimisation, penalise the move
-		if(bestToMove.getCToMove() == null) {
-			bestToMove.setCostOfMove(PENALTY);
 		}
 
 		return bestToMove;
@@ -217,7 +211,7 @@ public class SteepestDescent {
 		int iterationCounter = 0;
 
 		//As long as there are improving moves execute them
-		while(relocate.getCostOfMove() < PENALTY) {
+		while(relocate.getCostOfMove() < 0) {
 
 			//Visualize the relocation on the console
 			iterationCounter++;
@@ -303,16 +297,16 @@ public class SteepestDescent {
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle vCheck = vrp.vehicle[i];
 			//recalculate the giving and receiving of the first vehicle
-			if(vFrom.index!=i) {
+//			if(vFrom.index!=i) {
 				bestMoveMatrix[vFrom.index][i] = findBestCustomer(vFrom, vCheck);
 				bestMoveMatrix[i][vFrom.index] = findBestCustomer(vCheck,vFrom);
-			}
+//			}
 
-			if(vTo.index!=i) {
+//			if(vTo.index!=i) {
 				//recalculate the giving and receiving of the second vehicle
 				bestMoveMatrix[i][vTo.index] = findBestCustomer(vCheck, vTo);
 				bestMoveMatrix[vTo.index][i] = findBestCustomer(vFrom, vCheck);
-			}
+//			}
 		}
 	}
 
