@@ -96,6 +96,7 @@ public class Vehicle {
 			cInsert.insertBetween(cPred, cSucc);
 		} catch (TimeConstraintViolationException e) {
 			System.out.println(e.getMessage());
+			return false;
 		}
 
 		//increase the load of the vehicle by the customers demand
@@ -150,6 +151,7 @@ public class Vehicle {
 					cPred.propagateLatestStart();
 
 				} catch (TimeConstraintViolationException e) {
+					System.err.println("removal");
 					System.out.println(e.getMessage());
 				}
 

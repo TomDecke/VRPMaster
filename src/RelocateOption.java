@@ -9,7 +9,7 @@ public class RelocateOption {
 	private Customer cToMove;
 	Customer cPred;
 	Customer cSucc;
-	private double costOfMove;
+	private double delta;
 
 	/**
 	 * Constructor to create a relocation-object
@@ -18,9 +18,9 @@ public class RelocateOption {
 	 * @param vFrom Vehicle, the vehicle from which the customer would be taken
 	 * @param vTo Vehicle, the vehicle to which the customer would be moved
 	 */
-	public RelocateOption(Customer c, double cost, Vehicle vFrom, Vehicle vTo) {
+	public RelocateOption(Customer c, double delta, Vehicle vFrom, Vehicle vTo) {
 		this.cToMove = c;
-		this.costOfMove = cost;
+		this.delta = delta;
 		this.vehicleFrom = vFrom;
 		this.vehicleTo = vTo;
 	}
@@ -37,8 +37,8 @@ public class RelocateOption {
 	 * Accessor for the cost of the move
 	 * @return double
 	 */
-	public double getCostOfMove() {
-		return this.costOfMove;
+	public double getDelta() {
+		return this.delta;
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class RelocateOption {
 	 * @param cost double, the new cost 
 	 */
 	public void setCostOfMove(double cost) {
-		this.costOfMove = cost;
+		this.delta = cost;
 	}
 
 	/**
@@ -70,10 +70,10 @@ public class RelocateOption {
 	 */
 	public void printOption() {
 		if(cToMove != null) {
-			System.out.println("Move c"+cToMove.custNo+" from v" +vehicleFrom.id + " to v" + vehicleTo.id+ " at cost: "+costOfMove);
+			System.out.println("Move c"+cToMove.custNo+" from v" +vehicleFrom.id + " to v" + vehicleTo.id+ " at cost: "+delta);
 		}
 		else {
-			System.out.println("Move cX from v" +vehicleFrom.id + " to v" + vehicleTo.id+ " at cost: "+costOfMove);	
+			System.out.println("Move cX from v" +vehicleFrom.id + " to v" + vehicleTo.id+ " at cost: "+delta);	
 		}
 	}
 }
