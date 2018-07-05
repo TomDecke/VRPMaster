@@ -12,7 +12,7 @@ public class ExchangeOption {
 	private Customer cV1;
 	private Customer cV2;
 	private double delta;
-	
+
 	/**
 	 * Constructor to create an exchange option
 	 * @param v1 Vehicle, the first vehicle of the exchange
@@ -28,7 +28,7 @@ public class ExchangeOption {
 		this.cV2 = cV2;
 		this.delta = cost;
 	}
-	
+
 	public Vehicle getV1() {
 		return v1;
 	}
@@ -47,5 +47,15 @@ public class ExchangeOption {
 
 	public double getDelta() {
 		return delta;
+	}
+
+	public void printOption() {
+		if(cV1 == null) {
+			System.out.println(String.format("There are no customers to swap"));
+		}
+		else {
+			System.out.println(String.format("Swap customer c%d from vehicle v%d with customer c%d from vehicle v%d",cV1.custNo,v1.id,cV2.custNo,v2.id));
+
+		}
 	}
 }

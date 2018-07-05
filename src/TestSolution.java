@@ -128,6 +128,7 @@ public class TestSolution {
 		System.out.println("Total distance: " + totalDist);
 
 		//if all tests were passed, the solution is valid
+		System.out.println("The solution is valid!");
 		return true;
 	}
 
