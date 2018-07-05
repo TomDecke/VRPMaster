@@ -16,6 +16,8 @@ public class SteepestDescent {
 	private String out;
 	private VRP vrp;
 	private int numCustomers;
+	
+	//memory for the operators
 	private RelocateOption[][] bestMoveMatrix;
 	private ExchangeOption[][] exchangeMatrix;
 
@@ -43,6 +45,7 @@ public class SteepestDescent {
 		//go through the matrix and determine the best move for each combination 
 		for(int i = 0; i < numCustomers; i++) {
 			for(int j = 0; j < numCustomers; j++) {
+				//omit the relocation in the same vehicle on the first run
 				if(i==j) {
 					bestMoveMatrix[i][j] = new RelocateOption(null, PENALTY,vrp.vehicle[i], vrp.vehicle[j]);
 				}else {
@@ -56,6 +59,7 @@ public class SteepestDescent {
 	 * Create the matrix containing the best exchanges between tours
 	 */
 	public void createExchangeMatrix() {
+		//fill half of the matrix since swapping a & b is equivalent to swapping b & a
 		for(int i = 0 ; i < numCustomers ; i++) {
 			for(int j = i+1; j < numCustomers; j++) {
 				exchangeMatrix[i][j] = findBestExchange(vrp.vehicle[i], vrp.vehicle[j]);
@@ -65,10 +69,10 @@ public class SteepestDescent {
 
 
 	/**
-	 * Find customer who's moving to another vehicle would have the highest benefit
+	 * Find customer who's relocation to another vehicle would have the highest benefit
 	 * @param vFrom Vehicle, vehicle from which a customer is to be taken
 	 * @param vTo Vehicle, vehicle to which a customer is to be moved
-	 * @return RelocationOption, the best option for moving a customer from vFrom to vTo
+	 * @return RelocationOption, the best option for relocating a customer from vFrom to vTo
 	 */
 	public RelocateOption findBestRelocation(Vehicle vFrom, Vehicle vTo) {
 
@@ -102,8 +106,10 @@ public class SteepestDescent {
 				Customer cToPred = vTo.firstCustomer;
 				Customer cToSucc = cToPred.succ;
 				while(!cToPred.equals(vTo.lastCustomer)) {
+					
 					// a customer can not be inserted before/after himself
 					if(!(cFrom.equals(cToPred)||cFrom.equals(cToSucc))) {
+						
 						if(cFrom.canBeInsertedBetween(cToPred, cToSucc)) {
 							//determine how the total distance of vTo would change
 							double newDistVTo = vTo.getDistance() - vrp.distance(cToPred, cToSucc)
@@ -115,7 +121,7 @@ public class SteepestDescent {
 								newDistVTo = 0;
 							}
 
-							//the change in cost, if this move was to be made
+							//the occurring cost, if this move was to be made
 							double resultingCost = newDistVFrom * vFrom.costOfUse + newDistVTo * vTo.costOfUse;
 
 							//if this move is cheaper, take it up
@@ -134,7 +140,7 @@ public class SteepestDescent {
 			//go to the next customer
 			cFrom = cFrom.succ;
 		}
-		//if there is no customer who's movement could lead to optimisation, penalise the move
+		//if there is no customer who's movement could lead to improvement, penalise the move
 		if(bestToMove.getCToMove() == null) {
 			bestToMove.setCostOfMove(PENALTY);
 		}
@@ -148,10 +154,6 @@ public class SteepestDescent {
 	 * @return ExchangeOption, the best exchange option for v1 and v2
 	 */
 	public ExchangeOption findBestExchange(Vehicle v1, Vehicle v2) {
-
-		//get the current distance
-		double distV1 = v1.getDistance();
-		double distV2 = v2.getDistance();
 
 		//create a default exchange option
 		ExchangeOption bestExchange = new ExchangeOption(v1, v2, null, null, 0);
@@ -180,24 +182,25 @@ public class SteepestDescent {
 
 				//make sure the exchange does not violate time window constraints
 				if(cV1.canBeInsertedBetween(cV2Pred, cV2Succ) && cV2.canBeInsertedBetween(cV1Pred, cV1Succ)) {
-					//get the change in distance for v1
-					double deltaDistV1 = - vrp.distance(cV1Pred, cV1) - vrp.distance(cV1, cV1Succ)
-							+ vrp.distance(cV1Pred, cV2) + vrp.distance(cV2, cV1Succ);
+					
+					//ensure that the vehicles possess the capacity for the exchange
+					if((v1.load-cV1.demand+cV2.demand)<=v1.capacity && (v2.load-cV2.demand+cV1.demand)<=v2.capacity) {
+						//get the change in distance for v1
+						double deltaDistV1 = - vrp.distance(cV1Pred, cV1) - vrp.distance(cV1, cV1Succ)
+								+ vrp.distance(cV1Pred, cV2) + vrp.distance(cV2, cV1Succ);
 
-					//get the change in distance for v2
-					double deltaDistV2 =  - vrp.distance(cV2Pred, cV2) - vrp.distance(cV2, cV2Succ)
-							+ vrp.distance(cV2Pred, cV1) + vrp.distance(cV1, cV2Succ);
+						//get the change in distance for v2
+						double deltaDistV2 =  - vrp.distance(cV2Pred, cV2) - vrp.distance(cV2, cV2Succ)
+								+ vrp.distance(cV2Pred, cV1) + vrp.distance(cV1, cV2Succ);
 
+						//get the change in cost by subtracting the current cost from the potential new cost
+						double delta = (deltaDistV1 * v1.costOfUse + deltaDistV2 * v2.costOfUse)-(v1.cost + v2.cost); 
 
-					//get the change in cost by subtracting the current cost from the potential new cost
-					double delta = (deltaDistV1 * v1.costOfUse + deltaDistV2 * v2.costOfUse)-(distV1 + distV2); 
-
-					if(delta < bestExchange.getDelta()) {
-						bestExchange = new ExchangeOption(v1,v2, cV1, cV2, delta);
+						if(delta < bestExchange.getDelta()) {
+							bestExchange = new ExchangeOption(v1,v2, cV1, cV2, delta);
+						}
 					}
 				}
-
-
 
 				//move on to the next customer of vehicle two
 				cV2 = cV2.succ;
@@ -229,7 +232,7 @@ public class SteepestDescent {
 		//As long as there are improving moves execute them
 		while(relocate.getCostOfMove() < PENALTY) {
 
-			//Visualize the relocation on the console
+			//Visualize the state before the relocation on the console
 			iterationCounter++;
 			System.out.println(iterationCounter);
 			//uncomment if wanted printBMM();
@@ -242,7 +245,7 @@ public class SteepestDescent {
 			//relocate the customer
 			executeRelocation(relocate);
 
-			//Visualize the relocation on the console
+			//Visualize the state after the relocation on the console
 			System.out.print("vFrom - after move: ");
 			relocate.getVehicleFrom().show();
 			System.out.print("vTo - after move: ");
@@ -264,7 +267,6 @@ public class SteepestDescent {
 
 		printResultsToConsole();
 		printResultsToFile();
-
 	}
 
 
@@ -327,7 +329,7 @@ public class SteepestDescent {
 
 	/**
 	 * Swaps two customers according to the information stored in the exchange option
-	 * @param bE ExchangeOption, the best exchange option
+	 * @param bE ExchangeOption, exchange option to be used
 	 */
 	public void executeExchange(ExchangeOption bE) {
 		//obtain information of customer from vehicle 1
@@ -389,7 +391,7 @@ public class SteepestDescent {
 			Vehicle cV = vrp.vehicle[i];
 			int indV1 = v1.index;
 			int indV2 = v1.index;
-			//only consider inter-route exchanges for 
+			//only consider inter-route changes and one way swapping
 			if(indV1 < i) {
 				exchangeMatrix[i][indV1] = findBestExchange(v1, cV);
 			}
@@ -407,17 +409,19 @@ public class SteepestDescent {
 
 
 	/**
-	 * executes a two-opt move for a vehicle if possible
+	 * Executes a two-opt move for a vehicle if possible
 	 * @param v Vehicle, the vehicle which is to be checked for crossings
 	 * @return boolean, whether or not an optimization took place
 	 */
 	public boolean twoOpt(Vehicle v) {
+		//get the first route of the vehicle
 		Customer c1 = v.firstCustomer;
 		Customer c2 = c1.succ;
 		//go through all routes
+		
 		while(!c2.equals(v.lastCustomer)) {
-
-
+			
+			//get the succeeding route
 			Customer c3 = c2;
 			Customer c4 = c3.succ;
 			//compare each route with all following routes
@@ -425,16 +429,14 @@ public class SteepestDescent {
 
 				//check if the routes cross
 				if(lineCollision(c1, c2, c3, c4)) {
-					//check time window
-					System.out.println(reverseRoute(v.copy(), c3.copy(), c2.copy()));
 
-					//try the reversion on a copy of the data to check time windows
+					//try the reversion on a copy of the data to check time windows and cost constraint
 					if(reverseRoute(v.copy(), c3.copy(), c2.copy())) {
 						//if the reversion is possible, execute it
 						reverseRoute(v, c3, c2);
 					}
 				}
-
+				//move to the following route
 				c3 = c4;
 				c4 = c4.succ;
 			}
@@ -447,44 +449,27 @@ public class SteepestDescent {
 	}
 
 	/**
-	 * reverse the route between two customers
+	 * Reverse the route between two customers
 	 * @param v Vehicle, the vehicle which drives the route
 	 * @param newStart Customer, the customer which is the new start for the reversal
 	 * @param newEnd Customer, the customer which is the new end for the reversal
 	 * @return boolean, true, if reversing is possible and improves the cost, false otherwise
 	 */
 	public boolean reverseRoute(Vehicle v, Customer newStart, Customer newEnd) {
-
-		Customer nS = newStart;
-		Customer nE = newEnd;
-		Vehicle testV = v;
+;
 
 		System.out.println("Reverse vehicle: ");
-		testV.show();
+		v.show();
 
-		//find new start and new end in the new vehicle
-		Customer current = testV.firstCustomer;
-		while(!current.equals(testV.lastCustomer)) {
-			if(current.custNo == nS.custNo) {
-				nS = current;
-				nS.succ = current.succ;
-				nS.pred = current.pred;
-			}
-			if(current.custNo == nE.custNo) {
-				nE = current;
-				nE.succ = current.succ;
-				nE.pred = current.pred;
-			}
-			current = current.succ;
-		}
-
-		Customer last = nS.succ;
-		Customer limit = nE.pred;
+		double preCost = v.cost;
+		
+		Customer last = newStart.succ;
+		Customer limit = newEnd.pred;
 		ArrayList<Customer> customers = new ArrayList<Customer>();
 
 
 		//read the customers which are to be reversed in reversed order
-		Customer cCur = nS;
+		Customer cCur = newStart;
 		while(!cCur.equals(limit)) {
 			customers.add(cCur);
 
@@ -492,30 +477,31 @@ public class SteepestDescent {
 			cCur = cCur.pred;
 
 			//remove the customer of this visit
-			testV.remove(cCur.succ);
+			v.remove(cCur.succ);
 
 		}
 
-		testV.show();
+		//display the customers that were taken out
+		v.show();
 		for(Customer c : customers) {
 			System.out.println(c.custNo);
 		}
 
+		//try to insert the customers that were taken back into the route
 		Customer cPred = limit;
 		for(Customer c : customers) {
 			if(c.canBeInsertedBetween(cPred, last)) {
-				testV.insertBetween(c, cPred, last);
+				v.insertBetween(c, cPred, last);
 			}
 			else {
 				System.out.println("Time window violation");
 				return false;
 			}
 			cPred = c;
-
 		}
 
-		if(testV.cost < v.cost) {
-
+		//check if the cost of the vehicle has decreased
+		if(v.cost < preCost) {
 			return true;
 		}
 		else {
