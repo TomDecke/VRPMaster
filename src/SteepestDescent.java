@@ -557,6 +557,57 @@ public class SteepestDescent {
 		return (c1c2 >= 0 && c1c2 <= 1) && (c3c4 >= 0 && c3c4 <= 1);
 	}
 
+	/**
+	 * Find the best possible cross exchange between two vehicle routes
+	 * @param v1 Vehicle, the first vehicle for comparison
+	 * @param v2 Vehicle, the second vehicle for comparison
+	 * @return boolean, whether or not the cross exchange was successful
+	 */
+	public boolean crossExchange(Vehicle v1, Vehicle v2) {
+		
+		Customer cV1 = v1.firstCustomer;
+		
+		double cCost = v1.cost + v2.cost;
+		
+		//go through the first vehicle 
+		while(!cV1.equals(v1.lastCustomer)) {
+			Customer cV1Succ = cV1.succ;
+			
+			Customer cV2 = v2.firstCustomer.succ;
+			while(!cV2.equals(v2.lastCustomer)) {
+				Customer cV2Succ = cV2.succ;
+				
+				//swap the route
+				cV1.succ = cV2Succ;
+				cV2.succ = cV1Succ;
+
+				cV1Succ.pred = cV2;
+				cV2Succ.pred = cV1;
+			
+				//TODO die while-loop muss eine ebene nach oben
+				try {
+					//check for time window violations
+					cV1.propagateEarliestStart();
+					cV1.propagateLatestStart();
+					
+					cV2.propagateEarliestStart();
+					cV2.propagateLatestStart();
+				} catch (TimeConstraintViolationException e) {
+					e.printStackTrace();
+				}
+				
+				//TODO sum up load as you go / substract that from total load of vehicle -> determine load of both route parts
+				//to check for capacity violations
+				//Make sure to update the load of the vehicle after the exchange
+				
+			cV2 = cV2.succ;	
+			}
+			
+			//move to the next customer
+			cV1 = cV1.succ;			
+		}
+		return true;
+	}
 
 	/**
 	 * Construct the current best move matrix, showing which customer to move from which vehicle to an other

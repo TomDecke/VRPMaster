@@ -17,7 +17,6 @@ public class DisplayVRP {
 	private int xDepot, yDepot;
 	private VRP vrp;
 	private double costSol;
-	private int numCust;
 	private int numVehicles;
 	private ArrayList<int[]> vehicles; 
 	
@@ -147,8 +146,8 @@ public class DisplayVRP {
 	    StdDraw.setPenRadius(0.0005);
 	    int colourCount = 0;
 	    for(int[] vehicle : vehicles) {
-	    	//choose a random color for the vehicle route - StdDraw.setPenColor(new Color((int)(Math.random() * 0x1000000)));
-		    StdDraw.setPenColor(MyColours.getColour((colourCount)));
+	    	//choose a different color for each vehicle route
+		    //StdDraw.setPenColor(MyColours.getColour((colourCount)));
 		    
 		    //draw the line from the depot to the first customer
 		    int firstCustomer = vehicle[0];
