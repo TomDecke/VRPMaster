@@ -16,7 +16,7 @@ public class SteepestDescent {
 	private String out;
 	private VRP vrp;
 	private int numCustomers;
-	
+
 	//memory for the operators
 	private RelocateOption[][] bestMoveMatrix;
 	private ExchangeOption[][] exchangeMatrix;
@@ -106,10 +106,10 @@ public class SteepestDescent {
 				Customer cToPred = vTo.firstCustomer;
 				Customer cToSucc = cToPred.succ;
 				while(!cToPred.equals(vTo.lastCustomer)) {
-					
+
 					// a customer can not be inserted before/after himself
 					if(!(cFrom.equals(cToPred)||cFrom.equals(cToSucc))) {
-						
+
 						if(cFrom.canBeInsertedBetween(cToPred, cToSucc)) {
 							//determine how the total distance of vTo would change
 							double newDistVTo = vTo.getDistance() - vrp.distance(cToPred, cToSucc)
@@ -182,7 +182,7 @@ public class SteepestDescent {
 
 				//make sure the exchange does not violate time window constraints
 				if(cV1.canBeInsertedBetween(cV2Pred, cV2Succ) && cV2.canBeInsertedBetween(cV1Pred, cV1Succ)) {
-					
+
 					//ensure that the vehicles possess the capacity for the exchange
 					if((v1.load-cV1.demand+cV2.demand)<=v1.capacity && (v2.load-cV2.demand+cV1.demand)<=v2.capacity) {
 						//get the change in distance for v1
@@ -260,10 +260,10 @@ public class SteepestDescent {
 		printBMM();
 		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
 
-//		//TODO let's try something funny
-//		createExchangeMatrix();
-//		fetchBestExchange().printOption();
-//		executeExchange(fetchBestExchange());		
+		//		//TODO let's try something funny
+		//		createExchangeMatrix();
+		//		fetchBestExchange().printOption();
+		//		executeExchange(fetchBestExchange());		
 
 		printResultsToConsole();
 		printResultsToFile();
@@ -418,9 +418,9 @@ public class SteepestDescent {
 		Customer c1 = v.firstCustomer;
 		Customer c2 = c1.succ;
 		//go through all routes
-		
+
 		while(!c2.equals(v.lastCustomer)) {
-			
+
 			//get the succeeding route
 			Customer c3 = c2;
 			Customer c4 = c3.succ;
@@ -456,13 +456,13 @@ public class SteepestDescent {
 	 * @return boolean, true, if reversing is possible and improves the cost, false otherwise
 	 */
 	public boolean reverseRoute(Vehicle v, Customer newStart, Customer newEnd) {
-;
+		;
 
 		System.out.println("Reverse vehicle: ");
 		v.show();
 
 		double preCost = v.cost;
-		
+
 		Customer last = newStart.succ;
 		Customer limit = newEnd.pred;
 		ArrayList<Customer> customers = new ArrayList<Customer>();
@@ -564,50 +564,119 @@ public class SteepestDescent {
 	 * @return boolean, whether or not the cross exchange was successful
 	 */
 	public boolean crossExchange(Vehicle v1, Vehicle v2) {
-		
+
 		Customer cV1 = v1.firstCustomer;
-		
+		Customer cV2 = v2.firstCustomer.succ;
+
 		double cCost = v1.cost + v2.cost;
-		
+
+		//memorize the demand of the route-parts 
+		int loadUpToC1 = cV1.demand;
+		int loadAfterC1 = v1.load-loadUpToC1;
+
+		int loadUpToC2 = cV2.demand;
+		int loadAfterC2 = v2.load - loadUpToC2;
+
+		//memorize the distance of the route-parts
+		double distUpToC1 = 0;
+		double distAfterC1 = v1.getDistance();
+
+		double distUpToC2 = 0;
+		double distAfterC2 = v2.getDistance();
+
 		//go through the first vehicle 
 		while(!cV1.equals(v1.lastCustomer)) {
 			Customer cV1Succ = cV1.succ;
-			
-			Customer cV2 = v2.firstCustomer.succ;
-			while(!cV2.equals(v2.lastCustomer)) {
-				Customer cV2Succ = cV2.succ;
-				
-				//swap the route
-				cV1.succ = cV2Succ;
-				cV2.succ = cV1Succ;
 
-				cV1Succ.pred = cV2;
-				cV2Succ.pred = cV1;
-			
-				//TODO die while-loop muss eine ebene nach oben
-				try {
-					//check for time window violations
-					cV1.propagateEarliestStart();
-					cV1.propagateLatestStart();
-					
-					cV2.propagateEarliestStart();
-					cV2.propagateLatestStart();
-				} catch (TimeConstraintViolationException e) {
-					e.printStackTrace();
+			while(!cV2.equals(v2.lastCustomer)) {
+
+				//make sure that a swap would not violate capacity constraints
+				if(loadUpToC1+loadAfterC2 <= v1.capacity && loadUpToC2 + loadAfterC1 <= v2.capacity) {
+
+					//calculate the new cost of the route
+					double newRouteCost = (distUpToC1 * v1.costOfUse + distAfterC2 * v2.costOfUse)
+							+ (distUpToC2 * v2.costOfUse + distAfterC1 * v1.costOfUse);
+
+					//make sure the move has a cost benefit
+					if(newRouteCost < cCost) {
+
+						Customer cV2Succ = cV2.succ;
+
+						//swap the routes
+						cV1.succ = cV2Succ;
+						cV2.succ = cV1Succ;
+
+						cV1Succ.pred = cV2;
+						cV2Succ.pred = cV1;
+						
+						boolean exchangeSuccess = true;
+
+						try {
+							//check for time window violations
+							cV1.propagateEarliestStart();
+							cV1.propagateLatestStart();
+
+							cV2.propagateEarliestStart();
+							cV2.propagateLatestStart();
+						} catch (TimeConstraintViolationException e) {
+							//the swapping failed thus reverse it
+							cV1.succ = cV1Succ;
+							cV2.succ = cV2Succ;
+							
+							cV1Succ.pred = cV1;
+							cV2Succ.pred = cV2;
+							
+							exchangeSuccess = false;
+							
+							System.out.println(e.getMessage());
+						}
+						
+						//TODO re-think
+						if(exchangeSuccess) {
+							//assign the customers to their new vehicles
+							Customer cTmp = cV2Succ;
+							while(!cTmp.equals(v2.lastCustomer)) {
+								cTmp.vehicle = v1;
+								cTmp = cTmp.succ;
+							}
+							cTmp = cV1Succ;
+							while(!cTmp.equals(v2.lastCustomer)) {
+								cTmp.vehicle = v2;
+								cTmp = cTmp.succ;
+							}
+						}
+					}
+
+					//update the load of the vehicles after the exchange
+					v2.load = loadUpToC2 + loadAfterC1;
+					v1.load = loadUpToC1 + loadAfterC2;
 				}
-				
-				//TODO sum up load as you go / substract that from total load of vehicle -> determine load of both route parts
-				//to check for capacity violations
-				//Make sure to update the load of the vehicle after the exchange
-				
-			cV2 = cV2.succ;	
+				//move to the next customer
+				cV2 = cV2.succ;	
+
+				//update the demand before/after the second customer
+				loadUpToC2 += cV2.demand;
+				loadAfterC2 -= cV2.demand;
+
+				//update the distance towards/after the second customer
+				distUpToC2 += vrp.distance(cV2.pred, cV2);
+				distAfterC2 -=  vrp.distance(cV2.pred, cV2);
 			}
-			
+
 			//move to the next customer
-			cV1 = cV1.succ;			
+			cV1 = cV1.succ;		
+
+			//update the demand before/after the first customer
+			loadUpToC1 += cV1.demand;
+			loadAfterC1 -= cV1.demand;
+
+			//update the distance towards/after the second customer
+			distUpToC1 += vrp.distance(cV1.pred, cV1);
+			distAfterC1 -= vrp.distance(cV1.pred, cV1);
 		}
 		return true;
 	}
+
 
 	/**
 	 * Construct the current best move matrix, showing which customer to move from which vehicle to an other
@@ -757,10 +826,10 @@ public class SteepestDescent {
 		bE.printOption();
 		stDesc.executeExchange(bE);
 		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-		
-		
+
+
 		//		stDesc.createExchangeMatrix();
-//		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+		//		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
 
