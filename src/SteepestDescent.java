@@ -277,19 +277,19 @@ public class SteepestDescent {
 
 				//make sure that a swap would not violate capacity constraints
 				if(newLoadV1 <= v1.capacity && newLoadV2 <= v2.capacity) {
+					
+					//get the succeeding customers
+					Customer cV1Succ = cV1.succ;
+					Customer cV2Succ = cV2.succ;
 
 					//calculate the change in cost due to this move
-					//TODO include new distances, something is fishy here
-					double delta = (distUpToC1 * v1.costOfUse + distAfterC2 * v2.costOfUse)
-							+ (distUpToC2 * v2.costOfUse + distAfterC1 * v1.costOfUse)
+					//TODO would just the distance-change multiplied by the cost of use be sufficient?
+					double delta = (distUpToC1  + distAfterC2 + vrp.distance(cV1, cV2Succ) - vrp.distance(cV1, cV1Succ)) * v1.costOfUse
+							+ (distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ) - vrp.distance(cV2, cV2Succ)) * v2.costOfUse
 							- (v1.cost + v2.cost);
 
 					//make sure the move would be an improvement
 					if(delta < bestCrossEx.getDelta()) {
-
-						//get the succeeding customers
-						Customer cV1Succ = cV1.succ;
-						Customer cV2Succ = cV2.succ;
 
 						//swap the routes
 						cV1.succ = cV2Succ;
@@ -711,7 +711,7 @@ public class SteepestDescent {
 	 * @return boolean, true, if reversing is possible and improves the cost, false otherwise
 	 */
 	public boolean reverseRoute(Vehicle v, Customer newStart, Customer newEnd) {
-		;
+		
 
 		System.out.println("Reverse vehicle: ");
 		v.show();
@@ -1009,5 +1009,6 @@ public class SteepestDescent {
 
 
 		stDesc.printCrossEx();
+		System.exit(0);
 	}
 }
