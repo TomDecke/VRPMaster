@@ -1,6 +1,5 @@
-/CostAdjustment.class
+/CrossExOption.class
 /Customer.class
-/addOns/
 /DisplayVRP.class
 /ExchangeOption.class
 /MainVRP.class
@@ -10,4 +9,4 @@
 /TestSolution.class
 /VRP.class
 /Vehicle.class
-/CrossExOption.class
+/addOns/

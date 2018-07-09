@@ -232,7 +232,7 @@ public class Vehicle {
 
 		//run the solver
 		System.out.println("");
-		stDesc.solve();
+		stDesc.solve_Relocate();
 		
 		System.out.println("Copy test: ");
 		Vehicle v1 = stDesc.getVehicles().get(0);

@@ -20,6 +20,7 @@ public class SteepestDescent {
 	//memory for the operators
 	private RelocateOption[][] bestMoveMatrix;
 	private ExchangeOption[][] exchangeMatrix;
+	private CrossExOption[][] crossExMatrix;
 
 
 	/**
@@ -34,6 +35,7 @@ public class SteepestDescent {
 		this.out += "_Solution.txt";
 		this.bestMoveMatrix = new RelocateOption[customers][customers];
 		this.exchangeMatrix = new ExchangeOption[customers][customers];
+		this.crossExMatrix = new CrossExOption[customers][customers];
 		this.numCustomers = customers;
 	}
 
@@ -63,6 +65,18 @@ public class SteepestDescent {
 		for(int i = 0 ; i < numCustomers ; i++) {
 			for(int j = i+1; j < numCustomers; j++) {
 				exchangeMatrix[i][j] = findBestExchange(vrp.vehicle[i], vrp.vehicle[j]);
+			}
+		}
+	}
+	
+	/**
+	 * Create the matrix containing the best cross exchange for two vehicles
+	 */
+	public void createCrossExMatrix() {
+		//fill half of the matrix since exchanging between a & b is equivalent to exchanging between b & a
+		for(int i = 0 ; i < numCustomers ; i++) {
+			for(int j = i+1; j < numCustomers; j++) {
+				crossExMatrix[i][j] = findBestCrossEx(vrp.vehicle[i], vrp.vehicle[j]);
 			}
 		}
 	}
@@ -234,7 +248,7 @@ public class SteepestDescent {
 		int newLoadV1 = loadUpToC1 + loadAfterC2;
 		int newLoadV2 = loadUpToC2 + loadAfterC1;
 
-		//create a default best exchange
+		//create a default best cross exchange without improvement
 		CrossExOption bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, 0);
 
 		//memorize the distance of the route-parts
@@ -249,7 +263,7 @@ public class SteepestDescent {
 			while(!cV2.equals(v2.lastCustomer)) {
 
 				//make sure that a swap would not violate capacity constraints
-				if(loadUpToC1+loadAfterC2 <= v1.capacity && loadUpToC2 + loadAfterC1 <= v2.capacity) {
+				if(newLoadV1 <= v1.capacity && newLoadV2 <= v2.capacity) {
 
 					//calculate the change in cost due to this move
 					double delta = (distUpToC1 * v1.costOfUse + distAfterC2 * v2.costOfUse)
@@ -338,7 +352,7 @@ public class SteepestDescent {
 	/**
 	 * Runs steepest descent, to find a solution for the vrp-instance
 	 */
-	public void solve() {
+	public void solve_Relocate() {
 
 		//create best-move-matrix and print it to the console
 		createBMM();
@@ -389,6 +403,22 @@ public class SteepestDescent {
 		printResultsToConsole();
 		printResultsToFile();
 	}
+	
+	/**
+	 * Solve the problem with help of the cross exchange operator
+	 */
+	public void solve_CrossEx() {
+		createCrossExMatrix();
+		CrossExOption crossEx = fetchBestCrossEx();
+		while(crossEx.getDelta() < 0) {
+			executeCrossEx(crossEx);
+			updateCrossExMatrix(crossEx.getV1(), crossEx.getV2());
+			crossEx = fetchBestCrossEx();
+		}
+		
+		printResultsToConsole();
+		printResultsToFile();
+	}
 
 
 	/**
@@ -434,6 +464,23 @@ public class SteepestDescent {
 	}
 
 	/**
+	 * Retrieve the best cross exchange option from the cross-exchange matrix
+	 * @return CrossExOption, the cross exchange option with the greatest benefit
+	 */
+	public CrossExOption fetchBestCrossEx() {
+		CrossExOption bestCrossEx = crossExMatrix[0][1];
+		for(int i = 0 ; i < numCustomers ; i++) {
+			for(int j = i+1; j < numCustomers; j++) {
+				CrossExOption curCrossEx = crossExMatrix[i][j];
+				if(curCrossEx.getDelta() < bestCrossEx.getDelta()) {
+					bestCrossEx = curCrossEx;
+				}
+			}
+		}
+		return bestCrossEx;
+	}
+	
+	/**
 	 * Executes the relocation of a customer
 	 * @param bR RelocateOperation, option that is supposed to be executed 
 	 */
@@ -478,6 +525,10 @@ public class SteepestDescent {
 		}
 	}
 
+	/**
+	 * Execute the cross exchange between two vehicles
+	 * @param bCE CrossExOption, the cross exchange that is to be executed
+	 */
 	public void executeCrossEx(CrossExOption bCE) {
 
 		//get the involved vehicles
@@ -568,6 +619,34 @@ public class SteepestDescent {
 			}
 		}
 	}
+	
+	
+	/**
+	 * Update the cross-exchange matrix by finding new best crossings for the involved vehicles
+	 * @param v1 Vehicle, the first vehicles that was involved in the cross-exchange
+	 * @param v2 Vehicle, the second vehicles that was involved in the cross-exchange
+	 */
+	public void updateCrossExMatrix(Vehicle v1, Vehicle v2){
+		for(int i = 0; i < numCustomers; i++) {
+			Vehicle cV = vrp.vehicle[i];
+			int indV1 = v1.index;
+			int indV2 = v1.index;
+			//only consider inter-route and one way crossing
+			if(indV1 < i) {
+				crossExMatrix[i][indV1] = findBestCrossEx(v1, cV);
+			}
+			else if(indV1 > i) {
+				crossExMatrix[indV1][i] = findBestCrossEx(v1, cV);
+			}
+			if(indV2 < i) {
+				crossExMatrix[i][indV2] = findBestCrossEx(v2, cV);		
+			}
+			else if(indV2 > i) {
+				crossExMatrix[indV2][i] = findBestCrossEx(v2, cV);		
+			}
+		}
+	}
+
 
 
 	/**
@@ -861,23 +940,27 @@ public class SteepestDescent {
 
 
 		SteepestDescent stDesc = new SteepestDescent(in, num);
-		stDesc.solve();
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
-		stDesc.createExchangeMatrix();
-		ExchangeOption bE = stDesc.fetchBestExchange();
-		bE.printOption();
-		stDesc.executeExchange(bE);
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+//		stDesc.solve_Relocate();
+//		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
+//		stDesc.createExchangeMatrix();
+//		ExchangeOption bE = stDesc.fetchBestExchange();
+//		bE.printOption();
+//		stDesc.executeExchange(bE);
+//		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
+		stDesc.solve_CrossEx();
+		
 
 		//		stDesc.createExchangeMatrix();
-		//		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
 
 		//		for(Vehicle v : stDesc.getVehicles()) {
 		//			stDesc.twoOpt(v);
 		//		}
+		
+		
 
 	}
 }
