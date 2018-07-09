@@ -302,11 +302,15 @@ public class SteepestDescent {
 
 						try {
 							//check for time window violations
-							cV1.propagateEarliestStart();
-							cV1.propagateLatestStart();
+							//make sure not to access [0][0] of the distance matrix
+							if(cV1.custNo != 0 && cV2.custNo !=0 && cV2Succ.custNo != 0 && cV1Succ.custNo !=0) {
+								cV1.propagateEarliestStart();
+								cV1.propagateLatestStart();
 
-							cV2.propagateEarliestStart();
-							cV2.propagateLatestStart();
+								cV2.propagateEarliestStart();
+								cV2.propagateLatestStart();
+							}
+
 						} catch (TimeConstraintViolationException e) {
 							//the swapping violated a constraint, thus reverse it
 							cV1.succ = cV1Succ;
@@ -571,7 +575,7 @@ public class SteepestDescent {
 			cTmp = cTmp.succ;
 		}
 		cTmp = cV1Succ;
-		while(!cTmp.equals(v2.lastCustomer)) {
+		while(cTmp.equals(v1.lastCustomer)) {
 			cTmp.vehicle = v2;
 			cTmp = cTmp.succ;
 		}
@@ -994,6 +998,8 @@ public class SteepestDescent {
 		//		stDesc.executeExchange(bE);
 		//		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%");
 
+		stDesc.solve_Relocate();
+		System.out.println("Dafuq");
 		stDesc.solve_CrossEx();
 		
 
