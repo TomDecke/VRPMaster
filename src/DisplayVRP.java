@@ -144,10 +144,7 @@ public class DisplayVRP {
 	    	StdDraw.point(c.xCoord, c.yCoord);
 	    }
 	    StdDraw.setPenRadius(0.0005);
-	    int colourCount = 0;
 	    for(int[] vehicle : vehicles) {
-	    	//choose a different color for each vehicle route
-		    //StdDraw.setPenColor(MyColours.getColour((colourCount)));
 		    
 		    //draw the line from the depot to the first customer
 		    int firstCustomer = vehicle[0];
@@ -163,7 +160,6 @@ public class DisplayVRP {
 	    	//draw the line from the last customer back to the depot
 	    	int lastCustomer = vehicle[vehicle.length-1];
 		    StdDraw.line(vrp.customer[lastCustomer].xCoord,vrp.customer[lastCustomer].yCoord,xDepot, yDepot);
-	    	colourCount++;
 	    }
 	    
 	    

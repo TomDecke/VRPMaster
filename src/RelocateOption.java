@@ -7,8 +7,8 @@ public class RelocateOption {
 	private Vehicle vehicleFrom;
 	private Vehicle vehicleTo;
 	private Customer cToMove;
-	Customer cPred;
-	Customer cSucc;
+	private Customer cPred;
+	private Customer cSucc;
 	private double costOfMove;
 
 	/**
@@ -63,6 +63,38 @@ public class RelocateOption {
 	 */
 	public void setCostOfMove(double cost) {
 		this.costOfMove = cost;
+	}
+	
+	/**
+	 * Accessor for the predecessor of the customer to move
+	 * @return Customer, the predecessor
+	 */
+	public Customer getcPred() {
+		return cPred;
+	}
+
+	/**
+	 * Accessor for the successor of the customer to move
+	 * @return Customer, the successor
+	 */
+	public Customer getcSucc() {
+		return cSucc;
+	}
+
+	/**
+	 * Mutator for the predecessor of the customer to move
+	 * @param cPred Customer, the new predecessor
+	 */
+	public void setcPred(Customer cPred) {
+		this.cPred = cPred;
+	}
+
+	/**
+	 * Mutator for the successor of the customer to move
+	 * @param cSucc Customer, the new successor
+	 */
+	public void setcSucc(Customer cSucc) {
+		this.cSucc = cSucc;
 	}
 
 	/**
