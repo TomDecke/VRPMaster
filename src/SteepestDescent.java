@@ -254,7 +254,7 @@ public class SteepestDescent {
 		//create a default best cross exchange without improvement
 		CrossExOption bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, 0);
 		
-		//TODO rethink this part ignore empty vehicles
+		//TODO re-think this part ignore empty vehicles
 		if(cV1.succ.equals(v1.lastCustomer) || cV2.equals(v2.lastCustomer)) {
 			return bestCrossEx;
 		}
@@ -270,13 +270,13 @@ public class SteepestDescent {
 		while(!cV1.equals(v1.lastCustomer)) {
 			
 			//reset distance, load and starting point for the new combination
+			cV2 = v2.firstCustomer.succ;
+			
 			distUpToC2 = vrp.distance(v2.firstCustomer, cV2);
 			distAfterC2 = v2.getDistance()-distUpToC2;
 			
 			loadUpToC2 = cV2.demand;
 			loadAfterC2 = v2.load - loadUpToC2;
-			
-			cV2 = v2.firstCustomer.succ;
 			
 			while(!cV2.equals(v2.lastCustomer)) {
 
@@ -308,6 +308,7 @@ public class SteepestDescent {
 						try {
 							//check for time window violations
 							//make sure not to access [0][0] of the distance matrix
+							//TODO re-think position
 							if(cV1.custNo != 0 && cV2.custNo !=0 && cV2Succ.custNo != 0 && cV1Succ.custNo !=0) {
 								cV1.propagateEarliestStart();
 								cV1.propagateLatestStart();
@@ -574,17 +575,23 @@ public class SteepestDescent {
 
 		//assign the customers to their new vehicles
 		Customer cTmp = cV2Succ;
-		//TODO should I swap the last customer as well? In the end it's just the depot.
 		while(!cTmp.equals(v2.lastCustomer)) {
 			cTmp.vehicle = v1;
 			cTmp = cTmp.succ;
 		}
 		cTmp = cV1Succ;
-		while(cTmp.equals(v1.lastCustomer)) {
+		while(!cTmp.equals(v1.lastCustomer)) {
 			cTmp.vehicle = v2;
 			cTmp = cTmp.succ;
 		}
-
+		
+		//swap the last customers
+		cTmp = v2.lastCustomer;
+		v2.lastCustomer = v1.lastCustomer;
+		v1.lastCustomer = cTmp;
+//		v1.lastCustomer.vehicle = v1;
+//		v2.lastCustomer.vehicle = v2;
+		
 		//update the load of the vehicles after the exchange
 		v1.load = bCE.getLoadForV1(); 
 		v2.load = bCE.getLoadForV2();
