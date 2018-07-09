@@ -253,6 +253,11 @@ public class SteepestDescent {
 
 		//create a default best cross exchange without improvement
 		CrossExOption bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, 0);
+		
+		//TODO rethink this part ignore empty vehicles
+		if(cV1.succ.equals(v1.lastCustomer) || cV2.equals(v2.lastCustomer)) {
+			return bestCrossEx;
+		}
 
 		//memorize the distance of the route-parts
 		double distUpToC1 = 0;
