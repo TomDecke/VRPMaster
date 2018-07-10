@@ -221,9 +221,9 @@ public class SteepestDescent {
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
 
-				for(Vehicle v : stDesc.getVehicles()) {
-					TwoOpt.twoOpt(v);
-				}
+//				for(Vehicle v : stDesc.getVehicles()) {
+//					TwoOpt.twoOpt(v);
+//				}
 
 	}
 }

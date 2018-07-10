@@ -163,16 +163,16 @@ public class RelocateOperation {
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle vCheck = vrp.vehicle[i];
 			//recalculate the giving and receiving of the first vehicle
-			if(vFrom.index!=i) {
+//			if(vFrom.index!=i) {
 				relocateMatrix[vFrom.index][i] = findBestRelocation(vFrom, vCheck);
 				relocateMatrix[i][vFrom.index] = findBestRelocation(vCheck,vFrom);
-			}
+	//		}
 
-			if(vTo.index!=i) {
+		//	if(vTo.index!=i) {
 				//recalculate the giving and receiving of the second vehicle
 				relocateMatrix[i][vTo.index] = findBestRelocation(vCheck, vTo);
 				relocateMatrix[vTo.index][i] = findBestRelocation(vFrom, vCheck);
-			}
+			//}
 		}
 	}
 
