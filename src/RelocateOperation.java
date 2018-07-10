@@ -32,6 +32,7 @@ public class RelocateOperation {
 
 
 
+
 	/**
 	 * Find customer who's relocation to another vehicle would have the highest benefit
 	 * @param vFrom Vehicle, vehicle from which a customer is to be taken
@@ -40,14 +41,12 @@ public class RelocateOperation {
 	 */
 	public RelocateOption findBestRelocation(Vehicle vFrom, Vehicle vTo) {
 
-		//create an empty move with the current cost of the vehicles
+	double cCost = vFrom.cost + vTo.cost;
+		
+		//create an empty move with no improvement
 		//thus prevent the moving of one customer to another vehicle if there would be no benefit
-		RelocateOption bestToMove = new RelocateOption(null, vFrom.cost + vTo.cost, vFrom, vTo);
+		RelocateOption bestToMove = new RelocateOption(null, 0, vFrom, vTo);
 
-		//if the vehicles are the same, then there is only one cost
-		if(vFrom.equals(vTo)) {
-			bestToMove.setCostOfMove(vFrom.cost);
-		}
 
 		//start checking from the first customer, who is not the depot-connection
 		Customer cFrom = vFrom.firstCustomer.succ;
@@ -66,14 +65,11 @@ public class RelocateOperation {
 					newDistVFrom = 0;
 				}
 
-				//compare to all other valid options
 				Customer cToPred = vTo.firstCustomer;
 				Customer cToSucc = cToPred.succ;
 				while(!cToPred.equals(vTo.lastCustomer)) {
-
 					// a customer can not be inserted before/after himself
 					if(!(cFrom.equals(cToPred)||cFrom.equals(cToSucc))) {
-
 						if(cFrom.canBeInsertedBetween(cToPred, cToSucc)) {
 							//determine how the total distance of vTo would change
 							double newDistVTo = vTo.getDistance() - vrp.distance(cToPred, cToSucc)
@@ -85,12 +81,15 @@ public class RelocateOperation {
 								newDistVTo = 0;
 							}
 
-							//the occurring cost, if this move was to be made
+							//the new cost for the vehicles, if this move was to be made
 							double resultingCost = newDistVFrom * vFrom.costOfUse + newDistVTo * vTo.costOfUse;
+							
+							//the change in cost
+							double deltaCost =  resultingCost - cCost;
 
 							//if this move is cheaper, take it up
-							if(resultingCost < bestToMove.getCostOfMove()) {
-								bestToMove = new RelocateOption(cFrom,resultingCost,vFrom,vTo);
+							if(deltaCost < bestToMove.getCostOfMove()) {
+								bestToMove = new RelocateOption(cFrom,deltaCost,vFrom,vTo);
 								bestToMove.setcPred(cToPred);
 								bestToMove.setcSucc(cToSucc);
 							}
@@ -103,10 +102,6 @@ public class RelocateOperation {
 			}
 			//go to the next customer
 			cFrom = cFrom.succ;
-		}
-		//if there is no customer who's movement could lead to improvement, penalise the move
-		if(bestToMove.getCToMove() == null) {
-			bestToMove.setCostOfMove(PENALTY);
 		}
 		return bestToMove;
 	}

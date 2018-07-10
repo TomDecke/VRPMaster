@@ -220,10 +220,5 @@ public class SteepestDescent {
 		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
-
-				for(Vehicle v : stDesc.getVehicles()) {
-					TwoOpt.twoOpt(v);
-				}
-
 	}
 }
