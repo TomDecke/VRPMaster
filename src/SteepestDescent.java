@@ -49,7 +49,7 @@ public class SteepestDescent {
 		int iterationCounter = 0;
 
 		//As long as there are improving moves execute them
-		while(relocate.getCostOfMove() < PENALTY) {
+		while(relocate.getCostOfMove() < 0) {
 
 			//Visualize the state before the relocation on the console
 			iterationCounter++;

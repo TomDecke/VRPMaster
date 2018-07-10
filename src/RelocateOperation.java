@@ -2,17 +2,16 @@
 public class RelocateOperation {
 
 	private final double EPSILON = 1E-10;
-	private final int PENALTY = 10000;
 	private VRP vrp;
 	private int numCustomers;
 	private RelocateOption[][] relocateMatrix;
-	
+
 	public RelocateOperation(VRP vrp, int numCustomers) {
 		this.vrp = vrp;
 		this.numCustomers = numCustomers;
 		this.relocateMatrix = new RelocateOption[numCustomers][numCustomers];
 	}
-	
+
 	/**
 	 * Create the matrix containing the best moves from one vehicle to another
 	 */
@@ -21,11 +20,7 @@ public class RelocateOperation {
 		for(int i = 0; i < numCustomers; i++) {
 			for(int j = 0; j < numCustomers; j++) {
 				//omit the relocation in the same vehicle on the first run
-				if(i==j) {
-					relocateMatrix[i][j] = new RelocateOption(null, PENALTY,vrp.vehicle[i], vrp.vehicle[j]);
-				}else {
-					relocateMatrix[i][j] = findBestRelocation(vrp.vehicle[i], vrp.vehicle[j]);
-				}				
+				relocateMatrix[i][j] = findBestRelocation(vrp.vehicle[i], vrp.vehicle[j]);			
 			}
 		}
 	}
@@ -41,8 +36,8 @@ public class RelocateOperation {
 	 */
 	public RelocateOption findBestRelocation(Vehicle vFrom, Vehicle vTo) {
 
-	double cCost = vFrom.cost + vTo.cost;
-		
+		double cCost = vFrom.cost + vTo.cost;
+
 		//create an empty move with no improvement
 		//thus prevent the moving of one customer to another vehicle if there would be no benefit
 		RelocateOption bestToMove = new RelocateOption(null, 0, vFrom, vTo);
@@ -83,7 +78,7 @@ public class RelocateOperation {
 
 							//the new cost for the vehicles, if this move was to be made
 							double resultingCost = newDistVFrom * vFrom.costOfUse + newDistVTo * vTo.costOfUse;
-							
+
 							//the change in cost
 							double deltaCost =  resultingCost - cCost;
 
@@ -158,16 +153,12 @@ public class RelocateOperation {
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle vCheck = vrp.vehicle[i];
 			//recalculate the giving and receiving of the first vehicle
-			if(vFrom.index!=i) {
-				relocateMatrix[vFrom.index][i] = findBestRelocation(vFrom, vCheck);
-				relocateMatrix[i][vFrom.index] = findBestRelocation(vCheck,vFrom);
-			}
+			relocateMatrix[vFrom.index][i] = findBestRelocation(vFrom, vCheck);
+			relocateMatrix[i][vFrom.index] = findBestRelocation(vCheck,vFrom);
 
-			if(vTo.index!=i) {
-				//recalculate the giving and receiving of the second vehicle
-				relocateMatrix[i][vTo.index] = findBestRelocation(vCheck, vTo);
-				relocateMatrix[vTo.index][i] = findBestRelocation(vFrom, vCheck);
-			}
+			//recalculate the giving and receiving of the second vehicle
+			relocateMatrix[i][vTo.index] = findBestRelocation(vCheck, vTo);
+			relocateMatrix[vTo.index][i] = findBestRelocation(vFrom, vCheck);
 		}
 	}
 
