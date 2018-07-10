@@ -73,6 +73,7 @@ public class TwoOpt {
 			//move on to the next customer
 			cCur = cCur.pred;
 
+			//TODO find bug
 			//remove the customer of this visit
 			v.remove(cCur.succ);
 

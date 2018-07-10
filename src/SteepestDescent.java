@@ -2,9 +2,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import addOns.TimeConstraintViolationException;
-
-
 /**
  * 
  * @author Tom Decke
@@ -224,9 +221,9 @@ public class SteepestDescent {
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
 
-		//		for(Vehicle v : stDesc.getVehicles()) {
-		//			stDesc.twoOpt(v);
-		//		}
+				for(Vehicle v : stDesc.getVehicles()) {
+					TwoOpt.twoOpt(v);
+				}
 
 	}
 }
