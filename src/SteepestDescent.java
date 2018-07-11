@@ -8,8 +8,6 @@ import java.util.ArrayList;
  *
  */
 public class SteepestDescent {
-	private final int PENALTY = 10000;
-
 	private String out;
 	private VRP vrp;
 	private int numCustomers;
@@ -49,7 +47,7 @@ public class SteepestDescent {
 		int iterationCounter = 0;
 
 		//As long as there are improving moves execute them
-		while(relocate.getCostOfMove() < PENALTY) {
+		while(relocate.getCostOfMove() < 0) {
 
 			//Visualize the state before the relocation on the console
 			iterationCounter++;
@@ -220,10 +218,5 @@ public class SteepestDescent {
 		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
-
-//				for(Vehicle v : stDesc.getVehicles()) {
-//					TwoOpt.twoOpt(v);
-//				}
-
 	}
 }
