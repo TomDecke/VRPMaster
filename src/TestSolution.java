@@ -215,18 +215,6 @@ public class TestSolution {
 //		testV.add(v5);
 //		v3.show();
 		
-		c3.succ = c1;
-		c1.pred = c3;
-		c1.succ = v3.lastCustomer;
-		v3.lastCustomer.pred = c1;
-		c1.custNo = 3;
-		c1.vehicle = v3;
-		testV.add(v3);
-		testV.add(v2);
-		testV.add(v1);
-		testV.add(v4);
-		testV.add(v5);
-		v3.show();
 		
 		//Test customer in multiple vehicles
 //		v5.insertBetween(c1, c5, v5.lastCustomer);

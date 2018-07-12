@@ -112,13 +112,13 @@ public class ExchangeOperation {
 	 */
 	public void executeExchange(ExchangeOption bE) {
 		//obtain information of customer from vehicle 1
-		Customer c1		= bE.getcV1();
+		Customer c1		= bE.getC1();
 		Customer c1Pred = c1.pred;
 		Customer c1Succ = c1.succ;
 		Vehicle v1 = bE.getV1();
 
 		//obtain information of customer from vehicle 2
-		Customer c2		= bE.getcV2();
+		Customer c2		= bE.getC2();
 		Customer c2Pred = c2.pred;
 		Customer c2Succ = c2.succ;
 		Vehicle v2 = bE.getV2();

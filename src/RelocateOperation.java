@@ -82,7 +82,7 @@ public class RelocateOperation {
 							double deltaCost =  resultingCost - cCost;
 
 							//if this move is cheaper, take it up
-							if(deltaCost < bestToMove.getCostOfMove()) {
+							if(deltaCost < bestToMove.getDelta()) {
 								bestToMove = new RelocateOption(cFrom,deltaCost,vFrom,vTo);
 								bestToMove.setcPred(cToPred);
 								bestToMove.setcSucc(cToSucc);
@@ -108,14 +108,14 @@ public class RelocateOperation {
 	public RelocateOption fetchBestRelocation() {
 		//start comparing with the origin of the matrix
 		RelocateOption bestMove = relocateMatrix[0][0];
-		double minCost = bestMove.getCostOfMove();
+		double minCost = bestMove.getDelta();
 
 		RelocateOption currentMove = bestMove;
 		//go through the matrix and find the move with minimal cost
 		for(int i = 0; i < numCustomers; i++ ) {
 			for(int j = 0; j < numCustomers; j++) {
 				currentMove = relocateMatrix[i][j];
-				double currentCost = currentMove.getCostOfMove();
+				double currentCost = currentMove.getDelta();
 				if(currentMove.getCToMove()!=null && currentCost < minCost) {
 					minCost = currentCost;
 					bestMove = currentMove;
@@ -136,9 +136,9 @@ public class RelocateOperation {
 		Customer cRelocate = bR.getCToMove();
 
 		//remove customer from current vehicle if it exists
-		if(bR.getVehicleFrom().remove(cRelocate)) {
+		if(bR.getV1().remove(cRelocate)) {
 			//insert customer into new vehicle
-			bR.getVehicleTo().insertBetween(bR.getCToMove(), bR.getcPred(), bR.getcSucc());
+			bR.getV2().insertBetween(bR.getCToMove(), bR.getC1(), bR.getC2());
 		}
 	}
 

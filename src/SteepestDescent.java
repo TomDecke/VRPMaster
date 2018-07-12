@@ -47,16 +47,16 @@ public class SteepestDescent {
 		int iterationCounter = 0;
 
 		//As long as there are improving moves execute them
-		while(relocate.getCostOfMove() < 0) {
+		while(relocate.getDelta() < 0) {
 
 			//Visualize the state before the relocation on the console
 			iterationCounter++;
 			System.out.println(iterationCounter);
 			//uncomment if wanted printBMM();
 			System.out.print("vFrom - before move: ");
-			relocate.getVehicleFrom().show();
+			relocate.getV1().show();
 			System.out.print("vTo - before move: ");
-			relocate.getVehicleTo().show();
+			relocate.getV2().show();
 			relocate.printOption();
 
 			//relocate the customer
@@ -64,13 +64,13 @@ public class SteepestDescent {
 
 			//Visualize the state after the relocation on the console
 			System.out.print("vFrom - after move: ");
-			relocate.getVehicleFrom().show();
+			relocate.getV1().show();
 			System.out.print("vTo - after move: ");
-			relocate.getVehicleTo().show();
+			relocate.getV2().show();
 			System.out.println(" ");
 
 			//after each move update the matrix and find the next move
-			ro.updateRelocateMatrix(relocate.getVehicleFrom(), relocate.getVehicleTo());
+			ro.updateRelocateMatrix(relocate.getV1(), relocate.getV2());
 			relocate = ro.fetchBestRelocation();
 		}
 		//print the last BMM
@@ -211,12 +211,18 @@ public class SteepestDescent {
 
 
 		stDesc.solve_Relocate();
-		System.out.println("Dafuq");
-		//stDesc.solve_CrossEx();
+
 		
 
-		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+//		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
+		
+		System.out.println("Begin 2-opt");
+		
+		for (Vehicle v : stDesc.getVehicles()) {
+			v.show();
+			TwoOpt.twoOpt(v);
+		}
 	}
 }

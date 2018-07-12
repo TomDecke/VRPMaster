@@ -4,25 +4,25 @@
  *
  */
 public class RelocateOption {
-	private Vehicle vehicleFrom;
-	private Vehicle vehicleTo;
+	private Vehicle v1;
+	private Vehicle v2;
 	private Customer cToMove;
-	private Customer cPred;
-	private Customer cSucc;
-	private double costOfMove;
+	private Customer c1;
+	private Customer c2;
+	private double delta;
 
 	/**
 	 * Constructor to create a relocation-object
 	 * @param c Customer, the customer who is to be moved
-	 * @param cost double, the cost-reduction which occurs by the moving the customer
+	 * @param delta double, the cost-reduction which occurs by the moving the customer
 	 * @param vFrom Vehicle, the vehicle from which the customer would be taken
 	 * @param vTo Vehicle, the vehicle to which the customer would be moved
 	 */
-	public RelocateOption(Customer c, double cost, Vehicle vFrom, Vehicle vTo) {
+	public RelocateOption(Customer c, double delta, Vehicle vFrom, Vehicle vTo) {
 		this.cToMove = c;
-		this.costOfMove = cost;
-		this.vehicleFrom = vFrom;
-		this.vehicleTo = vTo;
+		this.delta = delta;
+		this.v1 = vFrom;
+		this.v2 = vTo;
 	}
 
 	/**
@@ -37,48 +37,41 @@ public class RelocateOption {
 	 * Accessor for the cost of the move
 	 * @return double
 	 */
-	public double getCostOfMove() {
-		return this.costOfMove;
+	public double getDelta() {
+		return this.delta;
 	}
 
 	/**
 	 * Accessor for the vehicle from which the customer would be taken
 	 * @return Vehicle
 	 */
-	public Vehicle getVehicleFrom() {
-		return vehicleFrom;
+	public Vehicle getV1() {
+		return v1;
 	}
 
 	/**
 	 * Accessor for the vehicle to which the customer would be moved
 	 * @return Vehicle
 	 */
-	public Vehicle getVehicleTo() {
-		return vehicleTo;
+	public Vehicle getV2() {
+		return v2;
 	}
 
-	/**
-	 * Mutator for the cost of the move
-	 * @param cost double, the new cost 
-	 */
-	public void setCostOfMove(double cost) {
-		this.costOfMove = cost;
-	}
 	
 	/**
 	 * Accessor for the predecessor of the customer to move
 	 * @return Customer, the predecessor
 	 */
-	public Customer getcPred() {
-		return cPred;
+	public Customer getC1() {
+		return c1;
 	}
 
 	/**
 	 * Accessor for the successor of the customer to move
 	 * @return Customer, the successor
 	 */
-	public Customer getcSucc() {
-		return cSucc;
+	public Customer getC2() {
+		return c2;
 	}
 
 	/**
@@ -86,7 +79,7 @@ public class RelocateOption {
 	 * @param cPred Customer, the new predecessor
 	 */
 	public void setcPred(Customer cPred) {
-		this.cPred = cPred;
+		this.c1 = cPred;
 	}
 
 	/**
@@ -94,7 +87,7 @@ public class RelocateOption {
 	 * @param cSucc Customer, the new successor
 	 */
 	public void setcSucc(Customer cSucc) {
-		this.cSucc = cSucc;
+		this.c2 = cSucc;
 	}
 
 	/**
@@ -102,10 +95,10 @@ public class RelocateOption {
 	 */
 	public void printOption() {
 		if(cToMove != null) {
-			System.out.println("Move c"+cToMove.custNo+" from v" +vehicleFrom.id + " to v" + vehicleTo.id+ " at cost: "+costOfMove);
+			System.out.println("Move c"+cToMove.custNo+" from v" +v1.id + " to v" + v2.id+ " at cost: "+delta);
 		}
 		else {
-			System.out.println("Move cX from v" +vehicleFrom.id + " to v" + vehicleTo.id+ " at cost: "+costOfMove);	
+			System.out.println("Move cX from v" +v1.id + " to v" + v2.id+ " at cost: "+delta);	
 		}
 	}
 }
