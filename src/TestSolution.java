@@ -29,6 +29,10 @@ public class TestSolution {
 
 		//Check all vehicles/routes
 		for(Vehicle v : solVehicles) {
+			if(v.id > vrp.m) {
+				System.out.println("Vehicle does not belong to VRP");
+				return false;
+			}
 			Customer cCur = v.firstCustomer;
 			Customer cSucc = cCur.succ;
 
@@ -129,7 +133,7 @@ public class TestSolution {
 		//check for derivation between solution and control
 		//allow minor derivation, which might be due to computational errors
 		if(Math.abs(totalDist - solDist) > DERIVATION) {
-			System.out.println("The distance of the solutions differ by: "+Math.abs(totalDist - solDist));
+			System.out.println("Wrong distance. The distance of the solutions differ by: "+Math.abs(totalDist - solDist));
 			return false;
 		}
 		System.out.println("Total distance: " + totalDist);
@@ -161,46 +165,100 @@ public class TestSolution {
 			System.out.println("");
 		}
 		
+		//get customers
 		Customer c1 = vrp.customer[1];
 		Customer c2 = vrp.customer[2];
 		Customer c3 = vrp.customer[3];
 		Customer c4 = vrp.customer[4];
 		Customer c5 = vrp.customer[5];
 		
-		Vehicle v = vrp.vehicle[4];
-		Vehicle v2 = vrp.vehicle[2];
-		System.out.println(v.id);
-		System.out.println(c5.toString());
-		
-		Customer lastV1 = v.lastCustomer;
-		Customer lastV2 = v2.lastCustomer;
-		
-		Customer cX = new Customer(6,48,48, 20,666,666,5);
+		//create unknown customer 
+		Customer cX = new Customer(7,48,48, 20,666,666,5);
 		cX.earliestStart = 666;
 		cX.latestStart = 666;
 		
-		//fill v1
-		v.insertBetween(c4, c5, lastV1);
-		v.insertBetween(c1, c4, lastV1);
-		v.show();
-		
-		//fill v2
-		cX.vehicle = v2;
-		cX.succ = lastV2;
-		lastV2.pred = cX;
-		c3.succ = cX;
-		cX.pred = c3;
-//		v2.insertBetween(cX, c3, lastV2);
-//		v2.insertBetween(c1, c4, lastV2);
-//		v2.insertBetween(c4, c1, lastV2);
-		v2.show();
-	
-		
+		//get vehicles
+		Vehicle v1 = vrp.vehicle[0];
+		Vehicle v2 = vrp.vehicle[1];
+		Vehicle v3 = vrp.vehicle[2];
+		Vehicle v4 = vrp.vehicle[3];
+		Vehicle v5 = vrp.vehicle[4];
+
+		//create unknown vehicle
+		Vehicle vX = new Vehicle(vrp, 6, 30, 1, vrp.depot);
+
+		//create array-list
 		ArrayList<Vehicle> testV = new ArrayList<Vehicle>();
-		testV.add(v);
+		
+		double dist = 0;
+		
+		//Test unknown customer
+//		cX.vehicle = v3;
+//		cX.succ = v3.lastCustomer;
+//		v3.lastCustomer.pred = cX;
+//		c3.succ = cX;
+//		cX.pred = c3;
+//		testV.add(v3);
+
+		
+		//TODO Test customer revisit
+//		c3.succ = cX;
+//		cX.pred = c3;
+//		cX.succ = v3.lastCustomer;
+//		v3.lastCustomer.pred = cX;
+//		cX.custNo = 3;
+//		cX.vehicle = v3;
+//		testV.add(v3);
+//		testV.add(v2);
+//		testV.add(v1);
+//		testV.add(v4);
+//		testV.add(v5);
+//		v3.show();
+		
+		c3.succ = c1;
+		c1.pred = c3;
+		c1.succ = v3.lastCustomer;
+		v3.lastCustomer.pred = c1;
+		c1.custNo = 3;
+		c1.vehicle = v3;
+		testV.add(v3);
 		testV.add(v2);
-		testV.add(vrp.vehicle[1]);
-		TestSolution.runTest(vrp, v.cost+73.4800872493708, testV);
+		testV.add(v1);
+		testV.add(v4);
+		testV.add(v5);
+		v3.show();
+		
+		//Test customer in multiple vehicles
+//		v5.insertBetween(c1, c5, v5.lastCustomer);
+//		testV.add(v1);
+//		testV.add(v5);
+		
+		//Test omit customers
+//		testV.add(v1);
+//		testV.add(v2);
+		
+		//Test overloading a vehicle
+//		v2.insertBetween(c1, c2, v2.lastCustomer);
+//		testV.add(v2);
+		
+		//Test time constraint violation
+//		v1.insertBetween(c5, c1, v1.lastCustomer);
+//		testV.add(v1);
+		
+		//Test non-existing vehicle
+//		testV.add(vX);
+		
+		//Test wrong distance proposal
+//		dist = -1;
+//		testV.add(v1);
+//		testV.add(v2);
+//		testV.add(v3);
+//		testV.add(v4);
+//		testV.add(v5);
+
+		TestSolution.runTest(vrp, dist, testV);
+		
+
 	}
 
 
