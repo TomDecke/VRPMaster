@@ -220,9 +220,9 @@ public class SteepestDescent {
 		
 		System.out.println("Begin 2-opt");
 		
-		for (Vehicle v : stDesc.getVehicles()) {
-			v.show();
-			TwoOpt.twoOpt(v);
-		}
+//		for (Vehicle v : stDesc.getVehicles()) {
+//			v.show();
+//			TwoOpt.twoOpt(v);
+//		}
 	}
 }

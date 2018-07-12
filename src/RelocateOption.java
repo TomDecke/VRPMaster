@@ -3,13 +3,8 @@
  * @author Tom Decke
  *
  */
-public class RelocateOption {
-	private Vehicle v1;
-	private Vehicle v2;
-	private Customer cToMove;
-	private Customer c1;
-	private Customer c2;
-	private double delta;
+public class RelocateOption extends Option{
+
 
 	/**
 	 * Constructor to create a relocation-object
@@ -19,10 +14,8 @@ public class RelocateOption {
 	 * @param vTo Vehicle, the vehicle to which the customer would be moved
 	 */
 	public RelocateOption(Customer c, double delta, Vehicle vFrom, Vehicle vTo) {
-		this.cToMove = c;
-		this.delta = delta;
-		this.v1 = vFrom;
-		this.v2 = vTo;
+		super(null,null,delta,vFrom,vTo);
+		super.cToMove = c;
 	}
 
 	/**
@@ -30,7 +23,7 @@ public class RelocateOption {
 	 * @return Customer
 	 */
 	public Customer getCToMove() {
-		return cToMove;
+		return super.cToMove;
 	}
 
 	/**
@@ -38,7 +31,7 @@ public class RelocateOption {
 	 * @return double
 	 */
 	public double getDelta() {
-		return this.delta;
+		return super.delta;
 	}
 
 	/**
@@ -46,7 +39,7 @@ public class RelocateOption {
 	 * @return Vehicle
 	 */
 	public Vehicle getV1() {
-		return v1;
+		return super.v1;
 	}
 
 	/**
@@ -54,7 +47,7 @@ public class RelocateOption {
 	 * @return Vehicle
 	 */
 	public Vehicle getV2() {
-		return v2;
+		return super.v2;
 	}
 
 	
@@ -63,7 +56,7 @@ public class RelocateOption {
 	 * @return Customer, the predecessor
 	 */
 	public Customer getC1() {
-		return c1;
+		return super.c1;
 	}
 
 	/**
@@ -71,7 +64,7 @@ public class RelocateOption {
 	 * @return Customer, the successor
 	 */
 	public Customer getC2() {
-		return c2;
+		return super.c2;
 	}
 
 	/**
@@ -79,7 +72,7 @@ public class RelocateOption {
 	 * @param cPred Customer, the new predecessor
 	 */
 	public void setcPred(Customer cPred) {
-		this.c1 = cPred;
+		super.c1 = cPred;
 	}
 
 	/**
@@ -87,7 +80,7 @@ public class RelocateOption {
 	 * @param cSucc Customer, the new successor
 	 */
 	public void setcSucc(Customer cSucc) {
-		this.c2 = cSucc;
+		super.c2 = cSucc;
 	}
 
 	/**

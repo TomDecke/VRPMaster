@@ -3,13 +3,7 @@
  * @author Tom Decke
  *
  */
-public class ExchangeOption {
-
-	private Vehicle v1;
-	private Vehicle v2;
-	private Customer c1;
-	private Customer c2;
-	private double delta;
+public class ExchangeOption extends Option {
 
 	/**
 	 * Constructor to create an exchange option
@@ -20,11 +14,7 @@ public class ExchangeOption {
 	 * @param cost double, the change of cost incurred by this move
 	 */
 	public ExchangeOption(Vehicle v1, Vehicle v2, Customer cV1, Customer cV2, double delta) {
-		this.v1 = v1;
-		this.v2 = v2;
-		this.c1 = cV1;
-		this.c2 = cV2;
-		this.delta = delta;
+		super(cV1,cV2,delta,v1,v2);
 	}
 
 	/**
@@ -32,7 +22,7 @@ public class ExchangeOption {
 	 * @return v1 Vehicle
 	 */
 	public Vehicle getV1() {
-		return v1;
+		return super.v1;
 	}
 
 	/**
@@ -40,7 +30,7 @@ public class ExchangeOption {
 	 * @return v2 Vehicle
 	 */
 	public Vehicle getV2() {
-		return v2;
+		return super.v2;
 	}
 
 	/**
@@ -48,7 +38,7 @@ public class ExchangeOption {
 	 * @return c1, the customer in vehicle 1
 	 */
 	public Customer getC1() {
-		return c1;
+		return super.c1;
 	}
 
 	/**
@@ -56,7 +46,7 @@ public class ExchangeOption {
 	 * @return c2, the customer in vehicle 2
 	 */
 	public Customer getC2() {
-		return c2;
+		return super.c2;
 	}
 
 	/**
@@ -64,7 +54,7 @@ public class ExchangeOption {
 	 * @return double, the change
 	 */
 	public double getDelta() {
-		return delta;
+		return super.delta;
 	}
 
 	public void printOption() {
