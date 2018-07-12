@@ -1,10 +1,10 @@
 
-public class RelocateOperation {
+public class RelocateOperation implements Operation{
 
 	private final double EPSILON = 1E-10;
 	private VRP vrp;
 	private int numCustomers;
-	private RelocateOption[][] relocateMatrix;
+	private Option[][] relocateMatrix;
 
 	public RelocateOperation(VRP vrp, int numCustomers) {
 		this.vrp = vrp;
@@ -15,11 +15,11 @@ public class RelocateOperation {
 	/**
 	 * Create the matrix containing the best moves from one vehicle to another
 	 */
-	public void createRelocateMatrix() {
+	public void createOptionMatrix() {
 		//go through the matrix and determine the best move for each combination 
 		for(int i = 0; i < numCustomers; i++) {
 			for(int j = 0; j < numCustomers; j++) {
-				relocateMatrix[i][j] = findBestRelocation(vrp.vehicle[i], vrp.vehicle[j]);			
+				relocateMatrix[i][j] = findBestOption(vrp.vehicle[i], vrp.vehicle[j]);			
 			}
 		}
 	}
@@ -33,7 +33,7 @@ public class RelocateOperation {
 	 * @param vTo Vehicle, vehicle to which a customer is to be moved
 	 * @return RelocationOption, the best option for relocating a customer from vFrom to vTo
 	 */
-	public RelocateOption findBestRelocation(Vehicle vFrom, Vehicle vTo) {
+	public Option findBestOption(Vehicle vFrom, Vehicle vTo) {
 
 		double cCost = vFrom.cost + vTo.cost;
 
@@ -105,12 +105,12 @@ public class RelocateOperation {
 	 * Find the best relocation in the matrix of possible relocations
 	 * @return RelocateOption, the currently best move in the BMM
 	 */
-	public RelocateOption fetchBestRelocation() {
+	public Option fetchBestOption() {
 		//start comparing with the origin of the matrix
-		RelocateOption bestMove = relocateMatrix[0][0];
+		Option bestMove = relocateMatrix[0][0];
 		double minCost = bestMove.getDelta();
 
-		RelocateOption currentMove = bestMove;
+		Option currentMove = bestMove;
 		//go through the matrix and find the move with minimal cost
 		for(int i = 0; i < numCustomers; i++ ) {
 			for(int j = 0; j < numCustomers; j++) {
@@ -131,7 +131,7 @@ public class RelocateOperation {
 	 * Executes the relocation of a customer
 	 * @param bR RelocateOperation, option that is supposed to be executed 
 	 */
-	public void executeRelocation(RelocateOption bR) {
+	public void executeOption(Option bR) {
 		//get the customer which is to be moved
 		Customer cRelocate = bR.getCToMove();
 
@@ -148,16 +148,16 @@ public class RelocateOperation {
 	 * @param vFrom Vehicle, vehicle from which a customer was removed
 	 * @param vTo Vehicle, vehicle to which a customer was moved
 	 */
-	public void updateRelocateMatrix(Vehicle vFrom, Vehicle vTo) {
+	public void updateOptionMatrix(Vehicle vFrom, Vehicle vTo) {
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle vCheck = vrp.vehicle[i];
 			//recalculate the giving and receiving of the first vehicle
-			relocateMatrix[vFrom.index][i] = findBestRelocation(vFrom, vCheck);
-			relocateMatrix[i][vFrom.index] = findBestRelocation(vCheck,vFrom);
+			relocateMatrix[vFrom.index][i] = findBestOption(vFrom, vCheck);
+			relocateMatrix[i][vFrom.index] = findBestOption(vCheck,vFrom);
 
 			//recalculate the giving and receiving of the second vehicle
-			relocateMatrix[i][vTo.index] = findBestRelocation(vCheck, vTo);
-			relocateMatrix[vTo.index][i] = findBestRelocation(vFrom, vCheck);
+			relocateMatrix[i][vTo.index] = findBestOption(vCheck, vTo);
+			relocateMatrix[vTo.index][i] = findBestOption(vFrom, vCheck);
 		}
 	}
 
@@ -195,6 +195,8 @@ public class RelocateOperation {
 			System.out.println("");
 		}
 	}
+
+
 
 
 }

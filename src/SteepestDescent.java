@@ -37,12 +37,12 @@ public class SteepestDescent {
 	public void solve_Relocate() {
 
 		//create best-move-matrix and print it to the console
-		ro.createRelocateMatrix();
+		ro.createOptionMatrix();
 		ro.printRelocateMatrix();
 		System.out.println(" ");
 
 		//find the first best move
-		RelocateOption relocate = ro.fetchBestRelocation();
+		Option relocate = ro.fetchBestOption();
 
 		int iterationCounter = 0;
 
@@ -60,7 +60,7 @@ public class SteepestDescent {
 			relocate.printOption();
 
 			//relocate the customer
-			ro.executeRelocation(relocate);
+			ro.executeOption(relocate);
 
 			//Visualize the state after the relocation on the console
 			System.out.print("vFrom - after move: ");
@@ -70,8 +70,8 @@ public class SteepestDescent {
 			System.out.println(" ");
 
 			//after each move update the matrix and find the next move
-			ro.updateRelocateMatrix(relocate.getV1(), relocate.getV2());
-			relocate = ro.fetchBestRelocation();
+			ro.updateOptionMatrix(relocate.getV1(), relocate.getV2());
+			relocate = ro.fetchBestOption();
 		}
 		//print the last BMM
 		ro.printRelocateMatrix();
