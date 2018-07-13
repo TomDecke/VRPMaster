@@ -52,12 +52,12 @@ public class SteepestDescent {
 		Option execute = ro.fetchBestOption();
 
 		//set up exchange
-		Option exchange = eo.fetchBestOption();
+		Option compare = eo.fetchBestOption();
 		
-		if(exchange.getDelta() < execute.getDelta()) {
-			execute = exchange;
+		if(compare.getDelta() < execute.getDelta()) {
+			execute = compare;
 		}
-		exchange.printOption();
+		compare.printOption();
 
 
 
@@ -90,7 +90,13 @@ public class SteepestDescent {
 			eo.updateOptionMatrix(execute.getV1(), execute.getV2());
 			ro.updateOptionMatrix(execute.getV1(), execute.getV2());
 			
-			execute = execute.getOperation().fetchBestOption();
+			//ro.createOptionMatrix();
+			execute = ro.fetchBestOption();
+			eo.createOptionMatrix();
+			compare = eo.fetchBestOption();
+			if(compare.getDelta() < execute.getDelta()) {
+				execute = compare;
+			}
 			
 		}
 		//print the last BMM
