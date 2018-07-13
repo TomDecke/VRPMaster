@@ -13,7 +13,7 @@ public class SteepestDescent {
 	private int numCustomers;
 	private CrossExOperation ceo;
 	private RelocateOperation ro;
-//	private ExchangeOperation eo;
+	private ExchangeOperation eo;
 
 
 
@@ -30,7 +30,7 @@ public class SteepestDescent {
 		this.numCustomers = customers;
 		this.ceo = new CrossExOperation(vrp, customers);
 		this.ro = new RelocateOperation(vrp, customers);
-		//this.eo = new ExchangeOperation(vrp, customers);
+		this.eo = new ExchangeOperation(vrp, customers);
 	}
 
 	/**
@@ -40,65 +40,65 @@ public class SteepestDescent {
 
 		//create best-move-matrix and print it to the console
 		ro.createOptionMatrix();
+		eo.createOptionMatrix();
+
 		
-		//set up exchange
-//		eo.createOptionMatrix();
 		
 		
 		ro.printRelocateMatrix();
 		System.out.println(" ");
 
 		//find the first best move
-		Option relocate = ro.fetchBestOption();
+		Option execute = ro.fetchBestOption();
 
-//		Option exchange = eo.fetchBestOption();
+		//set up exchange
+		Option exchange = eo.fetchBestOption();
+		
+		if(exchange.getDelta() < execute.getDelta()) {
+			execute = exchange;
+		}
+		exchange.printOption();
+
+
+
 		int iterationCounter = 0;
-
 		//As long as there are improving moves execute them
-		while(relocate.getDelta() < 0 /* || exchange.getDelta() < 0*/) {
+		while(execute.getDelta() < 0) {
 
 			//Visualize the state before the relocation on the console
 			iterationCounter++;
 			System.out.println(iterationCounter);
 			//uncomment if wanted printBMM();
 			System.out.print("vFrom - before move: ");
-			relocate.getV1().show();
+			execute.getV1().show();
 			System.out.print("vTo - before move: ");
-			relocate.getV2().show();
-			relocate.printOption();
+			execute.getV2().show();
+			execute.printOption();
+			
 
-			//if(relocate.getDelta() < exchange.getDelta()) {
-				//relocate the customer
-				ro.executeOption(relocate);
-//			}
-//			else {
-//				eo.executeOption(exchange);
-//			}
+			executeMove(execute);
+
 
 			//Visualize the state after the relocation on the console
 			System.out.print("vFrom - after move: ");
-			relocate.getV1().show();
+			execute.getV1().show();
 			System.out.print("vTo - after move: ");
-			relocate.getV2().show();
+			execute.getV2().show();
 			System.out.println(" ");
 
 			//after each move update the matrix and find the next move
-			ro.updateOptionMatrix(relocate.getV1(), relocate.getV2());
-//			eo.updateOptionMatrix(relocate.getV1(), relocate.getV2());
+			eo.updateOptionMatrix(execute.getV1(), execute.getV2());
+			ro.updateOptionMatrix(execute.getV1(), execute.getV2());
 			
-			relocate = ro.fetchBestOption();
-//			exchange = eo.fetchBestOption();
+			execute = execute.getOperation().fetchBestOption();
 			
 		}
 		//print the last BMM
 		ro.printRelocateMatrix();
 		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
 
-		//		//TODO test-exchange
-		//		createExchangeMatrix();
-		//		fetchBestExchange().printOption();
-		//		executeExchange(fetchBestExchange());		
 
+		
 		printResultsToConsole();
 		printResultsToFile();
 	}
@@ -129,6 +129,9 @@ public class SteepestDescent {
 		System.out.println(" ");
 	}
 
+	public void executeMove(Option o) {
+		o.getOperation().executeOption(o);
+	}
 
 	/**
 	 * Write the results to a text-file

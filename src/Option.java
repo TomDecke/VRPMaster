@@ -1,5 +1,6 @@
 
 public abstract class Option {
+	protected Operation operator;
 	protected Vehicle v1;
 	protected Vehicle v2;
 	protected Customer cToMove;
@@ -14,7 +15,8 @@ public abstract class Option {
 	 * @param v1
 	 * @param v2
 	 */
-	public Option(Customer c1, Customer c2, double delta, Vehicle v1, Vehicle v2) {
+	public Option(Customer c1, Customer c2, double delta, Vehicle v1, Vehicle v2, Operation op) {
+		this.operator = op;
 		this.c1 = c1;
 		this.c2 = c2;
 		this.delta = delta;
@@ -27,7 +29,11 @@ public abstract class Option {
 	}
 	
 	public Customer getCToMove() {
-		return cToMove;
+		return this.cToMove;
+	}
+	
+	public Operation getOperation() {
+		return this.operator;
 	}
 	
 	public abstract Vehicle getV1();

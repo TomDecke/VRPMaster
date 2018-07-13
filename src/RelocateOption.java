@@ -13,8 +13,8 @@ public class RelocateOption extends Option{
 	 * @param vFrom Vehicle, the vehicle from which the customer would be taken
 	 * @param vTo Vehicle, the vehicle to which the customer would be moved
 	 */
-	public RelocateOption(Customer c, double delta, Vehicle vFrom, Vehicle vTo) {
-		super(null,null,delta,vFrom,vTo);
+	public RelocateOption(Customer c, double delta, Vehicle vFrom, Vehicle vTo,Operation op) {
+		super(null,null,delta,vFrom,vTo,op);
 		super.cToMove = c;
 	}
 

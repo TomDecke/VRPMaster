@@ -1,16 +1,17 @@
 
 public class ExchangeOperation implements Operation {
 
+	private final double EPSILON = 1E-10;
 	private Option[][] exchangeMatrix;
 	private VRP vrp;
 	int numCustomers;
-	
+
 	public ExchangeOperation(VRP vrp, int numCustomers) {
 		this.vrp = vrp;
 		this.numCustomers = numCustomers;
 		exchangeMatrix = new ExchangeOption[numCustomers][numCustomers];
 	}
-	
+
 	/**
 	 * Create the matrix containing the best exchanges between tours
 	 */
@@ -22,7 +23,7 @@ public class ExchangeOperation implements Operation {
 			}
 		}
 	}
-	
+
 	/**
 	 * Find the customer exchange between two vehicles that yields the biggest cost benefit
 	 * @param v1 Vehicle, the first vehicle that is part of the swap
@@ -32,7 +33,7 @@ public class ExchangeOperation implements Operation {
 	public Option findBestOption(Vehicle v1, Vehicle v2) {
 
 		//create a default exchange option
-		ExchangeOption bestExchange = new ExchangeOption(v1, v2, null, null, 0);
+		ExchangeOption bestExchange = new ExchangeOption(v1, v2, null, null, 0,this);
 
 		//set up the encapsulating customers
 		Customer cV1Pred = v1.firstCustomer;
@@ -62,18 +63,27 @@ public class ExchangeOperation implements Operation {
 					//ensure that the vehicles possess the capacity for the exchange
 					if((v1.load-cV1.demand+cV2.demand)<=v1.capacity && (v2.load-cV2.demand+cV1.demand)<=v2.capacity) {
 						//get the change in distance for v1
-						double deltaDistV1 = - vrp.distance(cV1Pred, cV1) - vrp.distance(cV1, cV1Succ)
+						double deltaDistV1 = 
+								- vrp.distance(cV1Pred, cV1) - vrp.distance(cV1, cV1Succ)
 								+ vrp.distance(cV1Pred, cV2) + vrp.distance(cV2, cV1Succ);
 
 						//get the change in distance for v2
-						double deltaDistV2 =  - vrp.distance(cV2Pred, cV2) - vrp.distance(cV2, cV2Succ)
+						double deltaDistV2 =  
+								- vrp.distance(cV2Pred, cV2) - vrp.distance(cV2, cV2Succ)
 								+ vrp.distance(cV2Pred, cV1) + vrp.distance(cV1, cV2Succ);
 
-						//get the change in cost by subtracting the current cost from the potential new cost
-						double delta = (deltaDistV1 * v1.costOfUse + deltaDistV2 * v2.costOfUse)-(v1.cost + v2.cost); 
+						//catch computational inaccuracy
+						if(Math.abs(deltaDistV1+deltaDistV2) < EPSILON) {
+							deltaDistV1 = 0;
+							deltaDistV2 = 0;
+						}
+
+						double delta  =  ((v1.getDistance()+deltaDistV1) * v1.costOfUse 
+								+(v2.getDistance()+deltaDistV2) * v2.costOfUse)
+								-(v1.cost + v2.cost);
 
 						if(delta < bestExchange.getDelta()) {
-							bestExchange = new ExchangeOption(v1,v2, cV1, cV2, delta);
+							bestExchange = new ExchangeOption(v1,v2, cV1, cV2, delta,this);
 						}
 					}
 				}
@@ -105,7 +115,7 @@ public class ExchangeOperation implements Operation {
 		}
 		return bestExchange;
 	}
-	
+
 	/**
 	 * Swaps two customers according to the information stored in the exchange option
 	 * @param bE ExchangeOption, exchange option to be used
@@ -135,7 +145,7 @@ public class ExchangeOperation implements Operation {
 			}
 		}
 	}
-	
+
 	/**
 	 * Update the exchange matrix by finding new best exchanges for vehicles that were involved in the change
 	 * @param v1 Vehicle, the first vehicles that was involved in the exchange

@@ -39,7 +39,7 @@ public class RelocateOperation implements Operation{
 
 		//create an empty move with no improvement
 		//thus prevent the moving of one customer to another vehicle if there would be no benefit
-		RelocateOption bestToMove = new RelocateOption(null, 0, vFrom, vTo);
+		RelocateOption bestToMove = new RelocateOption(null, 0, vFrom, vTo,this);
 
 
 		//start checking from the first customer, who is not the depot-connection
@@ -83,7 +83,7 @@ public class RelocateOperation implements Operation{
 
 							//if this move is cheaper, take it up
 							if(deltaCost < bestToMove.getDelta()) {
-								bestToMove = new RelocateOption(cFrom,deltaCost,vFrom,vTo);
+								bestToMove = new RelocateOption(cFrom,deltaCost,vFrom,vTo,this);
 								bestToMove.setcPred(cToPred);
 								bestToMove.setcSucc(cToSucc);
 							}
