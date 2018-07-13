@@ -26,7 +26,7 @@ public class TwoOpt {
 
 				//check if the routes cross
 				if(lineCollision(c1, c2, c3, c4)) {
-
+					System.out.println("Collision");
 					//try the reversion on a copy of the data to check time windows and cost constraint
 					if(reverseRoute(v.copy(), c3.copy(), c2.copy())) {
 						//if the reversion is possible, execute it
