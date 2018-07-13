@@ -1,7 +1,7 @@
 
-public class ExchangeOperation {
+public class ExchangeOperation implements Operation {
 
-	private ExchangeOption[][] exchangeMatrix;
+	private Option[][] exchangeMatrix;
 	private VRP vrp;
 	int numCustomers;
 	
@@ -14,11 +14,11 @@ public class ExchangeOperation {
 	/**
 	 * Create the matrix containing the best exchanges between tours
 	 */
-	public void createExchangeMatrix() {
+	public void createOptionMatrix() {
 		//fill half of the matrix since swapping a & b is equivalent to swapping b & a
 		for(int i = 0 ; i < numCustomers ; i++) {
 			for(int j = i+1; j < numCustomers; j++) {
-				exchangeMatrix[i][j] = findBestExchange(vrp.vehicle[i], vrp.vehicle[j]);
+				exchangeMatrix[i][j] = findBestOption(vrp.vehicle[i], vrp.vehicle[j]);
 			}
 		}
 	}
@@ -29,7 +29,7 @@ public class ExchangeOperation {
 	 * @param v2 Vehicle, the second vehicle that is part of the swap
 	 * @return ExchangeOption, the best exchange option for v1 and v2
 	 */
-	public ExchangeOption findBestExchange(Vehicle v1, Vehicle v2) {
+	public Option findBestOption(Vehicle v1, Vehicle v2) {
 
 		//create a default exchange option
 		ExchangeOption bestExchange = new ExchangeOption(v1, v2, null, null, 0);
@@ -93,11 +93,11 @@ public class ExchangeOperation {
 	 * Retrieves the best exchange option from the exchange matrix
 	 * @return ExchangeOption, the option with the greatest cost reduction
 	 */
-	public ExchangeOption fetchBestExchange() {
-		ExchangeOption bestExchange = exchangeMatrix[0][1];
+	public Option fetchBestOption() {
+		Option bestExchange = exchangeMatrix[0][1];
 		for(int i = 0 ; i < numCustomers ; i++) {
 			for(int j = i+1; j < numCustomers; j++) {
-				ExchangeOption curExch = exchangeMatrix[i][j];
+				Option curExch = exchangeMatrix[i][j];
 				if(curExch.getDelta() < bestExchange.getDelta()) {
 					bestExchange = curExch;
 				}
@@ -110,7 +110,7 @@ public class ExchangeOperation {
 	 * Swaps two customers according to the information stored in the exchange option
 	 * @param bE ExchangeOption, exchange option to be used
 	 */
-	public void executeExchange(ExchangeOption bE) {
+	public void executeOption(Option bE) {
 		//obtain information of customer from vehicle 1
 		Customer c1		= bE.getC1();
 		Customer c1Pred = c1.pred;
@@ -141,23 +141,23 @@ public class ExchangeOperation {
 	 * @param v1 Vehicle, the first vehicles that was involved in the exchange
 	 * @param v2 Vehicle, the second vehicles that was involved in the exchange
 	 */
-	public void updateExchangeMatrix(Vehicle v1, Vehicle v2){
+	public void updateOptionMatrix(Vehicle v1, Vehicle v2){
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle cV = vrp.vehicle[i];
 			int indV1 = v1.index;
 			int indV2 = v1.index;
 			//only consider inter-route changes and one way swapping
 			if(indV1 < i) {
-				exchangeMatrix[i][indV1] = findBestExchange(v1, cV);
+				exchangeMatrix[i][indV1] = findBestOption(v1, cV);
 			}
 			else if(indV1 > i) {
-				exchangeMatrix[indV1][i] = findBestExchange(v1, cV);
+				exchangeMatrix[indV1][i] = findBestOption(v1, cV);
 			}
 			if(indV2 < i) {
-				exchangeMatrix[i][indV2] = findBestExchange(v2, cV);		
+				exchangeMatrix[i][indV2] = findBestOption(v2, cV);		
 			}
 			else if(indV2 > i) {
-				exchangeMatrix[indV2][i] = findBestExchange(v2, cV);		
+				exchangeMatrix[indV2][i] = findBestOption(v2, cV);		
 			}
 		}
 	}

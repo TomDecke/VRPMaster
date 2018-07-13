@@ -13,6 +13,7 @@ public class SteepestDescent {
 	private int numCustomers;
 	private CrossExOperation ceo;
 	private RelocateOperation ro;
+//	private ExchangeOperation eo;
 
 
 
@@ -27,8 +28,9 @@ public class SteepestDescent {
 		this.out = textfile.substring(0, textfile.length()-4);
 		this.out += "_Solution.txt";
 		this.numCustomers = customers;
-		this.ceo = new CrossExOperation(vrp, numCustomers);
+		this.ceo = new CrossExOperation(vrp, customers);
 		this.ro = new RelocateOperation(vrp, customers);
+		//this.eo = new ExchangeOperation(vrp, customers);
 	}
 
 	/**
@@ -38,16 +40,22 @@ public class SteepestDescent {
 
 		//create best-move-matrix and print it to the console
 		ro.createOptionMatrix();
+		
+		//set up exchange
+//		eo.createOptionMatrix();
+		
+		
 		ro.printRelocateMatrix();
 		System.out.println(" ");
 
 		//find the first best move
 		Option relocate = ro.fetchBestOption();
 
+//		Option exchange = eo.fetchBestOption();
 		int iterationCounter = 0;
 
 		//As long as there are improving moves execute them
-		while(relocate.getDelta() < 0) {
+		while(relocate.getDelta() < 0 /* || exchange.getDelta() < 0*/) {
 
 			//Visualize the state before the relocation on the console
 			iterationCounter++;
@@ -59,8 +67,13 @@ public class SteepestDescent {
 			relocate.getV2().show();
 			relocate.printOption();
 
-			//relocate the customer
-			ro.executeOption(relocate);
+			//if(relocate.getDelta() < exchange.getDelta()) {
+				//relocate the customer
+				ro.executeOption(relocate);
+//			}
+//			else {
+//				eo.executeOption(exchange);
+//			}
 
 			//Visualize the state after the relocation on the console
 			System.out.print("vFrom - after move: ");
@@ -71,7 +84,11 @@ public class SteepestDescent {
 
 			//after each move update the matrix and find the next move
 			ro.updateOptionMatrix(relocate.getV1(), relocate.getV2());
+//			eo.updateOptionMatrix(relocate.getV1(), relocate.getV2());
+			
 			relocate = ro.fetchBestOption();
+//			exchange = eo.fetchBestOption();
+			
 		}
 		//print the last BMM
 		ro.printRelocateMatrix();
