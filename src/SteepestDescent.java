@@ -14,7 +14,7 @@ public class SteepestDescent {
 	private CrossExOperation ceo;
 	private RelocateOperation ro;
 	private ExchangeOperation eo;
-	private TwoOpt two;
+	private TwoOptOperation two;
 
 
 
@@ -32,7 +32,7 @@ public class SteepestDescent {
 		this.ceo = new CrossExOperation(vrp, customers);
 		this.ro = new RelocateOperation(vrp, customers);
 		this.eo = new ExchangeOperation(vrp, customers);
-		this.two = new TwoOpt(vrp, vrp.m);
+		this.two = new TwoOptOperation(vrp, vrp.m);
 	}
 
 	/**
@@ -248,7 +248,7 @@ public class SteepestDescent {
 		VRP vrp = stDesc.vrp;
 		stDesc.solve_Relocate();
 
-		TwoOpt two = new TwoOpt(vrp, vrp.m);
+		TwoOptOperation two = new TwoOptOperation(vrp, vrp.m);
 
 		
 //		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());

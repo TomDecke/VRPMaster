@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-public class TwoOpt implements Operation{
+public class TwoOptOperation implements Operation{
 
 	private static final double EPSILON = 1E-10;
 
@@ -8,7 +8,7 @@ public class TwoOpt implements Operation{
 	private int numVehicles;
 	private Option[] twoOptMatrix;
 
-	public TwoOpt(VRP vrp, int numVehicles) {
+	public TwoOptOperation(VRP vrp, int numVehicles) {
 		this.vrp = vrp;
 		this.numVehicles = numVehicles;
 		this.twoOptMatrix = new Option[numVehicles];
@@ -39,9 +39,6 @@ public class TwoOpt implements Operation{
 		//the new start and end point of the route-part which is to be reversed
 		Customer newStart = o.c1;
 		Customer newEnd = o.c2;
-		
-		System.out.println("Reverse vehicle: ");
-		v.show();
 
 		Customer last = newStart.succ;
 		Customer limit = newEnd.pred;
@@ -59,12 +56,6 @@ public class TwoOpt implements Operation{
 			//remove the customer of this visit
 			v.remove(cCur.succ);
 
-		}
-
-		//display the customers that were taken out
-		v.show();
-		for(Customer c : customers) {
-			System.out.println(c.custNo);
 		}
 
 		//try to insert the customers that were taken back into the route
