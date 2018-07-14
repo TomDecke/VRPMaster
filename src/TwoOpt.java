@@ -1,16 +1,113 @@
 import java.util.ArrayList;
 
-public class TwoOpt {
+public class TwoOpt implements Operation{
 
 	private static final double EPSILON = 1E-10;
 
+	private VRP vrp;
+	private int numVehicles;
+	private Option[] twoOptMatrix;
+
+	public TwoOpt(VRP vrp, int numVehicles) {
+		this.vrp = vrp;
+		this.numVehicles = numVehicles;
+		this.twoOptMatrix = new Option[numVehicles];
+	}
+
+	@Override
+	public void createOptionMatrix() {
+		for(int i = 0; i < numVehicles; i++) {
+			twoOptMatrix[i] = findBestOption(vrp.vehicle[i], vrp.vehicle[i]);
+		}
+	}
+
+	@Override
+	public void updateOptionMatrix(Vehicle v1, Vehicle v2) {
+		twoOptMatrix[v1.index] = findBestOption(v1, v1);
+		twoOptMatrix[v2.index] = findBestOption(v2, v2);
+	}
+
 
 	/**
-	 * Executes a two-opt move for a vehicle if possible
-	 * @param v Vehicle, the vehicle which is to be checked for crossings
-	 * @return boolean, whether or not an optimization took place
+	 * Executes the reversal by extracting the information from the option and passing them on
+	 * @see reverserRoute()
 	 */
-	public static boolean twoOpt(Vehicle v, VRP vrp) {
+	@Override
+	public void executeOption(Option o) {
+		//the vehicle of interest
+		Vehicle v = o.v1;
+		//the new start and end point of the route-part which is to be reversed
+		Customer newStart = o.c1;
+		Customer newEnd = o.c2;
+		
+		System.out.println("Reverse vehicle: ");
+		v.show();
+
+		Customer last = newStart.succ;
+		Customer limit = newEnd.pred;
+		ArrayList<Customer> customers = new ArrayList<Customer>();
+
+
+		//read the customers which are to be reversed in reversed order
+		Customer cCur = newStart;
+		while(!cCur.equals(limit)) {
+			customers.add(cCur);
+
+			//move on to the next customer
+			cCur = cCur.pred;
+
+			//remove the customer of this visit
+			v.remove(cCur.succ);
+
+		}
+
+		//display the customers that were taken out
+		v.show();
+		for(Customer c : customers) {
+			System.out.println(c.custNo);
+		}
+
+		//try to insert the customers that were taken back into the route
+		Customer cPred = limit;
+		for(Customer c : customers) {
+			if(c.canBeInsertedBetween(cPred, last)) {
+				v.insertBetween(c, cPred, last);
+			}
+			else {
+				System.out.println("Time window violation");
+				return;
+			}
+			cPred = c;
+		}
+	}
+
+	
+	/**
+	 * Get the best option of the twoOptMatrix
+	 * @return Option, the best option
+	 */
+	@Override
+	public Option fetchBestOption() {
+		Option bestTwoOpt = twoOptMatrix[0];
+		for(Option o : twoOptMatrix) {
+			if(o.getDelta() < bestTwoOpt.getDelta()) {
+				bestTwoOpt = o;
+			}
+		}
+		return bestTwoOpt;
+	}
+
+	/**
+	 * Find the best possible reversion within a vehicle
+	 * @param v1 Vehicle, the vehicle which is to be checked
+	 * @param v2 this parameter is not used, as it is mandated by the structure of the Operation-interface
+	 * @return Option, the best reverse option for vehicle 1
+	 */
+	@Override
+	public Option findBestOption(Vehicle v1, Vehicle v2) {
+		Vehicle v = v1;
+		Option twoOpt = new TwoOptOption(null, null, v, 0, this);
+
 		//get the first route of the vehicle
 		Customer c1 = v.firstCustomer;
 		Customer c2 = c1.succ;
@@ -27,10 +124,12 @@ public class TwoOpt {
 				//check if the routes cross
 				if(lineCollision(c1, c2, c3, c4)) {
 					System.out.println("Collision");
-					//try the reversion on a copy of the data to check time windows and cost constraint
-					if(checkReversal(v, c3, c2, vrp)) {
-						//if the reversion is possible, execute it
-						reverseRoute(v, c3, c2);
+
+					//check if a reversal is possible and what benefit it would bring
+					double delta = checkReversal(v,c3, c2);
+
+					if(delta < 0) {
+						twoOpt = new TwoOptOption(c3, c2, v, delta, this);
 					}
 				}
 				//move to the following route
@@ -41,12 +140,17 @@ public class TwoOpt {
 			c1 = c2;
 			c2 = c2.succ;
 		}
-		//no crossing occurred, thus 
-		return false;
+		//return the best two opt
+		return twoOpt;
 	}
-
-	public static boolean checkReversal(Vehicle v, Customer newStart, Customer newEnd, VRP vrp) {
-
+	
+	/**
+	 * Check if the route between two customers can be reversed
+	 * @param newStart Customer, the start of the new middle route
+	 * @param newEnd Customer, the end of the new middle route
+	 * @return double, the cost-benefit of the reversal or 0 if there is none
+	 */
+	private double checkReversal(Vehicle v, Customer newStart, Customer newEnd) {
 
 		double oldCost = 0;
 		double newCost = 0;
@@ -71,8 +175,10 @@ public class TwoOpt {
 		}
 		newCost += vrp.distance(newEnd, oldEnd) + vrp.distance(oldStart, newStart);
 
+		double deltaCost = newCost - oldCost;
+
 		//check for improvement and catch computational error
-		if(newCost - oldCost < EPSILON) {
+		if(deltaCost < EPSILON) {
 			cCur = v.firstCustomer;
 
 			//get the propagation times
@@ -123,82 +229,17 @@ public class TwoOpt {
 			while(cCur != null) {
 				if(cCur.twoOptLatest < cCur.twoOptEarliest) {
 					System.out.println("Time window violation");
-					return false;
+					return 0;
 				}
 				cCur = cCur.succ;
 			}
 
-			return true;
+			return deltaCost;
 		}
 		else {
-			return false;
-		}
-
-	}
-
-	/**
-	 * Reverse the route between two customers
-	 * @param v Vehicle, the vehicle which drives the route
-	 * @param newStart Customer, the customer which is the new start for the reversal
-	 * @param newEnd Customer, the customer which is the new end for the reversal
-	 * @return boolean, true, if reversing is possible and improves the cost, false otherwise
-	 */
-	public static boolean reverseRoute(Vehicle v, Customer newStart, Customer newEnd) {
-
-
-		System.out.println("Reverse vehicle: ");
-		v.show();
-
-		double preCost = v.cost;
-
-		Customer last = newStart.succ;
-		Customer limit = newEnd.pred;
-		ArrayList<Customer> customers = new ArrayList<Customer>();
-
-
-		//read the customers which are to be reversed in reversed order
-		Customer cCur = newStart;
-		while(!cCur.equals(limit)) {
-			customers.add(cCur);
-
-			//move on to the next customer
-			cCur = cCur.pred;
-
-			//TODO find bug
-			//remove the customer of this visit
-			v.remove(cCur.succ);
-
-		}
-
-		//display the customers that were taken out
-		v.show();
-		for(Customer c : customers) {
-			System.out.println(c.custNo);
-		}
-
-		//try to insert the customers that were taken back into the route
-		Customer cPred = limit;
-		for(Customer c : customers) {
-			if(c.canBeInsertedBetween(cPred, last)) {
-				v.insertBetween(c, cPred, last);
-			}
-			else {
-				System.out.println("Time window violation");
-				return false;
-			}
-			cPred = c;
-		}
-
-		//check if the cost of the vehicle has decreased
-		if(v.cost < preCost) {
-			return true;
-		}
-		else {
-			System.out.println("No cost improvement");
-			return false;
+			return 0;
 		}
 	}
-
 
 	/**
 	 * Determine if the routes from c1c2 and c3c4 cross each other
@@ -210,7 +251,7 @@ public class TwoOpt {
 	 * @param c4 Customer, containing the end point of c3c4
 	 * @return
 	 */
-	public static boolean lineCollision(Customer c1, Customer c2, Customer c3, Customer c4  ) {
+	private boolean lineCollision(Customer c1, Customer c2, Customer c3, Customer c4  ) {
 
 		//extract the coordinates of the routes
 		double xC1 = c1.xCoord;
@@ -246,4 +287,6 @@ public class TwoOpt {
 		//check if the crossing happens between the end points of both routes
 		return (c1c2 >= 0 && c1c2 <= 1) && (c3c4 >= 0 && c3c4 <= 1);
 	}
+
+
 }

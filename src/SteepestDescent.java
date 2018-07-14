@@ -14,6 +14,7 @@ public class SteepestDescent {
 	private CrossExOperation ceo;
 	private RelocateOperation ro;
 	private ExchangeOperation eo;
+	private TwoOpt two;
 
 
 
@@ -31,6 +32,7 @@ public class SteepestDescent {
 		this.ceo = new CrossExOperation(vrp, customers);
 		this.ro = new RelocateOperation(vrp, customers);
 		this.eo = new ExchangeOperation(vrp, customers);
+		this.two = new TwoOpt(vrp, vrp.m);
 	}
 
 	/**
@@ -97,6 +99,13 @@ public class SteepestDescent {
 			if(compare.getDelta() < execute.getDelta()) {
 				execute = compare;
 			}
+			
+			two.createOptionMatrix();
+			Option o = two.fetchBestOption();
+			if(o.getDelta() < 0) {
+				System.err.println(o.getDelta());
+			}
+			
 			
 		}
 		//print the last BMM
@@ -236,19 +245,34 @@ public class SteepestDescent {
 		SteepestDescent stDesc = new SteepestDescent(in, num);
 
 
+		VRP vrp = stDesc.vrp;
 		stDesc.solve_Relocate();
 
-		
+		TwoOpt two = new TwoOpt(vrp, vrp.m);
 
-		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+		
+//		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
 		
 		System.out.println("Begin 2-opt");
 		
-		for (Vehicle v : stDesc.getVehicles()) {
-			v.show();
-			TwoOpt.twoOpt(v,stDesc.vrp);
-		}
+		Vehicle testV = vrp.vehicle[7];
+		Customer[] c = vrp.customer;
+		testV.show();
+		testV.insertBetween(c[10], testV.firstCustomer, testV.lastCustomer);
+		testV.insertBetween(c[4], c[10], testV.lastCustomer);
+		testV.insertBetween(c[6], c[4], testV.lastCustomer);
+		testV.insertBetween(c[8], c[6], testV.lastCustomer);
+		testV.insertBetween(c[7], c[8], testV.lastCustomer);
+		testV.show();
+		
+		Option x = two.findBestOption(testV, testV);
+		x.printOption();
+		two.executeOption(x);
+		testV.show();
+		
+//		two.createOptionMatrix();
+//		two.fetchBestOption().printOption();
 	}
 }
