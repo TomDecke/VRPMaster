@@ -248,7 +248,7 @@ public class SteepestDescent {
 		
 		for (Vehicle v : stDesc.getVehicles()) {
 			v.show();
-			TwoOpt.twoOpt(v);
+			TwoOpt.twoOpt(v,stDesc.vrp);
 		}
 	}
 }

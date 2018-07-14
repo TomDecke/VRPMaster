@@ -3,14 +3,14 @@ import java.util.ArrayList;
 public class TwoOpt {
 
 	private static final double EPSILON = 1E-10;
-	
+
 
 	/**
 	 * Executes a two-opt move for a vehicle if possible
 	 * @param v Vehicle, the vehicle which is to be checked for crossings
 	 * @return boolean, whether or not an optimization took place
 	 */
-	public static boolean twoOpt(Vehicle v) {
+	public static boolean twoOpt(Vehicle v, VRP vrp) {
 		//get the first route of the vehicle
 		Customer c1 = v.firstCustomer;
 		Customer c2 = c1.succ;
@@ -28,7 +28,7 @@ public class TwoOpt {
 				if(lineCollision(c1, c2, c3, c4)) {
 					System.out.println("Collision");
 					//try the reversion on a copy of the data to check time windows and cost constraint
-					if(reverseRoute(v.copy(), c3.copy(), c2.copy())) {
+					if(checkReversal(v, c3, c2, vrp)) {
 						//if the reversion is possible, execute it
 						reverseRoute(v, c3, c2);
 					}
@@ -45,6 +45,97 @@ public class TwoOpt {
 		return false;
 	}
 
+	public static boolean checkReversal(Vehicle v, Customer newStart, Customer newEnd, VRP vrp) {
+
+
+		double oldCost = 0;
+		double newCost = 0;
+
+		Customer oldEnd = newStart.succ;
+		Customer oldStart = newEnd.pred;
+
+		Customer cCur = oldStart;
+
+		//calculate the cost of the old route
+		while(!cCur.equals(oldEnd)) {
+			oldCost += vrp.distance(cCur, cCur.succ);
+			cCur = cCur.succ;
+		}
+
+		//calculate the cost of the new route
+		cCur = newStart;
+		while(!cCur.equals(newEnd)) {
+			newCost += vrp.distance(cCur, cCur.pred);
+			cCur = cCur.pred;
+
+		}
+		newCost += vrp.distance(newEnd, oldEnd) + vrp.distance(oldStart, newStart);
+
+		//check for improvement and catch computational error
+		if(newCost - oldCost < EPSILON) {
+			cCur = v.firstCustomer;
+
+			//get the propagation times
+			while(cCur != null) {
+				cCur.twoOptEarliest = cCur.earliestStart;
+				cCur.twoOptLatest = cCur.latestStart;
+				cCur = cCur.succ;
+			}
+
+			//forward propagation for the reversal part
+			cCur = oldStart;
+			Customer cSucc = newStart;
+			while (!cSucc.equals(oldStart)) {
+				cSucc.twoOptEarliest = Math.max(cSucc.readyTime,cCur.twoOptEarliest+cCur.serviceTime+vrp.distance(cCur,cSucc));
+				//take the predecessor instead of the successor because of reversion
+				cCur = cSucc;
+				cSucc = cSucc.pred;
+			}
+
+			//forward propagation for the remaining customers after the reversal (regular forward propagation)
+			cSucc = oldEnd;
+			while(cSucc != null) {
+				cSucc.twoOptEarliest = Math.max(cSucc.readyTime,cCur.twoOptEarliest+cCur.serviceTime+vrp.distance(cCur,cSucc));
+				cCur = cSucc;
+				cSucc = cSucc.succ;
+			}
+
+			//backward propagation for the reversal part 
+			cCur = oldEnd;
+			Customer cPred = newEnd;
+			while(!cPred.equals(newStart) ) {
+				cPred.twoOptLatest = Math.min(cPred.dueDate, cCur.twoOptLatest - cCur.serviceTime - vrp.distance(cPred, cCur));
+				//take the successor instead of the predecessor because of reversion
+				cCur = cPred;
+				cPred = cPred.succ;
+			}
+
+			//backward propagation for the remaining customers before the reversal (regular backward propagation)
+			cCur = oldStart;
+			while(cPred != null) {
+				cPred.twoOptLatest = Math.min(cPred.dueDate, cCur.twoOptLatest - cCur.serviceTime - vrp.distance(cPred, cCur));
+				cCur = cPred;
+				cPred = cPred.pred;
+			}
+
+			//check for time-constraint violations
+			cCur = v.firstCustomer;
+			while(cCur != null) {
+				if(cCur.twoOptLatest < cCur.twoOptEarliest) {
+					System.out.println("Time window violation");
+					return false;
+				}
+				cCur = cCur.succ;
+			}
+
+			return true;
+		}
+		else {
+			return false;
+		}
+
+	}
+
 	/**
 	 * Reverse the route between two customers
 	 * @param v Vehicle, the vehicle which drives the route
@@ -53,7 +144,7 @@ public class TwoOpt {
 	 * @return boolean, true, if reversing is possible and improves the cost, false otherwise
 	 */
 	public static boolean reverseRoute(Vehicle v, Customer newStart, Customer newEnd) {
-		
+
 
 		System.out.println("Reverse vehicle: ");
 		v.show();
@@ -107,8 +198,8 @@ public class TwoOpt {
 			return false;
 		}
 	}
-	
-	
+
+
 	/**
 	 * Determine if the routes from c1c2 and c3c4 cross each other
 	 * the solution is taken from 
