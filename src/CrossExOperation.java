@@ -1,11 +1,11 @@
 import addOns.TimeConstraintViolationException;
 
 public class CrossExOperation {
-	
+
 	private VRP vrp;
 	private int numCustomers;
 	private CrossExOption[][] crossExMatrix;
-	
+
 	public CrossExOperation(VRP vrp, int numCustomers) {
 		this.vrp=vrp;
 		this.numCustomers = numCustomers;
@@ -25,7 +25,7 @@ public class CrossExOperation {
 		printCrossEx();
 
 	}
-	
+
 	/**
 	 * Find the best possible cross exchange between two vehicle routes
 	 * @param v1 Vehicle, the first vehicle for comparison
@@ -50,7 +50,7 @@ public class CrossExOperation {
 
 		//create a default best cross exchange without improvement
 		CrossExOption bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, 0);
-		
+
 		//TODO re-think this part ignore empty vehicles
 		if(cV1.succ.equals(v1.lastCustomer) || cV2.equals(v2.lastCustomer)) {
 			return bestCrossEx;
@@ -65,21 +65,21 @@ public class CrossExOperation {
 
 		//go through the customer combinations 
 		while(!cV1.equals(v1.lastCustomer)) {
-			
+
 			//reset distance, load and starting point for the new combination
 			cV2 = v2.firstCustomer.succ;
-			
+
 			distUpToC2 = vrp.distance(v2.firstCustomer, cV2);
 			distAfterC2 = v2.getDistance()-distUpToC2;
-			
+
 			loadUpToC2 = cV2.demand;
 			loadAfterC2 = v2.load - loadUpToC2;
-			
+
 			while(!cV2.equals(v2.lastCustomer)) {
 
 				//make sure that a swap would not violate capacity constraints
 				if(newLoadV1 <= v1.capacity && newLoadV2 <= v2.capacity) {
-					
+
 					//get the succeeding customers
 					Customer cV1Succ = cV1.succ;
 					Customer cV2Succ = cV2.succ;
@@ -168,7 +168,7 @@ public class CrossExOperation {
 
 		return bestCrossEx;
 	}
-	
+
 	/**
 	 * Retrieve the best cross exchange option from the cross-exchange matrix
 	 * @return CrossExOption, the cross exchange option with the greatest benefit
@@ -185,7 +185,7 @@ public class CrossExOperation {
 		}
 		return bestCrossEx;
 	}
-	
+
 	/**
 	 * Execute the cross exchange between two vehicles
 	 * @param bCE CrossExOption, the cross exchange that is to be executed
@@ -221,14 +221,14 @@ public class CrossExOperation {
 			cTmp.vehicle = v2;
 			cTmp = cTmp.succ;
 		}
-		
+
 		//swap the last customers
 		cTmp = v2.lastCustomer;
 		v2.lastCustomer = v1.lastCustomer;
 		v1.lastCustomer = cTmp;
-//		v1.lastCustomer.vehicle = v1;
-//		v2.lastCustomer.vehicle = v2;
-		
+		//		v1.lastCustomer.vehicle = v1;
+		//		v2.lastCustomer.vehicle = v2;
+
 		//update the load of the vehicles after the exchange
 		v1.load = bCE.getLoadForV1(); 
 		v2.load = bCE.getLoadForV2();
@@ -259,7 +259,7 @@ public class CrossExOperation {
 			}
 		}
 	}
-	
+
 	/**
 	 * Construct the current cross exchange matrix, showing the obtained deltas
 	 */
@@ -290,5 +290,26 @@ public class CrossExOperation {
 			}
 			System.out.println("");
 		}
+	}
+
+	public static void main(String[] args) {
+		/**
+
+		 * Solve the problem with help of the cross exchange operator
+
+		public void solve_CrossEx() {
+
+		ceo.createCrossExMatrix();
+		CrossExOption crossEx = ceo.fetchBestCrossEx();
+		while(crossEx.getDelta() < 0) {
+			ceo.executeCrossEx(crossEx);
+			ceo.updateCrossExMatrix(crossEx.getV1(), crossEx.getV2());
+			crossEx = ceo.fetchBestCrossEx();
+		}
+
+		printResultsToConsole();
+		printResultsToFile();
+	}
+		 */
 	}
 }

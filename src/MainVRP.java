@@ -13,7 +13,7 @@ public class MainVRP {
 
 		//run the solver
 		System.out.println("");
-		stDesc.solve_Relocate();
+		stDesc.solve(0);
 
 
 		//show all vehicles after the search finished

@@ -14,7 +14,7 @@ public class SteepestDescent {
 	private CrossExOperation ceo;
 	private RelocateOperation ro;
 	private ExchangeOperation eo;
-	private TwoOptOperation two;
+	private TwoOptOperation to;
 
 
 
@@ -32,18 +32,18 @@ public class SteepestDescent {
 		this.ceo = new CrossExOperation(vrp, customers);
 		this.ro = new RelocateOperation(vrp, customers);
 		this.eo = new ExchangeOperation(vrp, customers);
-		this.two = new TwoOptOperation(vrp, vrp.m);
+		this.to = new TwoOptOperation(vrp, customers);
 	}
 
 	/**
 	 * Runs steepest descent, to find a solution for the vrp-instance
 	 */
-	public void solve_Relocate() {
+	public void solve(int mode) {
 
 		//create best-move-matrix and print it to the console
 		ro.createOptionMatrix();
 		eo.createOptionMatrix();
-
+		to.createOptionMatrix();
 		
 		
 		
@@ -54,13 +54,12 @@ public class SteepestDescent {
 		Option execute = ro.fetchBestOption();
 
 		//set up exchange
-		Option compare = eo.fetchBestOption();
-		
-		if(compare.getDelta() < execute.getDelta()) {
-			execute = compare;
-		}
-		compare.printOption();
+		Option optionExchange = eo.fetchBestOption();
+		Option optionTwoOpt = to.fetchBestOption();
 
+		//get the vehicles
+		Vehicle v1 = execute.getV1();
+		Vehicle v2 = execute.getV2();
 
 
 		int iterationCounter = 0;
@@ -71,10 +70,10 @@ public class SteepestDescent {
 			iterationCounter++;
 			System.out.println(iterationCounter);
 			//uncomment if wanted printBMM();
-			System.out.print("vFrom - before move: ");
-			execute.getV1().show();
-			System.out.print("vTo - before move: ");
-			execute.getV2().show();
+			System.out.print("v1 - before move: ");
+			v1.show();
+			System.out.print("v2 - before move: ");
+			v2.show();
 			execute.printOption();
 			
 
@@ -82,29 +81,71 @@ public class SteepestDescent {
 
 
 			//Visualize the state after the relocation on the console
-			System.out.print("vFrom - after move: ");
-			execute.getV1().show();
-			System.out.print("vTo - after move: ");
-			execute.getV2().show();
+			System.out.print("v1 - after move: ");
+			v1.show();
+			System.out.print("v2 - after move: ");
+			v2.show();
 			System.out.println(" ");
 
-			//after each move update the matrix and find the next move
-			eo.updateOptionMatrix(execute.getV1(), execute.getV2());
-			ro.updateOptionMatrix(execute.getV1(), execute.getV2());
-			
-			//ro.createOptionMatrix();
+			//update relocate and find best move for comparison
+			ro.updateOptionMatrix(v1,v2);
 			execute = ro.fetchBestOption();
-			eo.createOptionMatrix();
-			compare = eo.fetchBestOption();
-			if(compare.getDelta() < execute.getDelta()) {
-				execute = compare;
-			}
 			
-			two.createOptionMatrix();
-			Option o = two.fetchBestOption();
-			if(o.getDelta() < 0) {
-				System.err.println(o.getDelta());
+			//combine different moves
+			switch(mode) {
+			//only relocate
+			case 0:
+				break;
+				
+			//relocate and exchange
+			case 1:
+				//TODO figure out eo-update
+				//update exchange and compare option with the current result
+				eo.createOptionMatrix();
+				optionExchange = eo.fetchBestOption();
+				if(optionExchange.getDelta() < execute.getDelta()) {
+					execute = optionExchange;
+				}
+				break;
+				
+			//relocate and two-opt
+			case 2:
+				//update two-opt and compare option with current result
+				to.updateOptionMatrix(v1,v2);
+				optionTwoOpt = to.fetchBestOption();
+				if(optionTwoOpt.getDelta() < execute.getDelta()) {
+					execute = optionTwoOpt;
+				}
+				break;
+				
+			//relocate, exchange and two-opt
+			case 3:
+				//update exchange and two-opt
+				eo.updateOptionMatrix(v1, v2);
+				to.updateOptionMatrix(v1, v2);
+				//find the best option
+				if(optionExchange.getDelta() < execute.getDelta()) {
+					execute = optionExchange;
+				}
+				if(optionTwoOpt.getDelta() < execute.getDelta()) {
+					execute = optionTwoOpt;
+				}
+				break;
+				
+			//randomly selected improvement move
+			case 4: 
+				
+				//update all matrices
+				eo.updateOptionMatrix(v1,v2);
+	
+
+				break;
+
 			}
+
+			//update the vehicles
+			v1 = execute.getV1();
+			v2 = execute.getV2();
 			
 			
 		}
@@ -114,23 +155,6 @@ public class SteepestDescent {
 
 
 		
-		printResultsToConsole();
-		printResultsToFile();
-	}
-
-	/**
-	 * Solve the problem with help of the cross exchange operator
-	 */
-	public void solve_CrossEx() {
-		
-		ceo.createCrossExMatrix();
-		CrossExOption crossEx = ceo.fetchBestCrossEx();
-		while(crossEx.getDelta() < 0) {
-			ceo.executeCrossEx(crossEx);
-			ceo.updateCrossExMatrix(crossEx.getV1(), crossEx.getV2());
-			crossEx = ceo.fetchBestCrossEx();
-		}
-
 		printResultsToConsole();
 		printResultsToFile();
 	}
@@ -246,33 +270,13 @@ public class SteepestDescent {
 
 
 		VRP vrp = stDesc.vrp;
-		stDesc.solve_Relocate();
+		stDesc.solve(2);
 
-		TwoOptOperation two = new TwoOptOperation(vrp, vrp.m);
+		TwoOptOperation two = new TwoOptOperation(vrp, num);
 
 		
 //		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
-		
-		System.out.println("Begin 2-opt");
-		
-		Vehicle testV = vrp.vehicle[7];
-		Customer[] c = vrp.customer;
-		testV.show();
-		testV.insertBetween(c[10], testV.firstCustomer, testV.lastCustomer);
-		testV.insertBetween(c[4], c[10], testV.lastCustomer);
-		testV.insertBetween(c[6], c[4], testV.lastCustomer);
-		testV.insertBetween(c[8], c[6], testV.lastCustomer);
-		testV.insertBetween(c[7], c[8], testV.lastCustomer);
-		testV.show();
-		
-		Option x = two.findBestOption(testV, testV);
-		x.printOption();
-		two.executeOption(x);
-		testV.show();
-		
-//		two.createOptionMatrix();
-//		two.fetchBestOption().printOption();
 	}
 }

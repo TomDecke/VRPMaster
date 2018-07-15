@@ -5,18 +5,18 @@ public class TwoOptOperation implements Operation{
 	private static final double EPSILON = 1E-10;
 
 	private VRP vrp;
-	private int numVehicles;
+	private int numCustomers;
 	private Option[] twoOptMatrix;
 
-	public TwoOptOperation(VRP vrp, int numVehicles) {
+	public TwoOptOperation(VRP vrp, int numCustomers) {
 		this.vrp = vrp;
-		this.numVehicles = numVehicles;
-		this.twoOptMatrix = new Option[numVehicles];
+		this.numCustomers = numCustomers;
+		this.twoOptMatrix = new Option[numCustomers];
 	}
 
 	@Override
 	public void createOptionMatrix() {
-		for(int i = 0; i < numVehicles; i++) {
+		for(int i = 0; i < numCustomers; i++) {
 			twoOptMatrix[i] = findBestOption(vrp.vehicle[i], vrp.vehicle[i]);
 		}
 	}
