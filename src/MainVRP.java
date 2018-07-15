@@ -4,12 +4,15 @@ public class MainVRP {
 	public static void main(String[] args) throws IOException{
 		
 		//get the input
-		String fileIn = args[0];
+		String in = args[0];
 		int numCustomer = Integer.parseInt(args[1]);
 		
+		String fileOut = in.substring(0, in.length()-4);
+		fileOut += "_Solution.txt";
+		
 		//create verification instance and solver
-		VRP vrp = new VRP(fileIn,numCustomer);
-		SteepestDescent stDesc = new SteepestDescent(fileIn,numCustomer);
+		VRP vrp = new VRP(in,numCustomer);
+		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
 
 		//run the solver
 		System.out.println("");
@@ -36,9 +39,9 @@ public class MainVRP {
 		//if the solution is valid display it otherwise display a failure-message
 		if(valid) {
 			//determine the name of the output-file
-			String fileOut = fileIn.substring(0, fileIn.length()-4);
+			String out = in.substring(0, in.length()-4);
 			fileOut += "_Solution.txt";
-			DisplayVRP dVRP = new DisplayVRP(fileIn, numCustomer, fileOut);
+			DisplayVRP dVRP = new DisplayVRP(in, numCustomer, out);
 			dVRP.plotVRPSolution();
 		}
 		else {

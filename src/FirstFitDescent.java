@@ -1,4 +1,3 @@
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -8,8 +7,8 @@ public class FirstFitDescent extends Descent{
 	private ArrayList<Customer> cDesc;
 	private Vehicle[] vehicles;
 	
-	public FirstFitDescent(VRP vrp, int numCustomers, String fOut) {
-		super(vrp,numCustomers,fOut);
+	public FirstFitDescent(VRP vrp, String fOut) {
+		super(vrp,fOut);
 		cDesc = new ArrayList<Customer>();
 		vehicles = new Vehicle[vrp.m];
 		
@@ -35,7 +34,7 @@ public class FirstFitDescent extends Descent{
 		}	
 	}
 	
-	public void solve() {
+	public void solve(int mode) {
 		Customer cCur = null;
 		while(!cDesc.isEmpty()) {
 			cCur = cDesc.remove(0);
@@ -74,9 +73,9 @@ public class FirstFitDescent extends Descent{
 		String fileOut = in.substring(0, in.length()-4);
 		fileOut += "_Solution.txt";
 		
-		FirstFitDescent ffd = new FirstFitDescent(vrp,num,fileOut);
+		FirstFitDescent ffd = new FirstFitDescent(vrp,fileOut);
 		
-		ffd.solve();
+		ffd.solve(-1);
 		TestSolution.runTest(vrp, ffd.getTotalCost(), ffd.getVehicles());
 		DisplayVRP disp = new DisplayVRP(in, num, fileOut);
 		disp.plotVRPSolution();

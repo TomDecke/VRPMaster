@@ -7,9 +7,9 @@ public abstract class Descent {
 	protected VRP vrp;
 	protected int numCustomers;
 	
-	public Descent(VRP vrp, int numCust, String fOut) {
+	public Descent(VRP vrp, String fOut) {
 		this.vrp = vrp;
-		this.numCustomers = numCust;
+		this.numCustomers = vrp.n;
 		this.out = fOut;
 	}
 	
@@ -23,7 +23,7 @@ public abstract class Descent {
 		return numCustomers;
 	}
 	
-	public abstract void solve();
+	public abstract void solve(int mode);
 	
 	/**
 	 * After executing @see solve(), this method can be used to obtain the vehicles, which are present in the solution 
@@ -88,7 +88,7 @@ public abstract class Descent {
 	 * Determine the number of vehicles that are needed in the solution
 	 * @return int, the number of vehicles
 	 */
-	private int getVehicleCount() {
+	protected int getVehicleCount() {
 		int vehicleCount = 0; //number of vehicles needed in the solution
 		for(int i = 0 ; i<numCustomers; i++) {
 			Vehicle v = vrp.vehicle[i];
