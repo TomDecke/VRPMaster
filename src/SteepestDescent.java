@@ -180,7 +180,7 @@ public class SteepestDescent {
 		
 		//if the solution was random, memorize the result
 		if(mode == 3) {
-			soln = new RandomSolution(getTotalCost(), getVehicleCount(), getVehicles());
+			soln = new RandomSolution(getTotalCost(), getVehicleCount(),vrp.m, getVehicles());
 		}
 	}
 
