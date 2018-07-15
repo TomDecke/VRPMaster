@@ -1,6 +1,7 @@
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * 
@@ -11,10 +12,12 @@ public class SteepestDescent {
 	private String out;
 	private VRP vrp;
 	private int numCustomers;
-	private CrossExOperation ceo;
+//	private CrossExOperation ceo;
 	private RelocateOperation ro;
 	private ExchangeOperation eo;
 	private TwoOptOperation to;
+	
+	private RandomSolution soln = null;
 
 
 
@@ -29,7 +32,6 @@ public class SteepestDescent {
 		this.out = textfile.substring(0, textfile.length()-4);
 		this.out += "_Solution.txt";
 		this.numCustomers = customers;
-		this.ceo = new CrossExOperation(vrp, customers);
 		this.ro = new RelocateOperation(vrp, customers);
 		this.eo = new ExchangeOperation(vrp, customers);
 		this.to = new TwoOptOperation(vrp, customers);
@@ -76,8 +78,8 @@ public class SteepestDescent {
 			v2.show();
 			execute.printOption();
 			
-
-			executeMove(execute);
+			//execute the move
+			execute.getOperation().executeOption(execute);
 
 
 			//Visualize the state after the relocation on the console
@@ -134,29 +136,52 @@ public class SteepestDescent {
 				
 			//randomly selected improvement move
 			case 4: 
-				
+				//TODO
 				//update all matrices
-				eo.updateOptionMatrix(v1,v2);
-	
+				eo.createOptionMatrix();
+				to.updateOptionMatrix(v1, v2);
 
+				optionExchange = eo.fetchBestOption();
+				optionTwoOpt = to.fetchBestOption();
+				
+				double dEx = optionExchange.getDelta();
+				double d2opt = optionTwoOpt.getDelta();
+				double dRel = execute.getDelta();
+				
+				ArrayList<Option> options = new ArrayList<Option>();
+				//ensure that there are still improving moves
+				if(!(dEx == 0 && d2opt == 0 && dRel == 0)) {
+					//add improving moves to array list
+					if(dEx != 0) {
+						options.add(optionExchange);
+					}
+					if(d2opt != 0) {
+						options.add(optionTwoOpt);
+					}
+					if(dRel != 0) {
+						options.add(execute);
+					}
+					//select a random improving move from the matrix
+					execute = options.get(new Random().nextInt(options.size()));
+				}
 				break;
-
 			}
 
 			//update the vehicles
 			v1 = execute.getV1();
-			v2 = execute.getV2();
-			
-			
+			v2 = execute.getV2();	
 		}
+		
 		//print the last BMM
 		ro.printRelocateMatrix();
-		System.out.println("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% \n");
-
-
 		
 		printResultsToConsole();
 		printResultsToFile();
+		
+		//if the solution was random, memorize the result
+		if(mode == 3) {
+			soln = new RandomSolution(getTotalCost(), getVehicleCount(), getVehicles());
+		}
 	}
 
 	/**
@@ -270,7 +295,7 @@ public class SteepestDescent {
 
 
 		VRP vrp = stDesc.vrp;
-		stDesc.solve(2);
+		stDesc.solve(4);
 
 		TwoOptOperation two = new TwoOptOperation(vrp, num);
 
