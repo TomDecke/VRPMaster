@@ -1,4 +1,5 @@
 
+
 public interface Operation {
 	
 	public void createOptionMatrix();

@@ -1,4 +1,3 @@
-
 public class TwoOptOption extends Option{
 
 	public TwoOptOption(Customer newStart, Customer newEnd, Vehicle v, double delta, Operation op) {

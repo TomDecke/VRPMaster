@@ -1,4 +1,3 @@
-
 public abstract class Option {
 	protected Operation operator;
 	protected Vehicle v1;

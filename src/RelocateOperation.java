@@ -1,4 +1,3 @@
-
 public class RelocateOperation implements Operation{
 
 	private final double EPSILON = 1E-10;

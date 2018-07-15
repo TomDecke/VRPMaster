@@ -11,6 +11,7 @@ public class RandomSolution {
 	//TODO do I need to memorise in which vehicle the customers were? I.e since they are all identical
 	public RandomSolution(double cost, int needed, int available, ArrayList<Vehicle> v) {
 		this.cost = cost;
+		this.availableV = available;
 		this.neededV = needed;
 		this.availableV = available;
 		this.soln = v;
