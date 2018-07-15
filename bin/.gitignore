@@ -1,3 +1,7 @@
+/TestSolomon_Solution.txt
+/c103.txt
+/solomon_100/
+/addOns/
 /CrossExOperation.class
 /CrossExOption.class
 /Customer.class
@@ -5,7 +9,6 @@
 /ExchangeOperation.class
 /ExchangeOption.class
 /MainVRP.class
-/addOns/
 /Operation.class
 /Option.class
 /RandomSolution.class
@@ -13,10 +16,8 @@
 /RelocateOption.class
 /SteepestDescent.class
 /TestSolution.class
-/TwoOpt.class
+/TwoOptOperation.class
 /TwoOptOption.class
 /VRP.class
 /Vehicle.class
-/solomon_100/
-/Solution.txt
-/TwoOptOperation.class
+/operation/
