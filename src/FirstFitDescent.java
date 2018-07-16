@@ -6,11 +6,13 @@ public class FirstFitDescent extends Descent{
 
 	private ArrayList<Customer> cDesc;
 	private Vehicle[] vehicles;
+	private TwoOptOperation tOPt;
 	
 	public FirstFitDescent(VRP vrp, String fOut) {
 		super(vrp,fOut);
 		cDesc = new ArrayList<Customer>();
 		vehicles = new Vehicle[vrp.m];
+		tOPt = new TwoOptOperation(vrp, super.numCustomers);
 		
 		//iterate through vehicles and customers
 		for(int i = 0 ; i < vrp.n ; i++) {
@@ -24,10 +26,10 @@ public class FirstFitDescent extends Descent{
 				vehicles[i] = vCur;
 			}
 			
-			double dist = vrp.distance(vrp.depot, cCur);
+			double curStart = Math.max(cCur.earliestStart, vrp.distance(vrp.depot, cCur));
 			int pos = 0;
-			//order customers by distance
-			while(pos < cDesc.size() && dist < vrp.distance(vrp.depot, cDesc.get(pos))) {
+			//order customers by distance taking earliest start into account
+			while(pos < cDesc.size() && curStart  < Math.max(cDesc.get(pos).earliestStart, vrp.distance(vrp.depot, cDesc.get(pos)))) {
 				pos++;
 			}
 			cDesc.add(pos, cCur);
@@ -46,9 +48,22 @@ public class FirstFitDescent extends Descent{
 	private void placeCustomer(Customer c) {
 		for(Vehicle v : vehicles) {
 			if(v.canAccomodate(c)) {
-				if(c.canBeInsertedBetween(v.lastCustomer.pred, v.lastCustomer)) {
-					v.insertBetween(c, v.lastCustomer.pred, v.lastCustomer);
-					return;
+				Customer cCur = v.firstCustomer;
+				Customer cSucc = cCur.succ;
+				//find the first position where the customer can be inserted
+				while(!cCur.equals(v.lastCustomer)) {
+					if(c.canBeInsertedBetween(cCur, cSucc)) {
+						v.insertBetween(c, cCur, cSucc);
+						
+						//if it means improvement, execute a 2-opt-move
+						Option twoOpt = tOPt.findBestOption(v, v);
+						if(twoOpt.getDelta() < 0) {
+							executeMove(twoOpt);
+						}
+						return;	
+					}
+					cCur = cSucc;
+					cSucc = cSucc.succ;
 				}
 			}
 		}
@@ -75,8 +90,12 @@ public class FirstFitDescent extends Descent{
 		
 		FirstFitDescent ffd = new FirstFitDescent(vrp,fileOut);
 		
+		for(Customer c: ffd.getcDesc()) {
+			System.out.println(""+c.custNo +  " " + c.earliestStart);
+		}
+		
 		ffd.solve(-1);
-		TestSolution.runTest(vrp, ffd.getTotalCost(), ffd.getVehicles());
+		//TestSolution.runTest(vrp, ffd.getTotalCost(), ffd.getVehicles());
 		DisplayVRP disp = new DisplayVRP(in, num, fileOut);
 		disp.plotVRPSolution();
 	}

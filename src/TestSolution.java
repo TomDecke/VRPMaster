@@ -29,6 +29,7 @@ public class TestSolution {
 
 		//Check all vehicles/routes
 		for(Vehicle v : solVehicles) {
+			//check the vehicle
 			if(v.id > vrp.m) {
 				System.out.println("Vehicle does not belong to VRP");
 				return false;

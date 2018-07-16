@@ -194,7 +194,7 @@ public class SteepestDescent extends Descent{
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
 
 
-		stDesc.solve(4);
+		stDesc.solve(0);
 
 		TwoOptOperation two = new TwoOptOperation(vrp, num);
 

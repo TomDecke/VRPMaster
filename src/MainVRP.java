@@ -10,6 +10,7 @@ public class MainVRP {
 		String fileOut = in.substring(0, in.length()-4);
 		fileOut += "_Solution.txt";
 		
+		
 		//create verification instance and solver
 		VRP vrp = new VRP(in,numCustomer);
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
@@ -38,10 +39,7 @@ public class MainVRP {
 		
 		//if the solution is valid display it otherwise display a failure-message
 		if(valid) {
-			//determine the name of the output-file
-			String out = in.substring(0, in.length()-4);
-			fileOut += "_Solution.txt";
-			DisplayVRP dVRP = new DisplayVRP(in, numCustomer, out);
+			DisplayVRP dVRP = new DisplayVRP(in, numCustomer, fileOut);
 			dVRP.plotVRPSolution();
 		}
 		else {
@@ -50,6 +48,7 @@ public class MainVRP {
 		}
 		
 
+		System.out.println(fileOut);
 
 	}
 }
