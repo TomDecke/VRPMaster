@@ -27,9 +27,10 @@ public class RunDescents {
 		    if (file.isFile()) {
 		    	writer.write(file.getName()+"\n");
 		    	String vrpInstance = folderpath +file.getName();
-		        vrp = new VRP(vrpInstance, numCustomers);
+
 		        for(int i = 0; i < 5; i++) {
 		        	writer.write("mode " + i + ": ");
+			        vrp = new VRP(vrpInstance, numCustomers);
 			        stDesc = new SteepestDescent(vrp, resultpath + "mode_" + i + "_"+  file.getName());
 			        stDesc.solve(i);
 			        System.out.println(String.format("c: %.1f nV: %d ", stDesc.getTotalCost(),stDesc.getVehicleCount()));

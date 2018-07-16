@@ -54,7 +54,7 @@ public class RelocateOperation implements Operation{
 				- vrp.distance(cFrom, cFrom.succ);
 
 				//catch computational inaccuracy
-				if(newDistVFrom < EPSILON) {
+				if(Math.abs(newDistVFrom) < EPSILON) {
 					newDistVFrom = 0;
 				}
 
@@ -70,15 +70,20 @@ public class RelocateOperation implements Operation{
 									+ vrp.distance(cFrom, cToSucc);
 
 							//catch computational inaccuracy
-							if(newDistVTo < EPSILON) {
+							if(Math.abs(newDistVTo) < EPSILON) {
 								newDistVTo = 0;
 							}
-
+							
 							//the new cost for the vehicles, if this move was to be made
 							double resultingCost = newDistVFrom * vFrom.costOfUse + newDistVTo * vTo.costOfUse;
 
 							//the change in cost
 							double deltaCost =  resultingCost - cCost;
+							
+							//catch computational inaccuracy
+							if(Math.abs(deltaCost) < EPSILON) {
+								deltaCost = 0;
+							}
 
 							//if this move is cheaper, take it up
 							if(deltaCost < bestToMove.getDelta()) {

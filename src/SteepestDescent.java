@@ -117,8 +117,10 @@ public class SteepestDescent extends Descent{
 			//relocate, exchange and two-opt
 			case 3:
 				//update exchange and two-opt
-				eo.updateOptionMatrix(v1, v2);
+				eo.createOptionMatrix();
 				to.updateOptionMatrix(v1, v2);
+				optionExchange = eo.fetchBestOption();
+				optionTwoOpt = to.fetchBestOption();
 				//find the best option
 				if(optionExchange.getDelta() < execute.getDelta()) {
 					execute = optionExchange;
@@ -194,7 +196,7 @@ public class SteepestDescent extends Descent{
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
 
 
-		stDesc.solve(0);
+		stDesc.solve(1);
 
 		TwoOptOperation two = new TwoOptOperation(vrp, num);
 
