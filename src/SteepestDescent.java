@@ -9,11 +9,11 @@ import java.util.Random;
  *
  */
 public class SteepestDescent extends Descent{
-//	private CrossExOperation ceo;
+	//	private CrossExOperation ceo;
 	private RelocateOperation ro;
 	private ExchangeOperation eo;
 	private TwoOptOperation to;
-	
+
 	private RandomSolution soln = null;
 
 
@@ -40,9 +40,9 @@ public class SteepestDescent extends Descent{
 		ro.createOptionMatrix();
 		eo.createOptionMatrix();
 		to.createOptionMatrix();
-		
-		
-		
+
+
+
 		ro.printRelocateMatrix();
 		System.out.println(" ");
 
@@ -71,7 +71,7 @@ public class SteepestDescent extends Descent{
 			System.out.print("v2 - before move: ");
 			v2.show();
 			execute.printOption();
-			
+
 			//execute the move
 			execute.getOperation().executeOption(execute);
 
@@ -86,14 +86,14 @@ public class SteepestDescent extends Descent{
 			//update relocate and find best move for comparison
 			ro.updateOptionMatrix(v1,v2);
 			execute = ro.fetchBestOption();
-			
+
 			//combine different moves
 			switch(mode) {
 			//only relocate
 			case 0:
 				break;
-				
-			//relocate and exchange
+
+				//relocate and exchange
 			case 1:
 				//TODO figure out eo-update
 				//update exchange and compare option with the current result
@@ -103,8 +103,8 @@ public class SteepestDescent extends Descent{
 					execute = optionExchange;
 				}
 				break;
-				
-			//relocate and two-opt
+
+				//relocate and two-opt
 			case 2:
 				//update two-opt and compare option with current result
 				to.updateOptionMatrix(v1,v2);
@@ -113,8 +113,8 @@ public class SteepestDescent extends Descent{
 					execute = optionTwoOpt;
 				}
 				break;
-				
-			//relocate, exchange and two-opt
+
+				//relocate, exchange and two-opt
 			case 3:
 				//update exchange and two-opt
 				eo.createOptionMatrix();
@@ -129,8 +129,8 @@ public class SteepestDescent extends Descent{
 					execute = optionTwoOpt;
 				}
 				break;
-				
-			//randomly selected improvement move
+
+				//randomly selected improvement move
 			case 4: 
 				//update all matrices
 				eo.createOptionMatrix();
@@ -138,11 +138,11 @@ public class SteepestDescent extends Descent{
 
 				optionExchange = eo.fetchBestOption();
 				optionTwoOpt = to.fetchBestOption();
-				
+
 				double dEx = optionExchange.getDelta();
 				double d2opt = optionTwoOpt.getDelta();
 				double dRel = execute.getDelta();
-				
+
 				ArrayList<Option> options = new ArrayList<Option>();
 				//ensure that there are still improving moves
 				if(!(dEx == 0 && d2opt == 0 && dRel == 0)) {
@@ -166,19 +166,25 @@ public class SteepestDescent extends Descent{
 			v1 = execute.getV1();
 			v2 = execute.getV2();	
 		}
-		
+
 		//print the last BMM
 		ro.printRelocateMatrix();
-		
+
 		printResultsToConsole();
 		printResultsToFile();
-		
+
 		//if the solution was random, memorize the result
-		if(mode == 3) {
+		if(mode == 4) {
 			soln = new RandomSolution(super.getTotalCost(), super.getVehicleCount(),super.vrp.m, super.getVehicles());
 		}
+
+
 	}
 
+
+	public RandomSolution getRandomSolution() {
+		return this.soln;
+	}
 
 	/**
 	 * Main method for testing
@@ -189,19 +195,30 @@ public class SteepestDescent extends Descent{
 		String in = args[0];
 		int num = Integer.parseInt(args[1]);
 		VRP vrp = new VRP(in, num);
-		
+
 		String fileOut = in.substring(0, in.length()-4);
 		fileOut += "_Solution.txt";
 
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
+		stDesc.solve(4);
+		System.out.println(stDesc.getRandomSolution().getCost());
+
+		RandomSolution rs = stDesc.getRandomSolution();
+		for(int i = 0 ; i < 8 ; i++) {
+			vrp = new VRP(in, num);
+			stDesc = new SteepestDescent(vrp,fileOut);
+			stDesc.solve(4);
+			rs.compare(stDesc.getRandomSolution());
+			
+		}
+		System.out.println(rs.getCost());
 
 
-		stDesc.solve(1);
 
 		TwoOptOperation two = new TwoOptOperation(vrp, num);
 
-		
-//		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+
+		//		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
 	}

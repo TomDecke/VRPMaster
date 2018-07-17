@@ -9,6 +9,13 @@ public class RandomSolution {
 	private ArrayList<Vehicle> soln;
 	
 	//TODO do I need to memorise in which vehicle the customers were? I.e since they are all identical
+	/**
+	 * Constructor for the solution
+	 * @param cost double, the cost of the solution
+	 * @param needed int, the number of proposed vehicles
+	 * @param available int, the number of available vehicles
+	 * @param v ArrayList<Vehicle>, the vehicles for the solution
+	 */
 	public RandomSolution(double cost, int needed, int available, ArrayList<Vehicle> v) {
 		this.cost = cost;
 		this.availableV = available;
