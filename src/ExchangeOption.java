@@ -12,6 +12,7 @@ public class ExchangeOption extends Option {
 	 * @param cV1 Customer, the customer located in v1
 	 * @param cV2 Customer, the customer located in v2
 	 * @param cost double, the change of cost incurred by this move
+ 	 * @param op Operation, the operation to which the exchange option belongs
 	 */
 	public ExchangeOption(Vehicle v1, Vehicle v2, Customer cV1, Customer cV2, double delta, Operation op) {
 		super(cV1,cV2,delta,v1,v2,op);
