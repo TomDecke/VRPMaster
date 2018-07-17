@@ -5,13 +5,13 @@
  */
 public class RelocateOption extends Option{
 
-
 	/**
 	 * Constructor to create a relocation-object
 	 * @param c Customer, the customer who is to be moved
 	 * @param delta double, the cost-reduction which occurs by the moving the customer
 	 * @param vFrom Vehicle, the vehicle from which the customer would be taken
 	 * @param vTo Vehicle, the vehicle to which the customer would be moved
+	 * @param op Operation, the operation to which the relocate option belongs
 	 */
 	public RelocateOption(Customer c, double delta, Vehicle vFrom, Vehicle vTo,Operation op) {
 		super(null,null,delta,vFrom,vTo,op);
@@ -50,7 +50,6 @@ public class RelocateOption extends Option{
 		return super.v2;
 	}
 
-	
 	/**
 	 * Accessor for the predecessor of the customer to move
 	 * @return Customer, the predecessor

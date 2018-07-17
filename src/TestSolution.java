@@ -60,7 +60,7 @@ public class TestSolution {
 					System.out.println("Customer in wrong vehicle");
 					return false;
 				}
-				
+
 				//check if the target of travel belongs to the vrp
 				if(cSucc.custNo > vrp.n) {
 					System.out.println("Customer does not belong to the VRP.");
@@ -144,6 +144,11 @@ public class TestSolution {
 		return true;
 	}
 
+	/**
+	 * Main method for testing
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException {
 
 		//get the input
@@ -165,19 +170,19 @@ public class TestSolution {
 			}	
 			System.out.println("");
 		}
-		
+
 		//get customers
 		Customer c1 = vrp.customer[1];
 		Customer c2 = vrp.customer[2];
 		Customer c3 = vrp.customer[3];
 		Customer c4 = vrp.customer[4];
 		Customer c5 = vrp.customer[5];
-		
+
 		//create unknown customer 
 		Customer cX = new Customer(7,48,48, 20,666,666,5);
 		cX.earliestStart = 666;
 		cX.latestStart = 666;
-		
+
 		//get vehicles
 		Vehicle v1 = vrp.vehicle[0];
 		Vehicle v2 = vrp.vehicle[1];
@@ -190,63 +195,63 @@ public class TestSolution {
 
 		//create array-list
 		ArrayList<Vehicle> testV = new ArrayList<Vehicle>();
-		
-		double dist = 0;
-		
-		//Test unknown customer
-//		cX.vehicle = v3;
-//		cX.succ = v3.lastCustomer;
-//		v3.lastCustomer.pred = cX;
-//		c3.succ = cX;
-//		cX.pred = c3;
-//		testV.add(v3);
 
-		
+		double dist = 0;
+
+		//Test unknown customer
+		//		cX.vehicle = v3;
+		//		cX.succ = v3.lastCustomer;
+		//		v3.lastCustomer.pred = cX;
+		//		c3.succ = cX;
+		//		cX.pred = c3;
+		//		testV.add(v3);
+
+
 		//TODO Test customer revisit
-//		c3.succ = cX;
-//		cX.pred = c3;
-//		cX.succ = v3.lastCustomer;
-//		v3.lastCustomer.pred = cX;
-//		cX.custNo = 3;
-//		cX.vehicle = v3;
-//		testV.add(v3);
-//		testV.add(v2);
-//		testV.add(v1);
-//		testV.add(v4);
-//		testV.add(v5);
-//		v3.show();
-		
-		
+		//		c3.succ = cX;
+		//		cX.pred = c3;
+		//		cX.succ = v3.lastCustomer;
+		//		v3.lastCustomer.pred = cX;
+		//		cX.custNo = 3;
+		//		cX.vehicle = v3;
+		//		testV.add(v3);
+		//		testV.add(v2);
+		//		testV.add(v1);
+		//		testV.add(v4);
+		//		testV.add(v5);
+		//		v3.show();
+
+
 		//Test customer in multiple vehicles
-//		v5.insertBetween(c1, c5, v5.lastCustomer);
-//		testV.add(v1);
-//		testV.add(v5);
-		
+		//		v5.insertBetween(c1, c5, v5.lastCustomer);
+		//		testV.add(v1);
+		//		testV.add(v5);
+
 		//Test omit customers
-//		testV.add(v1);
-//		testV.add(v2);
-		
+		//		testV.add(v1);
+		//		testV.add(v2);
+
 		//Test overloading a vehicle
-//		v2.insertBetween(c1, c2, v2.lastCustomer);
-//		testV.add(v2);
-		
+		//		v2.insertBetween(c1, c2, v2.lastCustomer);
+		//		testV.add(v2);
+
 		//Test time constraint violation
-//		v1.insertBetween(c5, c1, v1.lastCustomer);
-//		testV.add(v1);
-		
+		//		v1.insertBetween(c5, c1, v1.lastCustomer);
+		//		testV.add(v1);
+
 		//Test non-existing vehicle
-//		testV.add(vX);
-		
+		//		testV.add(vX);
+
 		//Test wrong distance proposal
-//		dist = -1;
-//		testV.add(v1);
-//		testV.add(v2);
-//		testV.add(v3);
-//		testV.add(v4);
-//		testV.add(v5);
+		//		dist = -1;
+		//		testV.add(v1);
+		//		testV.add(v2);
+		//		testV.add(v3);
+		//		testV.add(v4);
+		//		testV.add(v5);
 
 		TestSolution.runTest(vrp, dist, testV);
-		
+
 
 	}
 

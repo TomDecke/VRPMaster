@@ -16,6 +16,12 @@ public class VRP {
 	int capacity;
 	Customer depot;
 
+	/**
+	 * Constructor to create a VRP-instance
+	 * @param fname String, name of the file containing the VRP-instance
+	 * @param numberOfCustomers int, the number of customers for the problem
+	 * @throws IOException
+	 */
 	public VRP(String fname,int numberOfCustomers) throws IOException {
 		n = numberOfCustomers;
 		//create arrays/matrix of necessary size
@@ -58,7 +64,7 @@ public class VRP {
 			}
 
 		depot = customer[0];
-		
+
 		//Create one vehicle for each customer and add a customer
 		for (int i=0;i<n;i++){
 			//vehicle at array-position 0 gets the id 1
@@ -87,7 +93,7 @@ public class VRP {
 		if (y == null) return distance[0][x.custNo];
 		return distance[x.custNo][y.custNo];
 	}
-	
+
 	/**
 	 * Calculate the total cost of all vehicles
 	 * @return double, the total cost of travel

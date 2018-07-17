@@ -1,16 +1,21 @@
 import java.io.IOException;
 
+/**
+ * Main method to obtain solutions for VRPs
+ * @author Tom
+ *
+ */
 public class MainVRP {
 	public static void main(String[] args) throws IOException{
-		
+
 		//get the input
 		String in = args[0];
 		int numCustomer = Integer.parseInt(args[1]);
-		
+
 		String fileOut = in.substring(0, in.length()-4);
 		fileOut += "_Solution.txt";
-		
-		
+
+
 		//create verification instance and solver
 		VRP vrp = new VRP(in,numCustomer);
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
@@ -28,7 +33,7 @@ public class MainVRP {
 			System.out.println("Cost for vehicle "+v.id+": "+v.cost);	
 		}
 		System.out.println(" ");
-		
+
 		//print the results of the steepest descent
 		System.out.println("Results:");
 		stDesc.printResultsToConsole();
@@ -36,7 +41,7 @@ public class MainVRP {
 		//test the solution
 		System.out.println("Test:");
 		boolean valid = TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
-		
+
 		//if the solution is valid display it otherwise display a failure-message
 		if(valid) {
 			DisplayVRP dVRP = new DisplayVRP(in, numCustomer, fileOut);
@@ -46,7 +51,7 @@ public class MainVRP {
 			System.out.println(" ");
 			System.err.println("invalid solution");		
 		}
-		
+
 
 		System.out.println(fileOut);
 

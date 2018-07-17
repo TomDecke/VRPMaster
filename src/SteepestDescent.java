@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * 
+ * Class to apply steepest descent to a VRP-instance
  * @author Tom Decke
  *
  */
@@ -13,10 +13,7 @@ public class SteepestDescent extends Descent{
 	private RelocateOperation ro;
 	private ExchangeOperation eo;
 	private TwoOptOperation to;
-
 	private RandomSolution soln = null;
-
-
 
 	/**
 	 * Constructor for the steepest descent
@@ -40,8 +37,6 @@ public class SteepestDescent extends Descent{
 		ro.createOptionMatrix();
 		eo.createOptionMatrix();
 		to.createOptionMatrix();
-
-
 
 		ro.printRelocateMatrix();
 		System.out.println(" ");
@@ -177,11 +172,13 @@ public class SteepestDescent extends Descent{
 		if(mode == 4) {
 			soln = new RandomSolution(super.getTotalCost(), super.getVehicleCount(),super.vrp.m, super.getVehicles());
 		}
-
-
 	}
 
 
+	/**
+	 * Accessor for the solution
+	 * @return RandomSolution, the solution obtained by using random operations
+	 */
 	public RandomSolution getRandomSolution() {
 		return this.soln;
 	}
@@ -209,7 +206,7 @@ public class SteepestDescent extends Descent{
 			stDesc = new SteepestDescent(vrp,fileOut);
 			stDesc.solve(4);
 			rs.compare(stDesc.getRandomSolution());
-			
+
 		}
 		System.out.println(rs.getCost());
 

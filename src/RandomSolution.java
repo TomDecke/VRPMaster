@@ -1,13 +1,18 @@
 import java.io.*;
 import java.util.ArrayList;
 
+/**
+ * Class to keep track of the best solution when using random operations
+ * @author Tom Decke
+ *
+ */
 public class RandomSolution {
 
 	private double cost;
 	private int neededV;
 	private int availableV;
 	private ArrayList<Vehicle> soln;
-	
+
 	//TODO do I need to memorise in which vehicle the customers were? I.e since they are all identical
 	/**
 	 * Constructor for the solution
@@ -22,9 +27,9 @@ public class RandomSolution {
 		this.neededV = needed;
 		this.availableV = available;
 		this.soln = v;
-		
+
 	}
-	
+
 	/**
 	 * Compares the object to another solution and returns the better one
 	 * @param rs RandomSolution, the solution with which to compare
@@ -42,18 +47,34 @@ public class RandomSolution {
 		return this;
 	}
 
+	/**
+	 * Accessor for the cost of the solution
+	 * @return double, the cost
+	 */
 	public double getCost() {
 		return cost;
 	}
 
+	/**
+	 * Accessor for the vehicles needed by the solution
+	 * @return int, number of needed vehicles
+	 */
 	public int getNeededV() {
 		return neededV;
 	}
 
+	/**
+	 * Accessor for the solution
+	 * @return ArrayList<Vehicle>, the vehicles of the solution
+	 */
 	public ArrayList<Vehicle> getSoln() {
 		return soln;
 	}
 
+	/**
+	 * Write the solution to a file
+	 * @param fOut, the name for the output-file
+	 */
 	public void writeSolutionToFile(String fOut) {
 		//create a writer
 		FileWriter writer;
@@ -79,6 +100,5 @@ public class RandomSolution {
 		}catch(IOException ioe) {
 			System.out.println("Error whilst writing");
 		}
-}
-	
+	}
 }

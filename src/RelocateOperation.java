@@ -1,3 +1,8 @@
+/**
+ * Class to represent the relocate-heuristic
+ * @author Tom Decke
+ *
+ */
 public class RelocateOperation implements Operation{
 
 	private final double EPSILON = 1E-10;
@@ -5,6 +10,11 @@ public class RelocateOperation implements Operation{
 	private int numCustomers;
 	private Option[][] relocateMatrix;
 
+	/**
+	 * Constructor for the relocate operation
+	 * @param vrp VRP, the VRP to which the operation is to be applied
+	 * @param numCustomers int, the number of customers in the VRP
+	 */
 	public RelocateOperation(VRP vrp, int numCustomers) {
 		this.vrp = vrp;
 		this.numCustomers = numCustomers;
@@ -22,9 +32,6 @@ public class RelocateOperation implements Operation{
 			}
 		}
 	}
-
-
-
 
 	/**
 	 * Find customer who's relocation to another vehicle would have the highest benefit
@@ -73,13 +80,13 @@ public class RelocateOperation implements Operation{
 							if(Math.abs(newDistVTo) < EPSILON) {
 								newDistVTo = 0;
 							}
-							
+
 							//the new cost for the vehicles, if this move was to be made
 							double resultingCost = newDistVFrom * vFrom.costOfUse + newDistVTo * vTo.costOfUse;
 
 							//the change in cost
 							double deltaCost =  resultingCost - cCost;
-							
+
 							//catch computational inaccuracy
 							if(Math.abs(deltaCost) < EPSILON) {
 								deltaCost = 0;
@@ -129,8 +136,6 @@ public class RelocateOperation implements Operation{
 		return bestMove;
 	}
 
-
-
 	/**
 	 * Executes the relocation of a customer
 	 * @param bR RelocateOperation, option that is supposed to be executed 
@@ -145,7 +150,6 @@ public class RelocateOperation implements Operation{
 			bR.getV2().insertBetween(bR.getCToMove(), bR.getC1(), bR.getC2());
 		}
 	}
-
 
 	/**
 	 * Find the new best customer to move for vehicle-relations that were affected by a change
@@ -164,7 +168,6 @@ public class RelocateOperation implements Operation{
 			relocateMatrix[vTo.index][i] = findBestOption(vFrom, vCheck);
 		}
 	}
-
 
 	/**
 	 * Construct the current best move matrix, showing which customer to move from which vehicle to an other
@@ -199,8 +202,4 @@ public class RelocateOperation implements Operation{
 			System.out.println("");
 		}
 	}
-
-
-
-
 }

@@ -1,5 +1,10 @@
 import java.util.ArrayList;
 
+/**
+ * Class to represent the 2-opt-heuristic
+ * @author Tom Decke
+ *
+ */
 public class TwoOptOperation implements Operation{
 
 	private static final double EPSILON = 1E-10;
@@ -8,12 +13,21 @@ public class TwoOptOperation implements Operation{
 	private int numCustomers;
 	private Option[] twoOptMatrix;
 
+
+	/**
+	 * Constructor for the 2-opt operation
+	 * @param vrp VRP, the VRP to which the operation is to be applied
+	 * @param numCustomers int, the number of customers in the VRP
+	 */
 	public TwoOptOperation(VRP vrp, int numCustomers) {
 		this.vrp = vrp;
 		this.numCustomers = numCustomers;
 		this.twoOptMatrix = new Option[numCustomers];
 	}
 
+	/**
+	 * Create the matrix containing the best 2-opt-options for each vehicle
+	 */
 	@Override
 	public void createOptionMatrix() {
 		for(int i = 0; i < numCustomers; i++) {
@@ -21,6 +35,11 @@ public class TwoOptOperation implements Operation{
 		}
 	}
 
+	/**
+	 * Find the new best 2-opts for vehicles that were affected by a change
+	 * @param v1 Vehicle, the first vehicle that was affected by the last option
+	 * @param v2 Vehicle, the second vehicle that was affected by the last option
+	 */
 	@Override
 	public void updateOptionMatrix(Vehicle v1, Vehicle v2) {
 		twoOptMatrix[v1.index] = findBestOption(v1, v1);
@@ -72,7 +91,7 @@ public class TwoOptOperation implements Operation{
 		}
 	}
 
-	
+
 	/**
 	 * Get the best option of the twoOptMatrix
 	 * @return Option, the best option
@@ -134,7 +153,7 @@ public class TwoOptOperation implements Operation{
 		//return the best two opt
 		return twoOpt;
 	}
-	
+
 	/**
 	 * Check if the route between two customers can be reversed
 	 * @param newStart Customer, the start of the new middle route

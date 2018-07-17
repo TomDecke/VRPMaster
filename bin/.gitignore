@@ -1,10 +1,10 @@
-/Solution.txt
 /CrossExOperation.class
 /CrossExOption.class
 /Customer.class
 /Descent.class
 /DisplayVRP.class
 /ExchangeOperation.class
+/addOns/
 /ExchangeOption.class
 /FirstFitDescent.class
 /MainVRP.class
@@ -13,12 +13,10 @@
 /RandomSolution.class
 /RelocateOperation.class
 /RelocateOption.class
+/RunDescents.class
 /SteepestDescent.class
 /TestSolution.class
 /TwoOptOperation.class
 /TwoOptOption.class
 /VRP.class
 /Vehicle.class
-/addOns/
-/RunDescents.class
-/solomon_100/

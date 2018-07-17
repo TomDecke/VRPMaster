@@ -2,7 +2,7 @@ import java.io.IOException;
 import addOns.TimeConstraintViolationException;
 
 /**
- * Class modelling a vehicle for a VRP-instance
+ * Class modeling a vehicle for a VRP-instance
  * @author Patrick Prosser
  *
  */
@@ -40,10 +40,10 @@ public class Vehicle {
 		firstCustomer.succ = lastCustomer;
 		lastCustomer.pred = firstCustomer;
 	}
-	
+
 	/**
 	 * Creates a copy of this vehicle
-	 * @return Vehicle the copy
+	 * @return Vehicle, the copy
 	 */
 	public Vehicle copy() {
 		//take the values of this vehicle for the copy
@@ -51,7 +51,7 @@ public class Vehicle {
 		nV.load = this.load;
 		nV.cost = this.cost;
 		nV.setDistance(this.distance);
-		
+
 		//copy the customers into the vehicle
 		Customer cPred = nV.firstCustomer;
 		Customer cCur = this.firstCustomer.succ;
@@ -59,7 +59,7 @@ public class Vehicle {
 			Customer cCopy = cCur.copy();
 			cPred.succ = cCopy;
 			cCopy.pred = cPred;
-			
+
 			//move to the next one
 			cPred = cCopy;
 			cCur = cCur.succ;
@@ -111,6 +111,11 @@ public class Vehicle {
 		return true;
 	}
 
+	/**
+	 * Check if the vehicle can accommodate a customer
+	 * @param c Customer, the customer to be checked
+	 * @return boolean, true if the vehicle can accommodate the customer, false otherwise
+	 */
 	public boolean canAccomodate(Customer c) {
 		if(this.capacity < this.load + c.demand) {
 			return false;
@@ -221,22 +226,22 @@ public class Vehicle {
 	 * @throws IOException
 	 */
 	public static void main(String[] args)  throws IOException {
-		
+
 		//get the input
 		String in = args[0];
 		int numCustomer = Integer.parseInt(args[1]);
-		
+
 		VRP vrp = new VRP(in,numCustomer);
-		
+
 		String fileOut = in.substring(0, in.length()-4);
 		fileOut += "_Solution.txt";
-	
+
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
 
 		//run the solver
 		System.out.println("");
 		stDesc.solve(0);
-		
+
 		System.out.println("Copy test: ");
 		Vehicle v1 = stDesc.getVehicles().get(0);
 		v1.show();

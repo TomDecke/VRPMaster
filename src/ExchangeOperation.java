@@ -1,3 +1,8 @@
+/**
+ * Class to represent the exchange-heuristic
+ * @author Tom
+ *
+ */
 public class ExchangeOperation implements Operation {
 
 	private final double EPSILON = 1E-10;
@@ -5,6 +10,11 @@ public class ExchangeOperation implements Operation {
 	private VRP vrp;
 	int numCustomers;
 
+	/**
+	 * Constructor for the exchange operation
+	 * @param vrp VRP, the VRP to which the operation is to be applied
+	 * @param numCustomers int, the number of customers in the VRP
+	 */
 	public ExchangeOperation(VRP vrp, int numCustomers) {
 		this.vrp = vrp;
 		this.numCustomers = numCustomers;
@@ -94,7 +104,6 @@ public class ExchangeOperation implements Operation {
 			//move on to the next vehicle of customer one
 			cV1 = cV1.succ;
 		}
-
 		return bestExchange;
 	}
 

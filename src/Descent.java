@@ -2,29 +2,37 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Super class to accomodate the basic functionality for optimization-processes.
+ * @author Tom Decke
+ *
+ */
 public abstract class Descent {
-	protected String out;
+	/**name of the output file*/
+	protected String fOut;
+	/**problem instance*/
 	protected VRP vrp;
+	/**customers in the problem instance*/
 	protected int numCustomers;
-	
+
+	/**
+	 * Constructor for the descent
+	 * @param vrp VRP, the problem instance
+	 * @param fOut String, the name of the file to which the result should be printed
+	 */
 	public Descent(VRP vrp, String fOut) {
 		this.vrp = vrp;
 		this.numCustomers = vrp.n;
-		this.out = fOut;
+		this.fOut = fOut;
 	}
-	
-	public String getOut() {
-		return out;
-	}
-	public VRP getVrp() {
-		return vrp;
-	}
-	public int getNumCustomers() {
-		return numCustomers;
-	}
-	
+
+
+	/**
+	 * Execute the descent to find a solution to the VRP-instance
+	 * @param mode int, the mode that determines which combination of operators is used
+	 */
 	public abstract void solve(int mode);
-	
+
 	/**
 	 * After executing @see solve(), this method can be used to obtain the vehicles, which are present in the solution 
 	 * @return ArrayList<Vehicle>, list of vehicles with customers
@@ -40,7 +48,7 @@ public abstract class Descent {
 		}
 		return vehicles;
 	}
-	
+
 	/**
 	 * After executing @see solve(), this method can be used to show the number of needed vehicles and the total cost
 	 */
@@ -50,6 +58,10 @@ public abstract class Descent {
 		System.out.println(" ");
 	}
 
+	/**
+	 * Executes an improvement option
+	 * @param o Option, the option to execute
+	 */
 	public void executeMove(Option o) {
 		o.getOperation().executeOption(o);
 	}
@@ -61,7 +73,7 @@ public abstract class Descent {
 		//create a writer
 		FileWriter writer;
 		try {
-			writer 	= new FileWriter(out);
+			writer 	= new FileWriter(fOut);
 			//write the cost of the solution
 			writer.write(""+vrp.m +" "+this.getVehicleCount()+"\n");
 
@@ -110,7 +122,6 @@ public abstract class Descent {
 		return vrp.calcTotalCost();
 	}
 
-
 	/**
 	 * Accessor for the VRP
 	 * @return VRP, the VRP-instance of the class
@@ -118,5 +129,20 @@ public abstract class Descent {
 	public VRP getVRP() {
 		return this.vrp;
 	}
-	
+
+	/**
+	 * Accessor for the output-file-name
+	 * @return String, the name of the output-file
+	 */
+	public String getFOut() {
+		return this.fOut;
+	}
+
+	/**
+	 * Accessor for the number of customers in the VRP
+	 * @return int, the number of customers
+	 */
+	public int getNumCustomers() {
+		return numCustomers;
+	}
 }

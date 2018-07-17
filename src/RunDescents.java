@@ -6,7 +6,7 @@ import java.io.*;
  *
  */
 public class RunDescents {
-	
+
 	private static final int RANDOM_RUNS = 10;
 
 	public static void main(String[] args) throws IOException {
@@ -23,7 +23,7 @@ public class RunDescents {
 		//create a folder for the results
 		File result = new File(resultpath);
 		result.mkdir();
-		
+
 		//get the files in the target directory
 		File folder = new File(folderpath);
 		File[] listOfFiles = folder.listFiles();
@@ -34,13 +34,13 @@ public class RunDescents {
 		//go through the files in the directory
 		for (File file : listOfFiles) {
 			if (file.isFile()) {
-				
+
 				writer.write(file.getName()+"\n");
 				String vrpInstance = folderpath +file.getName();
 
 				//execute the first four modes for steepest descent 
 				for(int i = 0; i < 4; i++) {
-					
+
 					vrp = new VRP(vrpInstance, numCustomers);
 					//get the descent specified by the input
 					if(steepest) {
@@ -58,7 +58,7 @@ public class RunDescents {
 						writer.write(String.format("cost: %.1f needed Vehicles: %d%n", desc.getTotalCost(),desc.getVehicleCount()));
 					}
 				}
-				
+
 				//determine the random result
 				if(steepest) {
 					SteepestDescent stDesc = new SteepestDescent(vrp, resultpath + "mode_4_"+  file.getName());
@@ -69,11 +69,14 @@ public class RunDescents {
 						stDesc = new SteepestDescent(vrp, resultpath + "mode_4_"+  file.getName());
 						stDesc.solve(4);
 						rs.compare(stDesc.getRandomSolution());
-						
+
 					}
+
+					rs.writeSolutionToFile(resultpath + "mode_r_"+  file.getName());
 					writer.write("mode rand:");
 					writer.write(String.format("cost: %.1f needed Vehicles: %d%n", rs.getCost(),rs.getNeededV()));
 					writer.write("\n");
+
 				}
 			}
 		}

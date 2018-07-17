@@ -8,7 +8,7 @@ import addOns.StdDraw;
  *
  */
 public class DisplayVRP {
-	
+
 	private String vrpInstance;
 	private int xMax, xMin, yMax, yMin;
 	private int xDepot, yDepot;
@@ -16,17 +16,23 @@ public class DisplayVRP {
 	private double costSol;
 	private int numVehicles;
 	private ArrayList<int[]> vehicles; 
-	
+
+	/**
+	 * Constructor to enable the display of solutions for a VRP-instance
+	 * @param vrpInstance String, the path to the instance
+	 * @param numCust int, the number of customers in the instance
+	 * @param sol String, the path to the proposed solution
+	 */
 	public DisplayVRP(String vrpInstance, int numCust, String sol) {
-		
+
 		try {
 			this.vrpInstance = vrpInstance;
 			this.vrp = new VRP(vrpInstance,numCust);
 			vehicles = new ArrayList<int[]>();
-			
+
 			this.xDepot = vrp.depot.xCoord;
 			this.yDepot = vrp.depot.yCoord;
-			
+
 			//create reader to take in the solution
 			FileReader reader;
 			Scanner sc;
@@ -37,7 +43,8 @@ public class DisplayVRP {
 			numCust = sc.nextInt();
 			numVehicles = sc.nextInt();
 			sc.nextLine();
-			
+
+			//extract the routes from the file
 			int vCount = 0;
 			while(sc.hasNextLine() && vCount < numVehicles) {
 				String[] vArray = sc.nextLine().split("[ ]+");
@@ -51,8 +58,8 @@ public class DisplayVRP {
 			//retrieve the cost
 			String[] tmp = sc.nextLine().split(" ");
 			costSol = Double.parseDouble(tmp[2]);
-			
-			
+
+
 			//Get the size of the map
 			xMax = vrp.customer[0].xCoord;
 			xMin = xMax;
@@ -67,7 +74,7 @@ public class DisplayVRP {
 				else if (currentX < xMin) {
 					xMin = currentX;
 				}
-				
+
 				if(currentY > yMax) {
 					yMax = currentY;
 				}
@@ -77,10 +84,10 @@ public class DisplayVRP {
 			}
 			//Add buffer in the lower dimension to accommodate text
 			yMin -= 5;
-			
+
 			reader.close();
 			sc.close();
-			
+
 		} catch(FileNotFoundException fnfe) {
 			System.err.println("File not found");
 		} catch(IOException ioe) {
@@ -88,7 +95,7 @@ public class DisplayVRP {
 		}
 
 	}
-	
+
 	/**
 	 * Accessor for the cost of the solution
 	 * @return double, the cost
@@ -96,7 +103,7 @@ public class DisplayVRP {
 	public double getCostSol() {
 		return this.costSol;
 	}
-	
+
 	/**
 	 * Accessor for the vehicles
 	 * @return ArrayList<int[]>
@@ -104,7 +111,7 @@ public class DisplayVRP {
 	public ArrayList<int[]> getVehicles(){
 		return vehicles;
 	}
-	
+
 	/**
 	 * Plots the cities of a VRP-instance
 	 */
@@ -112,17 +119,17 @@ public class DisplayVRP {
 		//set up a new plot
 		StdDraw.clear(StdDraw.WHITE);
 		StdDraw.setXscale(xMin, xMax);
-	    StdDraw.setYscale(yMin, yMax);
-	    
-	    //set customer size and print them to the map
-	    StdDraw.setPenRadius(0.005);
-	    for(Customer c : vrp.customer){
-	    	StdDraw.point(c.xCoord, c.yCoord);
-	    }
-	    
-	    StdDraw.show(0);
+		StdDraw.setYscale(yMin, yMax);
+
+		//set customer size and print them to the map
+		StdDraw.setPenRadius(0.005);
+		for(Customer c : vrp.customer){
+			StdDraw.point(c.xCoord, c.yCoord);
+		}
+
+		StdDraw.show(0);
 	}
-	
+
 	/**
 	 * Draw the solution
 	 */
@@ -130,39 +137,42 @@ public class DisplayVRP {
 		//set up a new plot
 		StdDraw.clear(StdDraw.LIGHT_GRAY);
 		StdDraw.setXscale(xMin, xMax);
-	    StdDraw.setYscale(yMin, yMax);
-	    
-	    StdDraw.textLeft(xMin,yMin,vrpInstance.substring(vrpInstance.length()-20, vrpInstance.length()));
-	    StdDraw.textRight(xMax,yMin,String.format("Distance: %.3f", costSol));
-	    
-	    //determine customer size and print them to the map
-	    StdDraw.setPenRadius(0.008);
-	    for(Customer c : vrp.customer){
-	    	StdDraw.point(c.xCoord, c.yCoord);
-	    }
-	    StdDraw.setPenRadius(0.0005);
-	    for(int[] vehicle : vehicles) {
-		    
-		    //draw the line from the depot to the first customer
-		    int firstCustomer = vehicle[0];
-		    StdDraw.line(xDepot, yDepot,vrp.customer[firstCustomer].xCoord,vrp.customer[firstCustomer].yCoord);
-		    
-		    //draw the tour-intermediates
-	    	for(int i = 0; i< vehicle.length-1; i++) {
-	    		Customer cCur = vrp.customer[vehicle[i]];
-	    		Customer cSucc = vrp.customer[vehicle[i+1]];
-	    		StdDraw.line(cCur.xCoord, cCur.yCoord, cSucc.xCoord, cSucc.yCoord);
-	    	}
-	    	
-	    	//draw the line from the last customer back to the depot
-	    	int lastCustomer = vehicle[vehicle.length-1];
-		    StdDraw.line(vrp.customer[lastCustomer].xCoord,vrp.customer[lastCustomer].yCoord,xDepot, yDepot);
-	    }
-	    
-	    
-	    StdDraw.show(0);
+		StdDraw.setYscale(yMin, yMax);
+
+		//write file name and solution cost
+		StdDraw.textLeft(xMin,yMin,vrpInstance.substring(vrpInstance.length()-20, vrpInstance.length()));
+		StdDraw.textRight(xMax,yMin,String.format("Distance: %.3f", costSol));
+
+		//determine customer size and print them to the map
+		StdDraw.setPenRadius(0.008);
+		for(Customer c : vrp.customer){
+			StdDraw.point(c.xCoord, c.yCoord);
+		}
+
+		//reset the pen-size and draw the connections
+		StdDraw.setPenRadius(0.0005);
+		for(int[] vehicle : vehicles) {
+
+			//draw the line from the depot to the first customer
+			int firstCustomer = vehicle[0];
+			StdDraw.line(xDepot, yDepot,vrp.customer[firstCustomer].xCoord,vrp.customer[firstCustomer].yCoord);
+
+			//draw the tour-intermediates
+			for(int i = 0; i< vehicle.length-1; i++) {
+				Customer cCur = vrp.customer[vehicle[i]];
+				Customer cSucc = vrp.customer[vehicle[i+1]];
+				StdDraw.line(cCur.xCoord, cCur.yCoord, cSucc.xCoord, cSucc.yCoord);
+			}
+
+			//draw the line from the last customer back to the depot
+			int lastCustomer = vehicle[vehicle.length-1];
+			StdDraw.line(vrp.customer[lastCustomer].xCoord,vrp.customer[lastCustomer].yCoord,xDepot, yDepot);
+		}
+
+
+		StdDraw.show(0);
 	}
-	
+
 	/**
 	 * Main method for testing
 	 * @param args
@@ -173,6 +183,6 @@ public class DisplayVRP {
 		String sol = "H:\\Masterthesis\\visualization\\r101-100.txt";
 		DisplayVRP distVRP = new DisplayVRP(vrpInstance, numCust, sol);
 		distVRP.plotVRPSolution();
-		
+
 	}
 }

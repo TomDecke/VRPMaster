@@ -2,7 +2,7 @@ import addOns.TimeConstraintViolationException;
 import java.io.*;
 
 /**
- * Class modelling a customer for a VRP-instance
+ * Class modeling a customer for a VRP-instance
  * @author Patrick Prosser
  *
  */
@@ -14,10 +14,23 @@ public class Customer {
 	Vehicle vehicle;
 	VRP vrp;
 
+	/**
+	 * Default-constructor to create an empty customer
+	 */
 	public Customer(){
 		pred = succ = null;
 	}
 
+	/**
+	 * Constructor to create a customer
+	 * @param custNo int, id of the customer
+	 * @param xCoord int, x-coordinate
+	 * @param yCoord int, y-coordinate
+	 * @param demand int, demand of the customer
+	 * @param readyTime int, time the customer is available
+	 * @param dueDate int, time the vehicle needs to arrive at the customer
+	 * @param serviceTime int, time it takes to serve the customer
+	 */
 	public Customer (int custNo,int xCoord,int yCoord, int demand,int readyTime, int dueDate,int serviceTime){
 		this.custNo = custNo;
 		this.xCoord = xCoord;
@@ -33,8 +46,12 @@ public class Customer {
 	}
 
 
-	// assuming this, y and z are all non-null can we
-	// insert this customer between customers y and z?
+	/**
+	 * Check if this customer can be inserted between y and z
+	 * @param y Customer, potential predecessor
+	 * @param z Customer, potential successor
+	 * @return boolean, true if this customer fits between y and z
+	 */
 	boolean canBeInsertedBetween(Customer y,Customer z){
 		double es = Math.max(this.readyTime,y.earliestStart + y.serviceTime + vrp.distance(y,this));
 		double ls = Math.min(this.dueDate,z.latestStart - (this.serviceTime + vrp.distance(this,z)));
@@ -54,11 +71,16 @@ public class Customer {
 		propagateEarliestStart();
 	}
 
+	/**
+	 * Propagate the latest start for a customer (propagate left)
+	 * @throws TimeConstraintViolationException
+	 */
 	public void propagateLatestStart() throws TimeConstraintViolationException{
 		Customer current = this;
 		// propagate latestStart left
 		while (current.pred != null){
 			Customer cPred = current.pred;
+			//latest start is the minimum between due date and the time necessary to leave for the successor to be served
 			cPred.latestStart = Math.min(cPred.dueDate,current.latestStart - (cPred.serviceTime + vrp.distance(cPred,current)));
 			if(cPred.earliestStart > cPred.latestStart) {
 				throw new TimeConstraintViolationException("Updated latest start comes before current earliest start");
@@ -67,11 +89,16 @@ public class Customer {
 		}
 	}
 
+	/**
+	 * Propagate the earliest start for a customer (propagate right)
+	 * @throws TimeConstraintViolationException
+	 */
 	public void propagateEarliestStart() throws TimeConstraintViolationException {
 		Customer current = this;
 		// propagate earliestStart right
 		while (current.succ != null){
 			Customer cSucc = current.succ;
+			//earliest start is the max between arrival at and ready time of the customer
 			cSucc.earliestStart = Math.max(cSucc.readyTime,current.earliestStart + current.serviceTime + vrp.distance(current,cSucc));
 			if(cSucc.earliestStart > cSucc.latestStart) {
 				throw new TimeConstraintViolationException("Updated earliest start comes before current latest start");
@@ -97,7 +124,7 @@ public class Customer {
 		nC.vrp = this.vrp;
 		nC.earliestStart = this.earliestStart;
 		nC.latestStart = this.latestStart;
-		
+
 		return nC;
 	}
 

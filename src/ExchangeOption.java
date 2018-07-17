@@ -1,5 +1,5 @@
 /**
- * Class to represent a possible customer exchange.
+ * Class to represent a possible customer exchange
  * @author Tom Decke
  *
  */
@@ -57,6 +57,9 @@ public class ExchangeOption extends Option {
 		return super.delta;
 	}
 
+	/**
+	 * Print the information of the option to the console
+	 */
 	public void printOption() {
 		if(c1 == null) {
 			System.out.println(String.format("There are no customers to swap"));
