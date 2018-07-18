@@ -9,7 +9,7 @@ import java.io.*;
 public class Customer {
 
 	int custNo, xCoord, yCoord, demand, readyTime, dueDate, serviceTime;
-	double earliestStart, latestStart, twoOptLatest,twoOptEarliest; // ... can be reset to readyTime & dueDate 
+	double earliestStart, latestStart, checkLatest,checkEarliest; // ... can be reset to readyTime & dueDate 
 	Customer pred,succ;
 	Vehicle vehicle;
 	VRP vrp;

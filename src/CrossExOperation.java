@@ -56,9 +56,9 @@ public class CrossExOperation implements Operation{
 		CrossExOption bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, 0,this);
 
 		//TODO re-think this part ignore empty vehicles
-		if(cV1.succ.equals(v1.lastCustomer) || cV2.equals(v2.lastCustomer)) {
-			return bestCrossEx;
-		}
+		//		if(cV1.succ.equals(v1.lastCustomer) || cV2.equals(v2.lastCustomer)) {
+		//			return bestCrossEx;
+		//		}
 
 		//memorize the distance of the route-parts
 		double distUpToC1 = 0;
@@ -89,11 +89,11 @@ public class CrossExOperation implements Operation{
 					Customer cV2Succ = cV2.succ;
 
 					//calculate the change in cost due to this move
-					//TODO would just the distance-change multiplied by the cost of use be sufficient?
 					double delta = (distUpToC1  + distAfterC2 + vrp.distance(cV1, cV2Succ) - vrp.distance(cV1, cV1Succ)) * v1.costOfUse
 							+ (distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ) - vrp.distance(cV2, cV2Succ)) * v2.costOfUse
 							- (v1.cost + v2.cost);
 
+					//catch computational inaccuracy
 					if(Math.abs(delta)<EPSILON) {
 						delta = 0;
 					}
@@ -108,42 +108,19 @@ public class CrossExOperation implements Operation{
 						cV1Succ.pred = cV2;
 						cV2Succ.pred = cV1;
 
-						boolean exchangeSuccess = true;
 
-						try {
-							//check for time window violations
-							//make sure not to access [0][0] of the distance matrix
-							//TODO re-think position
-							if(cV1.custNo != 0 && cV2.custNo !=0 && cV2Succ.custNo != 0 && cV1Succ.custNo !=0) {
-								cV1.propagateEarliestStart();
-								cV1.propagateLatestStart();
-
-								cV2.propagateEarliestStart();
-								cV2.propagateLatestStart();
-							}
-
-						} catch (TimeConstraintViolationException e) {
-							//the swapping violated a constraint, thus reverse it
-							cV1.succ = cV1Succ;
-							cV2.succ = cV2Succ;
-
-							cV1Succ.pred = cV1;
-							cV2Succ.pred = cV2;
-
-							System.out.println(e.getMessage());
-
-						}
-
-						//in case of a success reset the situation and create a new best exchange
-						if(exchangeSuccess) {
+						//if the swap is conform to time window constraints remember the option
+						if(checkPropagation(v1) && checkPropagation(v2)) {
 							bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, delta,this);
-
-							cV1.succ = cV1Succ;
-							cV2.succ = cV2Succ;
-
-							cV1Succ.pred = cV1;
-							cV2Succ.pred = cV2;
 						}
+
+						//reverse the swap
+						cV1.succ = cV1Succ;
+						cV2.succ = cV2Succ;
+
+						cV1Succ.pred = cV1;
+						cV2Succ.pred = cV2;
+
 					}
 				}
 				//move to the next customer of vehicle 2
@@ -175,6 +152,44 @@ public class CrossExOperation implements Operation{
 		}
 
 		return bestCrossEx;
+	}
+
+	private boolean checkPropagation(Vehicle v) {
+		Customer cCur = v.firstCustomer;
+		while(cCur != null) {
+			cCur.checkEarliest = cCur.earliestStart;
+			cCur.checkLatest = cCur.latestStart;
+			cCur = cCur.succ;
+		}
+
+		//execute forward propagation
+		cCur = v.firstCustomer;
+		Customer cSucc = cCur.succ;
+		while(cSucc != null) {
+			cSucc.checkEarliest = Math.max(cSucc.readyTime,cCur.checkEarliest+cCur.serviceTime+vrp.distance(cCur,cSucc));
+			cCur = cSucc;
+			cSucc = cSucc.succ;
+		}
+		
+		//execute backward propagation
+		cCur = v.lastCustomer;
+		Customer cPred = cCur.pred;
+		while(cPred != null) {
+			cPred.checkLatest = Math.min(cPred.dueDate, cCur.checkLatest - cCur.serviceTime - vrp.distance(cPred, cCur));
+			cCur = cPred;
+			cPred = cPred.pred;
+		}
+		
+		//check for constraint violation
+		cCur = v.firstCustomer;
+		while(cCur != null) {
+			if(cCur.checkLatest < cCur.checkEarliest) {
+				System.out.println("Time window violation");
+				return false;
+			}
+			cCur = cCur.succ;
+		}
+		return true;
 	}
 
 	/**
@@ -304,14 +319,15 @@ public class CrossExOperation implements Operation{
 		String in = args[0];
 		int num = Integer.parseInt(args[1]);
 		VRP vrp = new VRP(in, num);
-		
+
 		String fileOut = in.substring(0, in.length()-4);
 		fileOut += "_Solution.txt";
 
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
 		stDesc.solve_CrossEx();
-	
-		TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+
+
+//		TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num,fileOut);
 		dVRP.plotVRPSolution();
 

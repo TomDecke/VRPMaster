@@ -193,8 +193,8 @@ public class TwoOptOperation implements Operation{
 
 			//get the propagation times
 			while(cCur != null) {
-				cCur.twoOptEarliest = cCur.earliestStart;
-				cCur.twoOptLatest = cCur.latestStart;
+				cCur.checkEarliest = cCur.earliestStart;
+				cCur.checkLatest = cCur.latestStart;
 				cCur = cCur.succ;
 			}
 
@@ -202,7 +202,7 @@ public class TwoOptOperation implements Operation{
 			cCur = oldStart;
 			Customer cSucc = newStart;
 			while (!cSucc.equals(oldStart)) {
-				cSucc.twoOptEarliest = Math.max(cSucc.readyTime,cCur.twoOptEarliest+cCur.serviceTime+vrp.distance(cCur,cSucc));
+				cSucc.checkEarliest = Math.max(cSucc.readyTime,cCur.checkEarliest+cCur.serviceTime+vrp.distance(cCur,cSucc));
 				//take the predecessor instead of the successor because of reversion
 				cCur = cSucc;
 				cSucc = cSucc.pred;
@@ -211,7 +211,7 @@ public class TwoOptOperation implements Operation{
 			//forward propagation for the remaining customers after the reversal (regular forward propagation)
 			cSucc = oldEnd;
 			while(cSucc != null) {
-				cSucc.twoOptEarliest = Math.max(cSucc.readyTime,cCur.twoOptEarliest+cCur.serviceTime+vrp.distance(cCur,cSucc));
+				cSucc.checkEarliest = Math.max(cSucc.readyTime,cCur.checkEarliest+cCur.serviceTime+vrp.distance(cCur,cSucc));
 				cCur = cSucc;
 				cSucc = cSucc.succ;
 			}
@@ -220,7 +220,7 @@ public class TwoOptOperation implements Operation{
 			cCur = oldEnd;
 			Customer cPred = newEnd;
 			while(!cPred.equals(newStart) ) {
-				cPred.twoOptLatest = Math.min(cPred.dueDate, cCur.twoOptLatest - cCur.serviceTime - vrp.distance(cPred, cCur));
+				cPred.checkLatest = Math.min(cPred.dueDate, cCur.checkLatest - cCur.serviceTime - vrp.distance(cPred, cCur));
 				//take the successor instead of the predecessor because of reversion
 				cCur = cPred;
 				cPred = cPred.succ;
@@ -229,7 +229,7 @@ public class TwoOptOperation implements Operation{
 			//backward propagation for the remaining customers before the reversal (regular backward propagation)
 			cCur = oldStart;
 			while(cPred != null) {
-				cPred.twoOptLatest = Math.min(cPred.dueDate, cCur.twoOptLatest - cCur.serviceTime - vrp.distance(cPred, cCur));
+				cPred.checkLatest = Math.min(cPred.dueDate, cCur.checkLatest - cCur.serviceTime - vrp.distance(cPred, cCur));
 				cCur = cPred;
 				cPred = cPred.pred;
 			}
@@ -237,7 +237,7 @@ public class TwoOptOperation implements Operation{
 			//check for time-constraint violations
 			cCur = v.firstCustomer;
 			while(cCur != null) {
-				if(cCur.twoOptLatest < cCur.twoOptEarliest) {
+				if(cCur.checkLatest < cCur.checkEarliest) {
 					System.out.println("Time window violation");
 					return 0;
 				}
