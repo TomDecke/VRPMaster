@@ -13,6 +13,7 @@ public abstract class Option {
 	protected Customer c1;
 	protected Customer c2;
 	protected double delta;
+	protected VehicleUpdate vup;
 
 	/**
 	 * Create an option
@@ -70,6 +71,14 @@ public abstract class Option {
 
 	public void setLoadForV2(int loadForV2) {
 		this.loadForV2 = loadForV2;
+	}
+
+	public VehicleUpdate getVup() {
+		return vup;
+	}
+
+	public void setVup(VehicleUpdate vup) {
+		this.vup = vup;
 	}
 
 	/**

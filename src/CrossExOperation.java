@@ -74,7 +74,7 @@ public class CrossExOperation implements Operation{
 			cV2 = v2.firstCustomer.succ;
 
 			distUpToC2 = vrp.distance(v2.firstCustomer, cV2);
-			distAfterC2 = v2.getDistance()-distUpToC2;
+			distAfterC2 = v2.getDistance() - distUpToC2;
 
 			loadUpToC2 = cV2.demand;
 			loadAfterC2 = v2.load - loadUpToC2;
@@ -112,6 +112,10 @@ public class CrossExOperation implements Operation{
 						//if the swap is conform to time window constraints remember the option
 						if(checkPropagation(v1) && checkPropagation(v2)) {
 							bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, delta,this);
+							double nD1 = distUpToC1  + distAfterC2 + vrp.distance(cV1, cV2Succ);
+							double nD2 = distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ);
+							VehicleUpdate vUp = new VehicleUpdate(nD1,nD2,newLoadV1,newLoadV2);
+							bestCrossEx.setVup(vUp);
 						}
 
 						//reverse the swap
@@ -252,9 +256,11 @@ public class CrossExOperation implements Operation{
 		v1.lastCustomer.vehicle = v1;
 		v2.lastCustomer.vehicle = v2;
 
+		VehicleUpdate vUp = bCE.getVup();
+		
 		//update the load of the vehicles after the exchange
-		v1.load = bCE.getLoadForV1(); 
-		v2.load = bCE.getLoadForV2();
+		v1.load = vUp.getNewLoadV1(); 
+		v2.load = vUp.getNewLoadV2();
 	}
 
 	/**
@@ -326,8 +332,30 @@ public class CrossExOperation implements Operation{
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
 		stDesc.solve_CrossEx();
 
+		for(Vehicle v : vrp.vehicle) {
+			
+			if(v.firstCustomer.succ.equals(v.lastCustomer)) {
+				v.cost = 0;
+			}
+			else {
+				double dist = 0;
+				Customer cCur = v.firstCustomer;
+				Customer cSucc = cCur.succ;
+				while(!cSucc.equals(v.lastCustomer)) {
+					dist += vrp.distance(cCur, cSucc);
+					cCur = cSucc;
+					cSucc = cSucc.succ;
+				}
+				v.cost = dist;
+				v.show();
+				System.out.println(v.cost);
+			}
+		}
 
-//		TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+		System.out.println("Le total cost:" +stDesc.getTotalCost());
+		
+		System.out.println("Here starts test");
+		TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num,fileOut);
 		dVRP.plotVRPSolution();
 

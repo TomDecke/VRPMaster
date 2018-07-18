@@ -114,6 +114,7 @@ public class TestSolution {
 
 			//sum up the total cost of the solution for later comparison
 			totalDist += vehicleDist * v.costOfUse;
+			System.out.println("Vehicle cost: " + vehicleDist * v.costOfUse);
 			System.out.println("Total distance so far: " + totalDist);
 			System.out.println("");
 		}
@@ -134,7 +135,7 @@ public class TestSolution {
 		//check for derivation between solution and control
 		//allow minor derivation, which might be due to computational errors
 		if(Math.abs(totalDist - solDist) > DERIVATION) {
-			System.out.println("Wrong distance. The distance of the solutions differ by: "+Math.abs(totalDist - solDist));
+			System.out.println("Wrong distance. The distance of the solutions differ by: "+(totalDist - solDist));
 			return false;
 		}
 		System.out.println("Total distance: " + totalDist);
