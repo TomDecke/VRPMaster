@@ -1,11 +1,14 @@
 
+import java.io.IOException;
+
 import addOns.TimeConstraintViolationException;
 
-public class CrossExOperation {
+public class CrossExOperation implements Operation{
 
+	private final double EPSILON = 1E-8;
 	private VRP vrp;
 	private int numCustomers;
-	private CrossExOption[][] crossExMatrix;
+	private Option[][] crossExMatrix;
 
 	public CrossExOperation(VRP vrp, int numCustomers) {
 		this.vrp=vrp;
@@ -16,11 +19,11 @@ public class CrossExOperation {
 	/**
 	 * Create the matrix containing the best cross exchange for two vehicles
 	 */
-	public void createCrossExMatrix() {
+	public void createOptionMatrix() {
 		//fill half of the matrix since exchanging between a & b is equivalent to exchanging between b & a
 		for(int i = 0 ; i < numCustomers ; i++) {
 			for(int j = i+1; j < numCustomers; j++) {
-				crossExMatrix[i][j] = findBestCrossEx(vrp.vehicle[i], vrp.vehicle[j]);
+				crossExMatrix[i][j] = findBestOption(vrp.vehicle[i], vrp.vehicle[j]);
 			}
 		}
 		printCrossEx();
@@ -33,7 +36,7 @@ public class CrossExOperation {
 	 * @param v2 Vehicle, the second vehicle for comparison
 	 * @return boolean, whether or not the cross exchange was successful
 	 */
-	public CrossExOption findBestCrossEx(Vehicle v1, Vehicle v2) {
+	public Option findBestOption(Vehicle v1, Vehicle v2) {
 
 		Customer cV1 = v1.firstCustomer;
 		Customer cV2 = v2.firstCustomer.succ;
@@ -50,7 +53,7 @@ public class CrossExOperation {
 		int newLoadV2 = loadUpToC2 + loadAfterC1;
 
 		//create a default best cross exchange without improvement
-		CrossExOption bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, 0);
+		CrossExOption bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, 0,this);
 
 		//TODO re-think this part ignore empty vehicles
 		if(cV1.succ.equals(v1.lastCustomer) || cV2.equals(v2.lastCustomer)) {
@@ -91,6 +94,10 @@ public class CrossExOperation {
 							+ (distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ) - vrp.distance(cV2, cV2Succ)) * v2.costOfUse
 							- (v1.cost + v2.cost);
 
+					if(Math.abs(delta)<EPSILON) {
+						delta = 0;
+					}
+
 					//make sure the move would be an improvement
 					if(delta < bestCrossEx.getDelta()) {
 
@@ -129,7 +136,7 @@ public class CrossExOperation {
 
 						//in case of a success reset the situation and create a new best exchange
 						if(exchangeSuccess) {
-							bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, delta);
+							bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, delta,this);
 
 							cV1.succ = cV1Succ;
 							cV2.succ = cV2Succ;
@@ -174,11 +181,11 @@ public class CrossExOperation {
 	 * Retrieve the best cross exchange option from the cross-exchange matrix
 	 * @return CrossExOption, the cross exchange option with the greatest benefit
 	 */
-	public CrossExOption fetchBestCrossEx() {
-		CrossExOption bestCrossEx = crossExMatrix[0][1];
+	public Option fetchBestOption() {
+		Option bestCrossEx = crossExMatrix[0][1];
 		for(int i = 0 ; i < numCustomers ; i++) {
 			for(int j = i+1; j < numCustomers; j++) {
-				CrossExOption curCrossEx = crossExMatrix[i][j];
+				Option curCrossEx = crossExMatrix[i][j];
 				if(curCrossEx.getDelta() < bestCrossEx.getDelta()) {
 					bestCrossEx = curCrossEx;
 				}
@@ -189,17 +196,17 @@ public class CrossExOperation {
 
 	/**
 	 * Execute the cross exchange between two vehicles
-	 * @param bCE CrossExOption, the cross exchange that is to be executed
+	 * @param bCE Option, the cross exchange that is to be executed
 	 */
-	public void executeCrossEx(CrossExOption bCE) {
+	public void executeOption(Option bCE) {
 
 		//get the involved vehicles
 		Vehicle v1 = bCE.getV1();
 		Vehicle v2 = bCE.getV2();
 
 		//get the customer needed for the exchange
-		Customer cV1 = bCE.getcV1();
-		Customer cV2 = bCE.getcV2();
+		Customer cV1 = bCE.getC1();
+		Customer cV2 = bCE.getC2();
 
 		Customer cV1Succ = cV1.succ;
 		Customer cV2Succ = cV2.succ;
@@ -240,23 +247,23 @@ public class CrossExOperation {
 	 * @param v1 Vehicle, the first vehicles that was involved in the cross-exchange
 	 * @param v2 Vehicle, the second vehicles that was involved in the cross-exchange
 	 */
-	public void updateCrossExMatrix(Vehicle v1, Vehicle v2){
+	public void updateOptionMatrix(Vehicle v1, Vehicle v2){
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle cV = vrp.vehicle[i];
 			int indV1 = v1.index;
 			int indV2 = v1.index;
 			//only consider inter-route and one way crossing
 			if(indV1 < i) {
-				crossExMatrix[i][indV1] = findBestCrossEx(v1, cV);
+				crossExMatrix[i][indV1] = findBestOption(v1, cV);
 			}
 			else if(indV1 > i) {
-				crossExMatrix[indV1][i] = findBestCrossEx(v1, cV);
+				crossExMatrix[indV1][i] = findBestOption(v1, cV);
 			}
 			if(indV2 < i) {
-				crossExMatrix[i][indV2] = findBestCrossEx(v2, cV);		
+				crossExMatrix[i][indV2] = findBestOption(v2, cV);		
 			}
 			else if(indV2 > i) {
-				crossExMatrix[indV2][i] = findBestCrossEx(v2, cV);		
+				crossExMatrix[indV2][i] = findBestOption(v2, cV);		
 			}
 		}
 	}
@@ -293,24 +300,17 @@ public class CrossExOperation {
 		}
 	}
 
-	public static void main(String[] args) {
-		/**
+	public static void main(String[] args) throws IOException {
+		String in = args[0];
+		int num = Integer.parseInt(args[1]);
+		VRP vrp = new VRP(in, num);
+		
+		String fileOut = in.substring(0, in.length()-4);
+		fileOut += "_Solution.txt";
 
-		 * Solve the problem with help of the cross exchange operator
+		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
+		stDesc.solve_CrossEx();
+	
 
-		public void solve_CrossEx() {
-
-		ceo.createCrossExMatrix();
-		CrossExOption crossEx = ceo.fetchBestCrossEx();
-		while(crossEx.getDelta() < 0) {
-			ceo.executeCrossEx(crossEx);
-			ceo.updateCrossExMatrix(crossEx.getV1(), crossEx.getV2());
-			crossEx = ceo.fetchBestCrossEx();
-		}
-
-		printResultsToConsole();
-		printResultsToFile();
-	}
-		 */
 	}
 }

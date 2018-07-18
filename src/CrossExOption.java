@@ -1,78 +1,57 @@
 
-public class CrossExOption {
-	private Vehicle v1;
-	private Vehicle v2;
-	private Customer cV1;
-	private Customer cV2;
-	private int loadForV1;
-	private int loadForV2;
-	private double delta;
+public class CrossExOption extends Option{
 	
-	public CrossExOption(Vehicle v1, Vehicle v2, Customer cV1, Customer cV2, int loadForV1, int loadForV2, double delta) {
-		this.v1 = v1;
-		this.v2 = v2;
-		this.cV1 = cV1;
-		this.cV2 = cV2;
-		this.loadForV1 = loadForV1;
-		this.loadForV2 = loadForV2;
-		this.delta = delta;
+	public CrossExOption(Vehicle v1, Vehicle v2, Customer cV1, Customer cV2, int loadForV1, int loadForV2, double delta, Operation op) {
+		super(cV1,cV2,delta,v1,v2,op);
+		super.loadForV1 = loadForV1;
+		super.loadForV2 = loadForV2;
 		
 	}
+	
 
+	@Override
 	public Vehicle getV1() {
-		return v1;
+		return super.v1;
 	}
 
-	public void setV1(Vehicle v1) {
-		this.v1 = v1;
-	}
 
+
+	@Override
 	public Vehicle getV2() {
-		return v2;
+		return super.v2;
 	}
 
-	public void setV2(Vehicle v2) {
-		this.v2 = v2;
+
+
+	@Override
+	public Customer getC1() {
+		return super.c1;
 	}
 
-	public Customer getcV1() {
-		return cV1;
+
+
+	@Override
+	public Customer getC2() {
+		return super.c2;
 	}
 
-	public void setcV1(Customer cV1) {
-		this.cV1 = cV1;
-	}
 
-	public Customer getcV2() {
-		return cV2;
-	}
 
-	public void setcV2(Customer cV2) {
-		this.cV2 = cV2;
+	@Override
+	public double getDelta() {
+		return super.delta;
 	}
 	
-	public int getLoadForV1() {
-		return loadForV1;
-	}
 
-	public void setLoadForV1(int loadForV1) {
-		this.loadForV1 = loadForV1;
-	}
+	@Override
+	public void printOption() {
+		if(c1 == null) {
+			System.out.println(String.format("There are no customers to swap"));
+		}
+		else {
+			System.out.println(String.format("Exchange after customer c%d from vehicle v%d with after customer c%d from vehicle v%d. Improvement: %.2f",c1.custNo,v1.id,c2.custNo,v2.id,delta));
 
-	public int getLoadForV2() {
-		return loadForV2;
-	}
-
-	public void setLoadForV2(int loadForV2) {
-		this.loadForV2 = loadForV2;
-	}
-
-	public double getDelta() {
-		return delta;
-	}
-
-	public void setDelta(double delta) {
-		this.delta = delta;
+		}
 	}
 	
 }

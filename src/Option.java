@@ -7,6 +7,8 @@ public abstract class Option {
 	protected Operation operator;
 	protected Vehicle v1;
 	protected Vehicle v2;
+	protected int loadForV1;
+	protected int loadForV2;
 	protected Customer cToMove;
 	protected Customer c1;
 	protected Customer c2;
@@ -52,6 +54,22 @@ public abstract class Option {
 	 */
 	public Operation getOperation() {
 		return this.operator;
+	}
+
+	public int getLoadForV1() {
+		return loadForV1;
+	}
+
+	public void setLoadForV1(int loadForV1) {
+		this.loadForV1 = loadForV1;
+	}
+
+	public int getLoadForV2() {
+		return loadForV2;
+	}
+
+	public void setLoadForV2(int loadForV2) {
+		this.loadForV2 = loadForV2;
 	}
 
 	/**

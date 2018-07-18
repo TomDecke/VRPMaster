@@ -9,7 +9,7 @@ import java.util.Random;
  *
  */
 public class SteepestDescent extends Descent{
-	//	private CrossExOperation ceo;
+	private CrossExOperation ceo;
 	private RelocateOperation ro;
 	private ExchangeOperation eo;
 	private TwoOptOperation to;
@@ -26,6 +26,7 @@ public class SteepestDescent extends Descent{
 		this.ro = new RelocateOperation(vrp, super.numCustomers);
 		this.eo = new ExchangeOperation(vrp, super.numCustomers);
 		this.to = new TwoOptOperation(vrp, super.numCustomers);
+		this.ceo = new CrossExOperation(vrp, super.numCustomers);
 	}
 
 	/**
@@ -173,6 +174,24 @@ public class SteepestDescent extends Descent{
 			soln = new RandomSolution(super.getTotalCost(), super.getVehicleCount(),super.vrp.m, super.getVehicles());
 		}
 	}
+	
+	public void solve_CrossEx() {
+
+		ceo.createOptionMatrix();
+		Option crossEx = ceo.fetchBestOption();
+		ceo.printCrossEx();
+		crossEx.printOption();
+	
+		while(crossEx.getDelta() < 0) {
+			ceo.executeOption(crossEx);
+			ceo.updateOptionMatrix(crossEx.getV1(), crossEx.getV2());
+			crossEx = ceo.fetchBestOption();
+		}
+
+		printResultsToConsole();
+		printResultsToFile();
+	}
+
 
 
 	/**
@@ -189,14 +208,26 @@ public class SteepestDescent extends Descent{
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException{
+		
 		String in = args[0];
 		int num = Integer.parseInt(args[1]);
 		VRP vrp = new VRP(in, num);
-
+		
 		String fileOut = in.substring(0, in.length()-4);
 		fileOut += "_Solution.txt";
 
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
+		stDesc.solve_CrossEx();
+		
+		System.exit(0);
+//		String in = args[0];
+//		int num = Integer.parseInt(args[1]);
+//		VRP vrp = new VRP(in, num);
+//
+//		String fileOut = in.substring(0, in.length()-4);
+//		fileOut += "_Solution.txt";
+//
+//		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
 		stDesc.solve(4);
 		System.out.println(stDesc.getRandomSolution().getCost());
 
