@@ -234,8 +234,8 @@ public class CrossExOperation implements Operation{
 		cTmp = v2.lastCustomer;
 		v2.lastCustomer = v1.lastCustomer;
 		v1.lastCustomer = cTmp;
-		//		v1.lastCustomer.vehicle = v1;
-		//		v2.lastCustomer.vehicle = v2;
+		v1.lastCustomer.vehicle = v1;
+		v2.lastCustomer.vehicle = v2;
 
 		//update the load of the vehicles after the exchange
 		v1.load = bCE.getLoadForV1(); 
@@ -248,22 +248,24 @@ public class CrossExOperation implements Operation{
 	 * @param v2 Vehicle, the second vehicles that was involved in the cross-exchange
 	 */
 	public void updateOptionMatrix(Vehicle v1, Vehicle v2){
+		int indV1 = v1.index;
+		int indV2 = v2.index;
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle cV = vrp.vehicle[i];
-			int indV1 = v1.index;
-			int indV2 = v1.index;
+
+
 			//only consider inter-route and one way crossing
 			if(indV1 < i) {
-				crossExMatrix[i][indV1] = findBestOption(v1, cV);
-			}
-			else if(indV1 > i) {
 				crossExMatrix[indV1][i] = findBestOption(v1, cV);
 			}
+			else if(indV1 > i) {
+				crossExMatrix[i][indV1] = findBestOption(v1, cV);
+			}
 			if(indV2 < i) {
-				crossExMatrix[i][indV2] = findBestOption(v2, cV);		
+				crossExMatrix[indV2][i] = findBestOption(v2, cV);		
 			}
 			else if(indV2 > i) {
-				crossExMatrix[indV2][i] = findBestOption(v2, cV);		
+				crossExMatrix[i][indV2] = findBestOption(v2, cV);		
 			}
 		}
 	}
@@ -275,25 +277,23 @@ public class CrossExOperation implements Operation{
 
 		//create the top line of the matrix with vehicle-id's
 		String format = "\\ |";
-		System.out.print(String.format("%5s",format));
+		System.out.print(String.format("%7s",format));
 		for(int i = 0 ; i < numCustomers; i++) {
 			format = "v"+vrp.vehicle[i].id+"|";
-			System.out.print(String.format("%5s", format));
+			System.out.print(String.format("%7s", format));
 		}
 		System.out.println("");
 
 		//print the move options line by line
 		for(int j = 0 ; j< numCustomers ; j++) {
 			format = "v"+vrp.vehicle[j].id+"|";
-			System.out.print(String.format("%5s", format));
+			System.out.print(String.format("%7s", format));
 			for(int k = 0; k<numCustomers;k++) {
 				if(k<=j) {
-					System.out.print(String.format("%5s","X |"));
+					System.out.print(String.format("%7s","X |"));
 				}
 				else {
-
-
-					System.out.print(String.format("%1.2f|", crossExMatrix[j][k].getDelta()));
+					System.out.print(String.format("%2.2f|", crossExMatrix[j][k].getDelta()));
 				}
 			}
 			System.out.println("");
@@ -311,6 +311,9 @@ public class CrossExOperation implements Operation{
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
 		stDesc.solve_CrossEx();
 	
+		TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+		DisplayVRP dVRP = new DisplayVRP(in, num,fileOut);
+		dVRP.plotVRPSolution();
 
 	}
 }
