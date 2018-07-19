@@ -1,5 +1,10 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.Locale.FilteringMode;
 
 /**
  * A class to verify the validity of a solution for an instance of the CVRPTW
@@ -145,6 +150,65 @@ public class TestSolution {
 		return true;
 	}
 
+	public static boolean testFile(String vrpIn, String vrpSoln) throws IOException {
+
+		int numCust = 0;
+		int numVehicles = 0;
+		double costSoln = 0;
+		ArrayList<int[]> vehicles = new ArrayList<int[]>();
+
+		//create reader to take in the solution
+		FileReader reader;
+		Scanner sc;
+		try {
+			reader = new FileReader(vrpSoln);
+
+			sc = new Scanner(reader);
+
+			//read number of customers and needed vehicles, then move to the next line
+			numCust = sc.nextInt();
+			numVehicles = sc.nextInt();
+			sc.nextLine();
+
+			//extract the routes from the file
+			int vCount = 0;
+			while(sc.hasNextLine() && vCount < numVehicles) {
+				String[] vArray = sc.nextLine().split("[ ]+");
+				int[] customers = new int[vArray.length-1];
+				for (int i = 0; i < vArray.length-1; i++) {
+					customers[i] = Integer.parseInt(vArray[i]);
+				}
+				vehicles.add(customers);
+				vCount++;
+			}
+			//retrieve the cost
+			String[] tmp = sc.nextLine().split(" ");
+			costSoln = Double.parseDouble(tmp[2]);
+
+			sc.close();
+			reader.close();
+		} catch (FileNotFoundException fnfe) {
+			System.out.println(fnfe.getMessage());
+		} 
+
+		VRP vrp = new VRP(vrpIn,numCust);
+
+		ArrayList<Vehicle> vSoln = new ArrayList<Vehicle>();
+		for(int i = 0; i < vehicles.size() ; i++) {
+			Vehicle cV = new Vehicle(vrp, i, vrp.capacity, 1, vrp.depot);
+			int[] customerIds = vehicles.get(i);
+			Customer cPred = cV.firstCustomer;
+			for(int id : customerIds) {
+				Customer cC = vrp.customer[id];
+				cV.insertBetween(cC, cPred, cV.lastCustomer);
+				cPred = cC;
+			}
+			vSoln.add(cV);		
+		}
+
+		return runTest(vrp, costSoln, vSoln);
+	}
+
 	/**
 	 * Main method for testing
 	 * @param args
@@ -251,7 +315,29 @@ public class TestSolution {
 		//		testV.add(v4);
 		//		testV.add(v5);
 
-		TestSolution.runTest(vrp, dist, testV);
+		//TestSolution.runTest(vrp, dist, testV);
+
+		ArrayList<Boolean> testResult = new ArrayList<Boolean>();
+		
+		String pPath = "C:\\Users\\Tom\\Documents\\Glasgow\\UniUnterlagen\\MasterProject\\solomon_benchmarks\\s-25_test\\";
+		String sPath = "C:\\Users\\Tom\\Documents\\Glasgow\\UniUnterlagen\\MasterProject\\solomon_benchmarks\\s-25_test\\results";
+		File folder = new File(sPath);
+		
+		File[] listOfFiles = folder.listFiles();
+		for (File file : listOfFiles) {
+			if (file.isFile()) {
+				String fName = file.getPath();
+				String vrpName = pPath+fName.substring(fName.length()-8, fName.length());
+				System.out.println(vrpName);
+				System.out.println(file.getName());
+				boolean result = testFile(vrpName,file.getAbsolutePath());
+				testResult.add(Boolean.valueOf(result));
+			}
+		}
+		
+		for(Boolean b : testResult) {
+			System.out.println(b.toString());
+		}
 
 
 	}

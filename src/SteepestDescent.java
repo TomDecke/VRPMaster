@@ -163,7 +163,7 @@ public class SteepestDescent extends Descent{
 			v2 = execute.getV2();	
 		}
 		
-		//update the cost of the vehicles
+		//ensure - up-to-date of the cost of the vehicles
 		for(Vehicle v : vrp.vehicle) {
 			
 			if(v.firstCustomer.succ.equals(v.lastCustomer)) {
