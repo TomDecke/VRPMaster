@@ -162,6 +162,27 @@ public class SteepestDescent extends Descent{
 			v1 = execute.getV1();
 			v2 = execute.getV2();	
 		}
+		
+		//update the cost of the vehicles
+		for(Vehicle v : vrp.vehicle) {
+			
+			if(v.firstCustomer.succ.equals(v.lastCustomer)) {
+				v.cost = 0;
+			}
+			else {
+				double dist = 0;
+				Customer cCur = v.firstCustomer;
+				Customer cSucc = cCur.succ;
+				while(cSucc != null) {
+					dist += vrp.distance(cCur, cSucc);
+					cCur = cSucc;
+					cSucc = cSucc.succ;
+				}
+				v.cost = dist;
+				v.show();
+				System.out.println(v.cost);
+			}
+		}
 
 		//print the last BMM
 		ro.printRelocateMatrix();
@@ -243,21 +264,18 @@ public class SteepestDescent extends Descent{
 		System.out.println(stDesc.getRandomSolution().getCost());
 
 		RandomSolution rs = stDesc.getRandomSolution();
-		for(int i = 0 ; i < 20 ; i++) {
+		for(int i = 0 ; i < 2 ; i++) {
 			vrp = new VRP(in, num);
 			stDesc = new SteepestDescent(vrp,fileOut);
-			stDesc.solve(4);
-			rs.compare(stDesc.getRandomSolution());
+			stDesc.solve(1);
+//			rs.compare(stDesc.getRandomSolution());
 
 		}
-		System.out.println(rs.getCost());
+//		System.out.println(rs.getCost());
 
 
 
-		TwoOptOperation two = new TwoOptOperation(vrp, num);
-
-
-		//		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
 		dVRP.plotVRPSolution();
 	}

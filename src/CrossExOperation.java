@@ -174,7 +174,7 @@ public class CrossExOperation implements Operation{
 			cCur = cSucc;
 			cSucc = cSucc.succ;
 		}
-		
+
 		//execute backward propagation
 		cCur = v.lastCustomer;
 		Customer cPred = cCur.pred;
@@ -183,7 +183,7 @@ public class CrossExOperation implements Operation{
 			cCur = cPred;
 			cPred = cPred.pred;
 		}
-		
+
 		//check for constraint violation
 		cCur = v.firstCustomer;
 		while(cCur != null) {
@@ -257,7 +257,7 @@ public class CrossExOperation implements Operation{
 		v2.lastCustomer.vehicle = v2;
 
 		VehicleUpdate vUp = bCE.getVup();
-		
+
 		//update the load of the vehicles after the exchange
 		v1.load = vUp.getNewLoadV1(); 
 		v2.load = vUp.getNewLoadV2();
@@ -332,29 +332,29 @@ public class CrossExOperation implements Operation{
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
 		stDesc.solve_CrossEx();
 
-		for(Vehicle v : vrp.vehicle) {
-			
-			if(v.firstCustomer.succ.equals(v.lastCustomer)) {
-				v.cost = 0;
-			}
-			else {
-				double dist = 0;
-				Customer cCur = v.firstCustomer;
-				Customer cSucc = cCur.succ;
-				while(!cSucc.equals(v.lastCustomer)) {
-					dist += vrp.distance(cCur, cSucc);
-					cCur = cSucc;
-					cSucc = cSucc.succ;
-				}
-				v.cost = dist;
-				v.show();
-				System.out.println(v.cost);
-			}
-		}
+//				for(Vehicle v : vrp.vehicle) {
+//					
+//					if(v.firstCustomer.succ.equals(v.lastCustomer)) {
+//						v.cost = 0;
+//					}
+//					else {
+//						double dist = 0;
+//						Customer cCur = v.firstCustomer;
+//						Customer cSucc = cCur.succ;
+//						while(cSucc != null) {
+//							dist += vrp.distance(cCur, cSucc);
+//							cCur = cSucc;
+//							cSucc = cSucc.succ;
+//						}
+//						v.cost = dist;
+//						v.show();
+//						System.out.println(v.cost);
+//					}
+//				}
 
 		System.out.println("Le total cost:" +stDesc.getTotalCost());
-		
-		System.out.println("Here starts test");
+
+		System.out.println("\nHere starts test\n");
 		TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num,fileOut);
 		dVRP.plotVRPSolution();

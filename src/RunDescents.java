@@ -72,6 +72,7 @@ public class RunDescents {
 
 					}
 
+									
 					rs.writeSolutionToFile(resultpath + "mode_r_"+  file.getName());
 					writer.write("mode rand:");
 					writer.write(String.format("cost: %.1f needed Vehicles: %d%n", rs.getCost(),rs.getNeededV()));
