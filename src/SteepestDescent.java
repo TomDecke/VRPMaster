@@ -112,24 +112,24 @@ public class SteepestDescent extends Descent{
 		}
 
 		//ensure up-to-date of the cost of the vehicles
-		for(Vehicle v : vrp.vehicle) {
-			//clear empty vehicles
-			if(v.firstCustomer.succ.equals(v.lastCustomer)) {
-				v.cost = 0;
-			}
-			else {
-				//re-evaluate the cost of occupied cars
-				double dist = 0;
-				Customer cCur = v.firstCustomer;
-				Customer cSucc = cCur.succ;
-				while(cSucc != null) {
-					dist += vrp.distance(cCur, cSucc);
-					cCur = cSucc;
-					cSucc = cSucc.succ;
-				}
-				v.cost = dist;
-			}
-		}
+//		for(Vehicle v : vrp.vehicle) {
+//			//clear empty vehicles
+//			if(v.firstCustomer.succ.equals(v.lastCustomer)) {
+//				v.cost = 0;
+//			}
+//			else {
+//				//re-evaluate the cost of occupied cars
+//				double dist = 0;
+//				Customer cCur = v.firstCustomer;
+//				Customer cSucc = cCur.succ;
+//				while(cSucc != null) {
+//					dist += vrp.distance(cCur, cSucc);
+//					cCur = cSucc;
+//					cSucc = cSucc.succ;
+//				}
+//				v.cost = dist * v.costOfUse;
+//			}
+//		}
 
 		printResultsToConsole();
 		printResultsToFile();
@@ -177,13 +177,13 @@ public class SteepestDescent extends Descent{
 		ExchangeOperation exo = new ExchangeOperation(vrp, num);
 		TwoOptOperation	  two = new TwoOptOperation(vrp, num);
 		CrossExOperation  ceo = new CrossExOperation(vrp, num);
- 		ops.add(rlo);
- 		ops.add(exo);
+//		ops.add(rlo);
+// 		ops.add(exo);
 // 		ops.add(two);
-// 		ops.add(ceo);
+ 		ops.add(ceo);
 		
 
-		stDesc.solve(ops, false);
+		stDesc.solve(ops, true);
 
 
 

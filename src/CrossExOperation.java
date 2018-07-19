@@ -26,7 +26,7 @@ public class CrossExOperation implements Operation{
 				crossExMatrix[i][j] = findBestOption(vrp.vehicle[i], vrp.vehicle[j]);
 			}
 		}
-		printCrossEx();
+		//printCrossEx();
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class CrossExOperation implements Operation{
 			while(!cV2.equals(v2.lastCustomer)) {
 
 				//make sure that a swap would not violate capacity constraints
-				if(newLoadV1 <= v1.capacity && newLoadV2 <= v2.capacity) {
+				if(newLoadV1 < v1.capacity && newLoadV2 < v2.capacity) {
 
 					//get the succeeding customers
 					Customer cV1Succ = cV1.succ;
@@ -106,8 +106,8 @@ public class CrossExOperation implements Operation{
 						//if the swap is conform to time window constraints remember the option
 						if(checkPropagation(v1) && checkPropagation(v2)) {
 							bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, delta,this);
-							double nD1 = distUpToC1  + distAfterC2 + vrp.distance(cV1, cV2Succ);
-							double nD2 = distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ);
+							double nD1 = distUpToC1  + distAfterC2 + vrp.distance(cV1, cV2Succ) - vrp.distance(cV1, cV1Succ);
+							double nD2 = distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ) - vrp.distance(cV2, cV2Succ);
 							VehicleUpdate vUp = new VehicleUpdate(nD1,nD2,newLoadV1,newLoadV2);
 							bestCrossEx.setVup(vUp);
 						}
@@ -182,7 +182,7 @@ public class CrossExOperation implements Operation{
 		cCur = v.firstCustomer;
 		while(cCur != null) {
 			if(cCur.checkLatest < cCur.checkEarliest) {
-				System.out.println("Time window violation");
+				//System.out.println("Time window violation");
 				return false;
 			}
 			cCur = cCur.succ;
@@ -255,7 +255,41 @@ public class CrossExOperation implements Operation{
 		//update the load of the vehicles after the exchange
 		v1.load = vUp.getNewLoadV1(); 
 		v2.load = vUp.getNewLoadV2();
+		
+		//update distance and cost of the vehicle
+		v1.setDistance(vUp.getNewDistV1());
+		v2.setDistance(vUp.getNewDistV2());
+		v1.cost = v1.getDistance() * v1.costOfUse;
+		v2.cost = v2.getDistance() * v2.costOfUse;
+		
+
+		updateVehicle(v1);
+		updateVehicle(v2);
+		
 	}
+	
+	private void updateVehicle(Vehicle v) {
+
+		if(v.firstCustomer.succ.equals(v.lastCustomer)) {
+			v.setDistance(0);
+			v.cost = 0;
+		}
+		else {
+//			//re-evaluate the cost of occupied cars
+//			double dist = 0;
+//			Customer cCur = v.firstCustomer;
+//			Customer cSucc = cCur.succ;
+//			while(cSucc != null) {
+//				dist += vrp.distance(cCur, cSucc);
+//				cCur = cSucc;
+//				cSucc = cSucc.succ;
+//			}
+//			v.setDistance(dist);
+//			v.cost = dist * v.costOfUse;
+		}
+	}
+	
+
 
 	/**
 	 * Update the cross-exchange matrix by finding new best crossings for the involved vehicles
@@ -267,7 +301,6 @@ public class CrossExOperation implements Operation{
 		int indV2 = v2.index;
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle cV = vrp.vehicle[i];
-
 
 			//only consider inter-route and one way crossing
 			if(indV1 < i) {
