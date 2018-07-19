@@ -1,11 +1,8 @@
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
+import java.io.*;
 
 public class TestFiles {
 
 	public static void main(String[] args) throws IOException {
-		ArrayList<Boolean> testResult = new ArrayList<Boolean>();
 
 		//path to the vrp-instance
 		String pPath = args[0];

@@ -162,14 +162,15 @@ public class SteepestDescent extends Descent{
 			v1 = execute.getV1();
 			v2 = execute.getV2();	
 		}
-		
-		//ensure - up-to-date of the cost of the vehicles
+
+		//ensure up-to-date of the cost of the vehicles
 		for(Vehicle v : vrp.vehicle) {
-			
+			//clear empty vehicles
 			if(v.firstCustomer.succ.equals(v.lastCustomer)) {
 				v.cost = 0;
 			}
 			else {
+				//re-evaluate the cost of occupied cars
 				double dist = 0;
 				Customer cCur = v.firstCustomer;
 				Customer cSucc = cCur.succ;
@@ -209,7 +210,7 @@ public class SteepestDescent extends Descent{
 		}
 
 		for(Vehicle v : vrp.vehicle) {
-			
+
 			if(v.firstCustomer.succ.equals(v.lastCustomer)) {
 				v.cost = 0;
 			}
@@ -229,8 +230,8 @@ public class SteepestDescent extends Descent{
 		}
 
 
-				printResultsToConsole();
-				printResultsToFile();
+		printResultsToConsole();
+		printResultsToFile();
 	}
 
 
@@ -250,14 +251,14 @@ public class SteepestDescent extends Descent{
 	 */
 	public static void main(String[] args) throws IOException{
 
-				String in = args[0];
-				int num = Integer.parseInt(args[1]);
-				VRP vrp = new VRP(in, num);
-		
-				String fileOut = in.substring(0, in.length()-4);
-				fileOut += "_Solution.txt";
-		
-				SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
+		String in = args[0];
+		int num = Integer.parseInt(args[1]);
+		VRP vrp = new VRP(in, num);
+
+		String fileOut = in.substring(0, in.length()-4);
+		fileOut += "_Solution.txt";
+
+		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
 		stDesc.solve(4);
 		System.out.println(stDesc.getRandomSolution().getCost());
 
@@ -266,10 +267,10 @@ public class SteepestDescent extends Descent{
 			vrp = new VRP(in, num);
 			stDesc = new SteepestDescent(vrp,fileOut);
 			stDesc.solve(1);
-//			rs.compare(stDesc.getRandomSolution());
+			//			rs.compare(stDesc.getRandomSolution());
 
 		}
-//		System.out.println(rs.getCost());
+		//		System.out.println(rs.getCost());
 
 
 
