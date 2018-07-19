@@ -160,11 +160,10 @@ public class ExchangeOperation implements Operation {
 	 * @param v2 Vehicle, the second vehicles that was involved in the exchange
 	 */
 	public void updateOptionMatrix(Vehicle v1, Vehicle v2){
-		//createOptionMatrix();
+		int indV1 = v1.index;
+		int indV2 = v2.index;
 		for(int i = 0; i < numCustomers; i++) {
 			Vehicle cV = vrp.vehicle[i];
-			int indV1 = v1.index;
-			int indV2 = v1.index;
 			//only consider inter-route changes and one way swapping
 			if(indV1 < i) {
 				exchangeMatrix[indV1][i] = findBestOption(v1, cV);

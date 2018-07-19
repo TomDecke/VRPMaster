@@ -72,11 +72,12 @@ public class SteepestDescent extends Descent{
 			v2.show();
 			System.out.println(" ");
 
-			//update relocate and find best move for comparison
+			//update the move matrices
 			for(Operation op : operators) {
 				op.updateOptionMatrix(v1, v2);
 			}
 
+			//get the next best move
 			execute = operators.get(0).fetchBestOption();
 			for(Operation op : operators) {
 				tmp = op.fetchBestOption();
@@ -85,6 +86,7 @@ public class SteepestDescent extends Descent{
 				}
 			}
 
+			//if the mode is random overwrite the found move
 			if(random) {
 				ArrayList<Option> options = new ArrayList<Option>();
 				Option cur = null;
