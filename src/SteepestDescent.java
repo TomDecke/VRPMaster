@@ -179,8 +179,6 @@ public class SteepestDescent extends Descent{
 					cSucc = cSucc.succ;
 				}
 				v.cost = dist;
-				v.show();
-				System.out.println(v.cost);
 			}
 		}
 

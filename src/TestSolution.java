@@ -272,7 +272,7 @@ public class TestSolution {
 		//		testV.add(v3);
 
 
-		//TODO Test customer revisit
+		//Test re-visit custoemr
 		//		c3.succ = cX;
 		//		cX.pred = c3;
 		//		cX.succ = v3.lastCustomer;
@@ -316,29 +316,6 @@ public class TestSolution {
 		//		testV.add(v5);
 
 		//TestSolution.runTest(vrp, dist, testV);
-
-		ArrayList<Boolean> testResult = new ArrayList<Boolean>();
-		
-		String pPath = "C:\\Users\\Tom\\Documents\\Glasgow\\UniUnterlagen\\MasterProject\\solomon_benchmarks\\s-25_test\\";
-		String sPath = "C:\\Users\\Tom\\Documents\\Glasgow\\UniUnterlagen\\MasterProject\\solomon_benchmarks\\s-25_test\\results";
-		File folder = new File(sPath);
-		
-		File[] listOfFiles = folder.listFiles();
-		for (File file : listOfFiles) {
-			if (file.isFile()) {
-				String fName = file.getPath();
-				String vrpName = pPath+fName.substring(fName.length()-8, fName.length());
-				System.out.println(vrpName);
-				System.out.println(file.getName());
-				boolean result = testFile(vrpName,file.getAbsolutePath());
-				testResult.add(Boolean.valueOf(result));
-			}
-		}
-		
-		for(Boolean b : testResult) {
-			System.out.println(b.toString());
-		}
-
 
 	}
 
