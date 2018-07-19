@@ -27,7 +27,6 @@ public class CrossExOperation implements Operation{
 			}
 		}
 		printCrossEx();
-
 	}
 
 	/**
@@ -54,11 +53,6 @@ public class CrossExOperation implements Operation{
 
 		//create a default best cross exchange without improvement
 		CrossExOption bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, 0,this);
-
-		//TODO re-think this part ignore empty vehicles
-		//		if(cV1.succ.equals(v1.lastCustomer) || cV2.equals(v2.lastCustomer)) {
-		//			return bestCrossEx;
-		//		}
 
 		//memorize the distance of the route-parts
 		double distUpToC1 = 0;
@@ -320,7 +314,12 @@ public class CrossExOperation implements Operation{
 			System.out.println("");
 		}
 	}
-
+	
+	/**
+	 * Main method for testing
+	 * @param args
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws IOException {
 		String in = args[0];
 		int num = Integer.parseInt(args[1]);
@@ -329,35 +328,6 @@ public class CrossExOperation implements Operation{
 		String fileOut = in.substring(0, in.length()-4);
 		fileOut += "_Solution.txt";
 
-		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
-		stDesc.solve_CrossEx();
-
-//				for(Vehicle v : vrp.vehicle) {
-//					
-//					if(v.firstCustomer.succ.equals(v.lastCustomer)) {
-//						v.cost = 0;
-//					}
-//					else {
-//						double dist = 0;
-//						Customer cCur = v.firstCustomer;
-//						Customer cSucc = cCur.succ;
-//						while(cSucc != null) {
-//							dist += vrp.distance(cCur, cSucc);
-//							cCur = cSucc;
-//							cSucc = cSucc.succ;
-//						}
-//						v.cost = dist;
-//						v.show();
-//						System.out.println(v.cost);
-//					}
-//				}
-
-		System.out.println("Le total cost:" +stDesc.getTotalCost());
-
-		System.out.println("\nHere starts test\n");
-		TestSolution.runTest(vrp, stDesc.getTotalCost(), stDesc.getVehicles());
-		DisplayVRP dVRP = new DisplayVRP(in, num,fileOut);
-		dVRP.plotVRPSolution();
 
 	}
 }

@@ -62,11 +62,11 @@ public class ExchangeOption extends Option {
 	 * Print the information of the option to the console
 	 */
 	public void printOption() {
-		if(c1 == null) {
+		if(c1 == null || c2 == null) {
 			System.out.println(String.format("There are no customers to swap"));
 		}
 		else {
-			System.out.println(String.format("Swap customer c%d from vehicle v%d with customer c%d from vehicle v%d",c1.custNo,v1.id,c2.custNo,v2.id));
+			System.out.println(String.format("Swap customer c%d from vehicle v%d with customer c%d from vehicle v%d. Improvement: %.2f",c1.custNo,v1.id,c2.custNo,v2.id,getDelta()));
 
 		}
 	}

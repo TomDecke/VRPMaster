@@ -127,4 +127,10 @@ public class FirstFitDescent extends Descent{
 		DisplayVRP disp = new DisplayVRP(in, num, fileOut);
 		disp.plotVRPSolution();
 	}
+
+	@Override
+	public void solve(ArrayList<Operation> ops, boolean random) {
+		// TODO Auto-generated method stub
+		
+	}
 }

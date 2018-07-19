@@ -32,6 +32,8 @@ public abstract class Descent {
 	 * @param mode int, the mode that determines which combination of operators is used
 	 */
 	public abstract void solve(int mode);
+	
+	public abstract void solve(ArrayList<Operation> ops, boolean random);
 
 	/**
 	 * After executing @see solve(), this method can be used to obtain the vehicles, which are present in the solution 
