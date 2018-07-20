@@ -15,8 +15,9 @@ public class TestFiles {
 		File[] listOfFiles = folder.listFiles();
 		for (File file : listOfFiles) {
 			if (file.isFile()) {
-				String fName = file.getPath();
-				String vrpName = pPath+fName.substring(fName.length()-8, fName.length());
+				String fName = file.getName();
+				String[] name = fName.split("_");
+				String vrpName = pPath+name[2];
 				//test if the solution is valid
 				boolean result = TestSolution.testFile(vrpName, numCustomer,file.getAbsolutePath());
 				if(!result) {
