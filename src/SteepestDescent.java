@@ -188,7 +188,7 @@ public class SteepestDescent extends Descent{
  		ops.add(ceo);
 		
 
-		stDesc.solve(ops, false);
+		stDesc.solve(ops, true);
 
 
 
