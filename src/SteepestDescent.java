@@ -152,13 +152,7 @@ public class SteepestDescent extends Descent{
 	public RandomSolution getRandomSolution() {
 		return this.soln;
 	}
-	
 
-	@Override
-	public void solve(int mode) {
-		// TODO Auto-generated method stub
-
-	}
 
 	/**
 	 * Main method for testing

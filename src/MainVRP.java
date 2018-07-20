@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Main method to obtain solutions for VRPs
@@ -22,7 +23,22 @@ public class MainVRP {
 
 		//run the solver
 		System.out.println("");
-		stDesc.solve(0);
+		ArrayList<Operation> ops = new ArrayList<Operation>();
+
+		//instantiate the heuristics
+		RelocateOperation rlo = new RelocateOperation(vrp, numCustomer);
+		ExchangeOperation exo = new ExchangeOperation(vrp, numCustomer);
+		TwoOptOperation	  two = new TwoOptOperation(vrp, numCustomer);
+		CrossExOperation  ceo = new CrossExOperation(vrp, numCustomer);
+		ops.add(rlo);
+// 		ops.add(exo);
+// 		ops.add(two);
+ 		ops.add(ceo);
+		
+
+		stDesc.solve(ops, true);
+		//TODO update the main		
+		//stDesc.solve(0);
 
 
 		//show all vehicles after the search finished

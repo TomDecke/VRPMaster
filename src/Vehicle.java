@@ -227,27 +227,14 @@ public class Vehicle {
 	 */
 	public static void main(String[] args)  throws IOException {
 
-		//get the input
-		String in = args[0];
-		int numCustomer = Integer.parseInt(args[1]);
-
-		VRP vrp = new VRP(in,numCustomer);
-
-		String fileOut = in.substring(0, in.length()-4);
-		fileOut += "_Solution.txt";
-
-		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
-
-		//run the solver
-		System.out.println("");
-		stDesc.solve(0);
-
-		System.out.println("Copy test: ");
-		Vehicle v1 = stDesc.getVehicles().get(0);
-		v1.show();
-		System.out.println("Actual copy:");
-		Vehicle vC = v1.copy();
-		vC.show();
+//		//get the input
+//		String in = args[0];
+//		int numCustomer = Integer.parseInt(args[1]);
+//
+//		VRP vrp = new VRP(in,numCustomer);
+//
+//		String fileOut = in.substring(0, in.length()-4);
+//		fileOut += "_Solution.txt";
 
 	}
 }

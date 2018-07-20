@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 
 /**
  * Class to obtain results from multiple input files in a given directory
@@ -10,11 +11,15 @@ public class RunDescents {
 	private static final int RANDOM_RUNS = 10;
 
 	public static void main(String[] args) throws IOException {
+		
 		//get information from the input
 		String folderpath = args[0];
 		String resultpath = folderpath+"results\\";
 		int numCustomers = Integer.parseInt(args[1]);
+		
 		boolean steepest = true;
+		ArrayList<Operation> ops = null;
+		boolean rand = true;
 
 		//set up the descent and the problem instance
 		Descent desc = null;
@@ -39,9 +44,10 @@ public class RunDescents {
 				String vrpInstance = folderpath +file.getName();
 
 				//execute the first four modes for steepest descent 
-				for(int i = 0; i < 4; i++) {
+				for(int i = 0; i < 7; i++) {
 
 					vrp = new VRP(vrpInstance, numCustomers);
+					ops = getMoves(vrp, numCustomers, i);
 					//get the descent specified by the input
 					if(steepest) {
 						desc = new SteepestDescent(vrp, resultpath + "mode_" + i + "_"+  file.getName());
@@ -50,9 +56,9 @@ public class RunDescents {
 						desc = new FirstFitDescent(vrp, resultpath + "mode_" + i + "_"+  file.getName());
 					}
 					//make sure that first descent only executes once, if chosen
-					if(steepest || i%4==0) {
+					if(steepest || i%7==0) {
 						//solve the VRP-instance
-						desc.solve(i);
+						desc.solve(ops,rand);
 						//write the results to the output file
 						writer.write("mode " + i + ": ");
 						writer.write(String.format("cost: %.1f needed Vehicles: %d%n", desc.getTotalCost(),desc.getVehicleCount()));
@@ -62,12 +68,12 @@ public class RunDescents {
 				//determine the random result
 				if(steepest) {
 					SteepestDescent stDesc = new SteepestDescent(vrp, resultpath + "mode_4_"+  file.getName());
-					stDesc.solve(4);
+					stDesc.solve(ops,rand);
 					RandomSolution rs = stDesc.getRandomSolution();
 					for(int i = 0 ; i < RANDOM_RUNS ; i++) {
 						vrp = new VRP(vrpInstance, numCustomers);
 						stDesc = new SteepestDescent(vrp, resultpath + "mode_4_"+  file.getName());
-						stDesc.solve(4);
+						stDesc.solve(ops,rand);
 						rs.compare(stDesc.getRandomSolution());
 
 					}
@@ -82,5 +88,54 @@ public class RunDescents {
 			}
 		}
 		writer.close();
+	}
+	
+	private static ArrayList<Operation> getMoves(VRP vrp, int numCustomer, int mode){
+		ArrayList<Operation> ops = new ArrayList<Operation>();
+		RelocateOperation rlo = new RelocateOperation(vrp, numCustomer);
+		ExchangeOperation exo = new ExchangeOperation(vrp, numCustomer);
+		TwoOptOperation	  two = new TwoOptOperation(vrp, numCustomer);
+		CrossExOperation  ceo = new CrossExOperation(vrp, numCustomer);
+		
+		switch(mode) {
+		case 0:
+			ops.add(rlo);
+			break;
+		case 1:
+			ops.add(rlo);
+			ops.add(exo);
+			break;
+		case 2:
+			ops.add(rlo);
+			ops.add(two);
+			break;
+		case 3:
+			ops.add(rlo);
+			ops.add(ceo);
+			break;
+		case 4: 
+			ops.add(rlo);
+			ops.add(exo);
+			ops.add(two);
+			break;
+		case 5:
+			ops.add(rlo);
+			ops.add(two);
+			ops.add(ceo);
+			break;
+		case 6: 
+			ops.add(rlo);
+			ops.add(exo);
+			ops.add(ceo);
+			break;
+		case 7:
+			ops.add(rlo);
+			ops.add(exo);
+			ops.add(two);
+			ops.add(ceo);
+			break;
+		
+		}
+		return ops;
 	}
 }

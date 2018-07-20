@@ -1,7 +1,6 @@
 
 import java.io.IOException;
 
-import addOns.TimeConstraintViolationException;
 
 public class CrossExOperation implements Operation{
 
@@ -93,7 +92,7 @@ public class CrossExOperation implements Operation{
 
 					newLoadV1 = checkLoad(v1);
 					newLoadV2 = checkLoad(v2);
-					if(newLoadV1<v1.capacity && newLoadV2 < v2.capacity) {
+					if(newLoadV1 <= v1.capacity && newLoadV2 <= v2.capacity) {
 
 
 						//if the swap is conform to time window constraints remember the option
@@ -347,12 +346,12 @@ public void printCrossEx() {
  * @throws IOException
  */
 public static void main(String[] args) throws IOException {
-	String in = args[0];
-	int num = Integer.parseInt(args[1]);
-	VRP vrp = new VRP(in, num);
-
-	String fileOut = in.substring(0, in.length()-4);
-	fileOut += "_Solution.txt";
+//	String in = args[0];
+//	int num = Integer.parseInt(args[1]);
+//	VRP vrp = new VRP(in, num);
+//
+//	String fileOut = in.substring(0, in.length()-4);
+//	fileOut += "_Solution.txt";
 
 
 }

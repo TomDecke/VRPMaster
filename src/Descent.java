@@ -29,10 +29,9 @@ public abstract class Descent {
 
 	/**
 	 * Execute the descent to find a solution to the VRP-instance
-	 * @param mode int, the mode that determines which combination of operators is used
+	 * @param ops ArrayList<Operation> the improvement moves which should be used
+	 * @param random boolean, whether or not the solution should use a randomly selected improving move
 	 */
-	public abstract void solve(int mode);
-	
 	public abstract void solve(ArrayList<Operation> ops, boolean random);
 
 	/**
