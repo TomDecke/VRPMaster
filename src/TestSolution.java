@@ -52,8 +52,8 @@ public class TestSolution {
 			double vehicleDist = 0;
 
 			//print vehicle route and cost 
-			v.show();
-			System.out.println("cost: "+v.cost);
+//TODO uncomment			v.show();
+//			System.out.println("cost: "+v.cost);
 
 			//Check the route of the vehicle
 			while(!cCur.equals(v.lastCustomer)) {
@@ -74,11 +74,11 @@ public class TestSolution {
 
 				//compute and print the distance between the current customers
 				double distTraveled = vrp.distance(cCur, cSucc);
-				System.out.println("Distance from " + cCur.custNo + " to "+ cSucc.custNo +": "+ distTraveled);
+				//TODO uncomment System.out.println("Distance from " + cCur.custNo + " to "+ cSucc.custNo +": "+ distTraveled);
 
 				//add the distance to the overall distance and show the intermediate distance
 				vehicleDist += distTraveled;
-				System.out.println(vehicleDist);
+				//TODO uncomment System.out.println(vehicleDist);
 
 				//the time of travel and the time of leave(pred) determine the arrival at succ
 				double arrival = distTraveled + leave;
@@ -119,9 +119,9 @@ public class TestSolution {
 
 			//sum up the total cost of the solution for later comparison
 			totalDist += vehicleDist * v.costOfUse;
-			System.out.println("Vehicle cost: " + vehicleDist * v.costOfUse);
-			System.out.println("Total distance so far: " + totalDist);
-			System.out.println("");
+//TODO uncomment			System.out.println("Vehicle cost: " + vehicleDist * v.costOfUse);
+//			System.out.println("Total distance so far: " + totalDist);
+//			System.out.println("");
 		}
 
 		//check if all customers have been visited exactly once
@@ -150,10 +150,9 @@ public class TestSolution {
 		return true;
 	}
 
-	public static boolean testFile(String vrpIn, String vrpSoln) throws IOException {
+	public static boolean testFile(String vrpIn, int numCust, String vrpSoln) throws IOException {
 
-		int numCust = 0;
-		int numVehicles = 0;
+		int neededVehicles = 0;
 		double costSoln = 0;
 		ArrayList<int[]> vehicles = new ArrayList<int[]>();
 
@@ -166,13 +165,13 @@ public class TestSolution {
 			sc = new Scanner(reader);
 
 			//read number of customers and needed vehicles, then move to the next line
-			numCust = sc.nextInt();
-			numVehicles = sc.nextInt();
+			sc.nextInt();
+			neededVehicles = sc.nextInt();
 			sc.nextLine();
 
 			//extract the routes from the file
 			int vCount = 0;
-			while(sc.hasNextLine() && vCount < numVehicles) {
+			while(sc.hasNextLine() && vCount < neededVehicles) {
 				String[] vArray = sc.nextLine().split("[ ]+");
 				int[] customers = new int[vArray.length-1];
 				for (int i = 0; i < vArray.length-1; i++) {

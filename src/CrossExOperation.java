@@ -69,11 +69,16 @@ public class CrossExOperation implements Operation{
 				//get the succeeding customers
 				Customer cV1Succ = cV1.succ;
 				Customer cV2Succ = cV2.succ;
+				
 
 				//calculate the change in cost due to this move
 				double delta = (distUpToC1  + distAfterC2 + vrp.distance(cV1, cV2Succ) - vrp.distance(cV1, cV1Succ)) * v1.costOfUse
 						+ (distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ) - vrp.distance(cV2, cV2Succ)) * v2.costOfUse
 						- (v1.cost + v2.cost);
+				
+				if(cV2Succ.equals(v2.lastCustomer) && cV1Succ.equals(v1.lastCustomer)) {
+					delta = 0;
+				}
 
 				//catch computational inaccuracy
 				if(Math.abs(delta)<EPSILON) {
@@ -144,6 +149,7 @@ private int checkLoad(Vehicle v) {
 	}
 	return load;
 }
+
 private boolean checkPropagation(Vehicle v) {
 	Customer cCur = v.firstCustomer;
 	while(cCur != null) {

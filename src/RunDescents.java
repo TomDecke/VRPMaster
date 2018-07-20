@@ -44,7 +44,7 @@ public class RunDescents {
 				String vrpInstance = folderpath +file.getName();
 
 				//execute the first four modes for steepest descent 
-				for(int i = 0; i < 7; i++) {
+				for(int i = 0; i < 1; i++) {
 
 					vrp = new VRP(vrpInstance, numCustomers);
 					ops = getMoves(vrp, numCustomers, i);
@@ -56,7 +56,7 @@ public class RunDescents {
 						desc = new FirstFitDescent(vrp, resultpath + "mode_" + i + "_"+  file.getName());
 					}
 					//make sure that first descent only executes once, if chosen
-					if(steepest || i%7==0) {
+					if(steepest || i%4==0) {
 						//solve the VRP-instance
 						desc.solve(ops,rand);
 						//write the results to the output file
@@ -111,7 +111,8 @@ public class RunDescents {
 			break;
 		case 3:
 			ops.add(rlo);
-			ops.add(ceo);
+			ops.add(exo);
+			ops.add(two);
 			break;
 		case 4: 
 			ops.add(rlo);
