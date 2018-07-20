@@ -26,7 +26,6 @@ public class CrossExOperation implements Operation{
 				crossExMatrix[i][j] = findBestOption(vrp.vehicle[i], vrp.vehicle[j]);
 			}
 		}
-		//printCrossEx();
 	}
 
 	/**
@@ -38,7 +37,7 @@ public class CrossExOperation implements Operation{
 	public Option findBestOption(Vehicle v1, Vehicle v2) {
 
 		Customer cV1 = v1.firstCustomer;
-		Customer cV2 = v2.firstCustomer.succ;
+		Customer cV2 = v2.firstCustomer;
 
 
 		//memorize the demand of the route-parts 
@@ -48,8 +47,8 @@ public class CrossExOperation implements Operation{
 		int loadUpToC2 = cV2.demand;
 		int loadAfterC2 = v2.load - loadUpToC2;
 
-		int newLoadV1 = loadUpToC1 + loadAfterC2;
-		int newLoadV2 = loadUpToC2 + loadAfterC1;
+		int newLoadV1 = loadUpToC2 + loadAfterC1;
+		int newLoadV2 = loadUpToC1 + loadAfterC2;
 
 		//create a default best cross exchange without improvement
 		CrossExOption bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, 0,this);
@@ -65,7 +64,7 @@ public class CrossExOperation implements Operation{
 		while(!cV1.equals(v1.lastCustomer)) {
 
 			//reset distance, load and starting point for the new combination
-			cV2 = v2.firstCustomer.succ;
+			cV2 = v2.firstCustomer;
 
 			distUpToC2 = vrp.distance(v2.firstCustomer, cV2);
 			distAfterC2 = v2.getDistance() - distUpToC2;
@@ -128,13 +127,13 @@ public class CrossExOperation implements Operation{
 				loadUpToC2 += cV2.demand;
 				loadAfterC2 -= cV2.demand;
 
+				//update the load which the second vehicle would have to carry in case of an exchange
+				newLoadV1 = loadUpToC2 + loadAfterC1;
+				newLoadV2 = loadUpToC1 + loadAfterC2;
+
 				//update the distance towards/after the second customer
 				distUpToC2 += vrp.distance(cV2.pred, cV2);
 				distAfterC2 -=  vrp.distance(cV2.pred, cV2);
-
-				//update the load which a vehicle would have to carry in case of an exchange
-				newLoadV1 = loadUpToC1 + loadAfterC2;
-				newLoadV2 = loadUpToC2 + loadAfterC1;
 			}
 
 			//move to the next customer of vehicle 1
@@ -255,19 +254,19 @@ public class CrossExOperation implements Operation{
 		//update the load of the vehicles after the exchange
 		v1.load = vUp.getNewLoadV1(); 
 		v2.load = vUp.getNewLoadV2();
-		
+
 		//update distance and cost of the vehicle
 		v1.setDistance(vUp.getNewDistV1());
 		v2.setDistance(vUp.getNewDistV2());
 		v1.cost = v1.getDistance() * v1.costOfUse;
 		v2.cost = v2.getDistance() * v2.costOfUse;
-		
+
 
 		updateVehicle(v1);
 		updateVehicle(v2);
-		
+
 	}
-	
+
 	private void updateVehicle(Vehicle v) {
 
 		if(v.firstCustomer.succ.equals(v.lastCustomer)) {
@@ -275,20 +274,20 @@ public class CrossExOperation implements Operation{
 			v.cost = 0;
 		}
 		else {
-//			//re-evaluate the cost of occupied cars
-//			double dist = 0;
-//			Customer cCur = v.firstCustomer;
-//			Customer cSucc = cCur.succ;
-//			while(cSucc != null) {
-//				dist += vrp.distance(cCur, cSucc);
-//				cCur = cSucc;
-//				cSucc = cSucc.succ;
-//			}
-//			v.setDistance(dist);
-//			v.cost = dist * v.costOfUse;
+			//re-evaluate the cost of occupied cars
+			double dist = 0;
+			Customer cCur = v.firstCustomer;
+			Customer cSucc = cCur.succ;
+			while(cSucc != null) {
+				dist += vrp.distance(cCur, cSucc);
+				cCur = cSucc;
+				cSucc = cSucc.succ;
+			}
+			v.setDistance(dist);
+			v.cost = dist * v.costOfUse;
 		}
 	}
-	
+
 
 
 	/**
@@ -347,7 +346,7 @@ public class CrossExOperation implements Operation{
 			System.out.println("");
 		}
 	}
-	
+
 	/**
 	 * Main method for testing
 	 * @param args

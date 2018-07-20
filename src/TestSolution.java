@@ -37,8 +37,7 @@ public class TestSolution {
 			//check the vehicle
 			if(v.id > vrp.m) {
 				System.out.println("Vehicle does not belong to VRP");
-				//TODO uncomment
-				//return false;
+				return false;
 			}
 			Customer cCur = v.firstCustomer;
 			Customer cSucc = cCur.succ;

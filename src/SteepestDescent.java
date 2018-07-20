@@ -57,8 +57,10 @@ public class SteepestDescent extends Descent{
 			System.out.println(iterationCounter);
 			System.out.print("v1 - before move: ");
 			v1.show();
+			System.out.println("load :"+v1.load);
 			System.out.print("v2 - before move: ");
 			v2.show();
+			System.out.println("load :"+ v2.load);
 			execute.printOption();
 
 			//execute the move
@@ -68,8 +70,10 @@ public class SteepestDescent extends Descent{
 			//Visualize the state after the relocation on the console
 			System.out.print("v1 - after move: ");
 			v1.show();
+			System.out.println("load :"+v1.load);
 			System.out.print("v2 - after move: ");
 			v2.show();
+			System.out.println("load :"+ v2.load);
 			System.out.println(" ");
 
 			//update the move matrices
@@ -111,6 +115,7 @@ public class SteepestDescent extends Descent{
 			v2 = execute.getV2();	
 		}
 
+		//TODO figure where the update has to take place
 		//ensure up-to-date of the cost of the vehicles
 //		for(Vehicle v : vrp.vehicle) {
 //			//clear empty vehicles
@@ -177,13 +182,13 @@ public class SteepestDescent extends Descent{
 		ExchangeOperation exo = new ExchangeOperation(vrp, num);
 		TwoOptOperation	  two = new TwoOptOperation(vrp, num);
 		CrossExOperation  ceo = new CrossExOperation(vrp, num);
-//		ops.add(rlo);
+		ops.add(rlo);
 // 		ops.add(exo);
 // 		ops.add(two);
  		ops.add(ceo);
 		
 
-		stDesc.solve(ops, true);
+		stDesc.solve(ops, false);
 
 
 
