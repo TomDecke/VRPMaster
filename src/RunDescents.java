@@ -67,12 +67,12 @@ public class RunDescents {
 
 				//determine the random result
 				if(steepest) {
-					SteepestDescent stDesc = new SteepestDescent(vrp, resultpath + "mode_4_"+  file.getName());
+					SteepestDescent stDesc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
 					stDesc.solve(ops,rand);
 					RandomSolution rs = stDesc.getRandomSolution();
 					for(int i = 0 ; i < RANDOM_RUNS ; i++) {
 						vrp = new VRP(vrpInstance, numCustomers);
-						stDesc = new SteepestDescent(vrp, resultpath + "mode_4_"+  file.getName());
+						stDesc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
 						stDesc.solve(ops,rand);
 						rs.compare(stDesc.getRandomSolution());
 
