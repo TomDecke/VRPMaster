@@ -110,7 +110,7 @@ public class SteepestDescent extends Descent{
 			v1 = execute.getV1();
 			v2 = execute.getV2();	
 		}
-
+		
 		printResultsToConsole();
 		printResultsToFile();
 
