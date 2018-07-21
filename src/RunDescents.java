@@ -68,8 +68,6 @@ public class RunDescents {
 				//determine the random result
 				if(rand) {
 					
-					ArrayList<RandomSolution> allSol = new ArrayList<RandomSolution>();
-					
 					//get problem instance
 					vrp = new VRP(vrpInstance, numCustomers);
 					//get operators
@@ -78,24 +76,17 @@ public class RunDescents {
 					desc.solve(ops,rand);
 					
 					RandomSolution randSoln = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
-					allSol.add(randSoln);
-
-					
-					for(int i = 0 ; i < RANDOM_RUNS ; i++) {
+				for(int i = 0 ; i < RANDOM_RUNS ; i++) {
 						vrp = new VRP(vrpInstance, numCustomers);
 						desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
 						ops = getMoves(vrp, numCustomers, 4);
 						desc.solve(ops,rand);
-						allSol.add(new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles()));
-					}
-
-					randSoln = allSol.get(0);
-					for(RandomSolution rs : allSol) {
-						if(rs.getCost()<randSoln.getCost()) {
-							randSoln = rs;
+						RandomSolution rsTmp = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
+						if(rsTmp.getCost() < randSoln.getCost()) {
+							randSoln = rsTmp;
 						}
 					}
-					
+
 					randSoln.writeSolutionToFile(resultpath + "mode_rSoln_"+  file.getName());
 					writer.write("mode r: ");
 					writer.write(String.format("cost: %.1f needed Vehicles: %d%n", randSoln.getCost(),randSoln.getNeededV()));
