@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class RunDescents {
 
-	private static final int RANDOM_RUNS = 0;
+	private static final int RANDOM_RUNS = 8;
 
 	public static void main(String[] args) throws IOException {
 		
@@ -44,7 +44,7 @@ public class RunDescents {
 				String vrpInstance = folderpath +file.getName();
 
 				//execute the first four modes for steepest descent 
-				for(int i = 0; i < 0; i++) {
+				for(int i = 0; i < 4; i++) {
 
 					vrp = new VRP(vrpInstance, numCustomers);
 					ops = getMoves(vrp, numCustomers, i);
@@ -84,13 +84,18 @@ public class RunDescents {
 					for(int i = 0 ; i < RANDOM_RUNS ; i++) {
 						vrp = new VRP(vrpInstance, numCustomers);
 						desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
+						ops = getMoves(vrp, numCustomers, 4);
 						desc.solve(ops,rand);
 						allSol.add(new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles()));
-						if(desc.getTotalCost() < randSoln.getCost()) {
-							randSoln = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
-						}
 					}
 
+					randSoln = allSol.get(0);
+					for(RandomSolution rs : allSol) {
+						if(rs.getCost()<randSoln.getCost()) {
+							randSoln = rs;
+						}
+					}
+					
 					randSoln.writeSolutionToFile(resultpath + "mode_rSoln_"+  file.getName());
 					writer.write("mode r: ");
 					writer.write(String.format("cost: %.1f needed Vehicles: %d%n", randSoln.getCost(),randSoln.getNeededV()));
