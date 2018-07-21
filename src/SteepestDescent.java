@@ -113,6 +113,8 @@ public class SteepestDescent extends Descent{
 		
 		printResultsToConsole();
 		printResultsToFile();
+				
+		
 
 		//if the solution was random, memorize the result
 		if(random) {

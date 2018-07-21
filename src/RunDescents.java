@@ -44,7 +44,7 @@ public class RunDescents {
 				String vrpInstance = folderpath +file.getName();
 
 				//execute the first four modes for steepest descent 
-				for(int i = 0; i < 1; i++) {
+				for(int i = 0; i < 0; i++) {
 
 					vrp = new VRP(vrpInstance, numCustomers);
 					ops = getMoves(vrp, numCustomers, i);
@@ -66,22 +66,34 @@ public class RunDescents {
 				}
 
 				//determine the random result
-				if(steepest) {
-					SteepestDescent stDesc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
-					stDesc.solve(ops,rand);
-					RandomSolution rs = stDesc.getRandomSolution();
-					for(int i = 0 ; i < RANDOM_RUNS ; i++) {
-						VRP vrpR = new VRP(vrpInstance, numCustomers);
-						stDesc = new SteepestDescent(vrpR, resultpath + "mode_r_"+  file.getName());
-						stDesc.solve(ops,rand);
-						rs = rs.compare(stDesc.getRandomSolution());
+				if(rand) {
+					
+					ArrayList<RandomSolution> allSol = new ArrayList<RandomSolution>();
+					
+					//get problem instance
+					vrp = new VRP(vrpInstance, numCustomers);
+					//get operators
+					ops = getMoves(vrp, numCustomers, 4);
+					desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
+					desc.solve(ops,rand);
+					
+					RandomSolution randSoln = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
+					allSol.add(randSoln);
 
+					
+					for(int i = 0 ; i < RANDOM_RUNS ; i++) {
+						vrp = new VRP(vrpInstance, numCustomers);
+						desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
+						desc.solve(ops,rand);
+						allSol.add(new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles()));
+						if(desc.getTotalCost() < randSoln.getCost()) {
+							randSoln = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
+						}
 					}
 
-									
-					rs.writeSolutionToFile(resultpath + "mode_r_"+  file.getName());
-					writer.write("mode r:");
-					writer.write(String.format("cost: %.1f needed Vehicles: %d%n", rs.getCost(),rs.getNeededV()));
+					randSoln.writeSolutionToFile(resultpath + "mode_rSoln_"+  file.getName());
+					writer.write("mode r: ");
+					writer.write(String.format("cost: %.1f needed Vehicles: %d%n", randSoln.getCost(),randSoln.getNeededV()));
 					writer.write("\n");
 
 				}

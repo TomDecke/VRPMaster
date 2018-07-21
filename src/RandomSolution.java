@@ -78,6 +78,11 @@ public class RandomSolution {
 	public void writeSolutionToFile(String fOut) {
 		//create a writer
 		FileWriter writer;
+		
+//		double upCost = 0;
+//		for(Vehicle v : soln) {
+//			upCost += v.cost;
+//		}
 		try {
 			writer 	= new FileWriter(fOut);
 			//write the cost of the solution
@@ -87,7 +92,7 @@ public class RandomSolution {
 			for(Vehicle v : soln) {
 				StringBuilder sBuild = new StringBuilder();
 				Customer customer = v.firstCustomer.succ;
-				while (customer != v.lastCustomer){
+				while (!customer.equals(v.lastCustomer)){
 					sBuild.append(customer.custNo + " ");
 					customer = customer.succ;
 				}
