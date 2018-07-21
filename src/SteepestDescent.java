@@ -99,7 +99,7 @@ public class SteepestDescent extends Descent{
 
 				//if no move is improving set execute to such, otherwise choose a random one
 				if(options.isEmpty()) {
-					execute = cur;
+					execute = operators.get(0).fetchBestOption();;
 				}
 				else {
 					execute = options.get(new Random().nextInt(options.size()));

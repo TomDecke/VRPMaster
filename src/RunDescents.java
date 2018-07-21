@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class RunDescents {
 
-	private static final int RANDOM_RUNS = 10;
+	private static final int RANDOM_RUNS = 3;
 
 	public static void main(String[] args) throws IOException {
 		
@@ -56,7 +56,7 @@ public class RunDescents {
 						desc = new FirstFitDescent(vrp, resultpath + "mode_" + i + "_"+  file.getName());
 					}
 					//make sure that first descent only executes once, if chosen
-					if(steepest || i%4==0) {
+					if(steepest) {
 						//solve the VRP-instance
 						desc.solve(ops,rand);
 						//write the results to the output file
@@ -74,13 +74,13 @@ public class RunDescents {
 						vrp = new VRP(vrpInstance, numCustomers);
 						stDesc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
 						stDesc.solve(ops,rand);
-						rs.compare(stDesc.getRandomSolution());
+						rs = rs.compare(stDesc.getRandomSolution());
 
 					}
 
 									
 					rs.writeSolutionToFile(resultpath + "mode_r_"+  file.getName());
-					writer.write("mode rand:");
+					writer.write("mode r:");
 					writer.write(String.format("cost: %.1f needed Vehicles: %d%n", rs.getCost(),rs.getNeededV()));
 					writer.write("\n");
 

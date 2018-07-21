@@ -141,9 +141,11 @@ public class TestSolution {
 		//allow minor derivation, which might be due to computational errors
 		if(Math.abs(totalDist - solDist) > DERIVATION) {
 			System.out.println("Wrong distance. The distance of the solutions differ by: "+(totalDist - solDist));
+			System.out.println("Proposed solution: " + solDist);
+			System.out.println("Actual solution: " + totalDist);
 			return false;
 		}
-		System.out.println("Total distance: " + totalDist);
+		//System.out.println("Total distance: " + totalDist);
 
 		//if all tests were passed, the solution is valid
 		System.out.println("The solution is valid!");
