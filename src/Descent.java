@@ -82,7 +82,7 @@ public abstract class Descent {
 			for(Vehicle v : getVehicles()) {
 				StringBuilder sBuild = new StringBuilder();
 				Customer customer = v.firstCustomer.succ;
-				while (customer != v.lastCustomer){
+				while (!customer.equals(v.lastCustomer)){
 					sBuild.append(customer.custNo + " ");
 					customer = customer.succ;
 				}

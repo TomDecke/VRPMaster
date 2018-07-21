@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class RunDescents {
 
-	private static final int RANDOM_RUNS = 5;
+	private static final int RANDOM_RUNS = 10;
 
 	public static void main(String[] args) throws IOException {
 		
