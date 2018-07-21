@@ -19,11 +19,10 @@ public class TestFiles {
 				String[] name = fName.split("_");
 				String vrpName = pPath+name[2];
 				//test if the solution is valid
-				System.out.println(name[2]);
+				System.out.println(fName);
 				boolean result = TestSolution.testFile(vrpName, numCustomer,file.getAbsolutePath());
 				if(!result) {
-					System.out.println("Invalid solution: " + fName);
-					return;
+					System.out.println("Invalid solution: " + name[2]);
 				}
 			}
 		}

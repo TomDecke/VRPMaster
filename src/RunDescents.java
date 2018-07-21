@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class RunDescents {
 
-	private static final int RANDOM_RUNS = 3;
+	private static final int RANDOM_RUNS = 5;
 
 	public static void main(String[] args) throws IOException {
 		
@@ -44,7 +44,7 @@ public class RunDescents {
 				String vrpInstance = folderpath +file.getName();
 
 				//execute the first four modes for steepest descent 
-				for(int i = 0; i < 1; i++) {
+				for(int i = 0; i < 5; i++) {
 
 					vrp = new VRP(vrpInstance, numCustomers);
 					ops = getMoves(vrp, numCustomers, i);
