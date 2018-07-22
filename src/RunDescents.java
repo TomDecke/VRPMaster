@@ -19,7 +19,7 @@ public class RunDescents {
 		
 		boolean steepest = true;
 		ArrayList<Operation> ops = null;
-		boolean rand = true;
+		boolean rand = false;
 
 		//set up the descent and the problem instance
 		Descent desc = null;
@@ -44,7 +44,7 @@ public class RunDescents {
 				String vrpInstance = folderpath +file.getName();
 
 				//execute the first four modes for steepest descent 
-				for(int i = 0; i < 4; i++) {
+				for(int i = 10; i < 12; i++) {
 
 					vrp = new VRP(vrpInstance, numCustomers);
 					ops = getMoves(vrp, numCustomers, i);
@@ -71,7 +71,7 @@ public class RunDescents {
 					//get problem instance
 					vrp = new VRP(vrpInstance, numCustomers);
 					//get operators
-					ops = getMoves(vrp, numCustomers, 4);
+					ops = getMoves(vrp, numCustomers, 11);
 					desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
 					desc.solve(ops,rand);
 					
@@ -79,7 +79,7 @@ public class RunDescents {
 				for(int i = 0 ; i < RANDOM_RUNS ; i++) {
 						vrp = new VRP(vrpInstance, numCustomers);
 						desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
-						ops = getMoves(vrp, numCustomers, 4);
+						ops = getMoves(vrp, numCustomers, 11);
 						desc.solve(ops,rand);
 						RandomSolution rsTmp = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
 						if(rsTmp.getCost() < randSoln.getCost()) {
@@ -96,7 +96,32 @@ public class RunDescents {
 			}
 		}
 		writer.close();
+		
+		
+
+		//Test the solutions
+		//path to the solution
+		String sPath = folderpath+"results";
+		File resultFiles = new File(sPath);
+
+		//go through all solutions in the given directory
+		File[] listOfResults = resultFiles.listFiles();
+		for (File file : listOfResults) {
+			if (file.isFile()) {
+				String fName = file.getName();
+				String[] name = fName.split("_");
+				String vrpName = folderpath+name[2];
+				//test if the solution is valid
+				System.out.println(fName);
+				boolean testResult = TestSolution.testFile(vrpName, numCustomers,file.getAbsolutePath());
+				if(!testResult) {
+					System.out.println("Invalid solution: " + name[2]);
+				}
+			}
+		}
+		System.out.println("Valid solution!");
 	}
+	
 	
 	private static ArrayList<Operation> getMoves(VRP vrp, int numCustomer, int mode){
 		ArrayList<Operation> ops = new ArrayList<Operation>();
@@ -123,21 +148,36 @@ public class RunDescents {
 			ops.add(two);
 			break;
 		case 4: 
-			ops.add(rlo);
-			ops.add(exo);
-			ops.add(two);
+			ops.add(ceo);
 			break;
 		case 5:
-			ops.add(rlo);
-			ops.add(two);
 			ops.add(ceo);
+			ops.add(two);
 			break;
 		case 6: 
-			ops.add(rlo);
-			ops.add(exo);
 			ops.add(ceo);
+			ops.add(exo);
 			break;
 		case 7:
+			ops.add(ceo);
+			ops.add(rlo);
+			break;
+		case 8:
+			ops.add(ceo);
+			ops.add(exo);
+			ops.add(two);
+			break;
+		case 9:
+			ops.add(ceo);
+			ops.add(rlo);
+			ops.add(two);
+			break;
+		case 10:
+			ops.add(ceo);
+			ops.add(rlo);
+			ops.add(exo);
+			break;
+		case 11:
 			ops.add(rlo);
 			ops.add(exo);
 			ops.add(two);

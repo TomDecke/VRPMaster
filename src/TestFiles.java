@@ -8,12 +8,12 @@ public class TestFiles {
 		String pPath = args[0];
 		int numCustomer = Integer.parseInt(args[1]);
 		//path to the solution
-		String sPath = args[2];
-		File folder = new File(sPath);
+		String sPath = pPath+"results";
+		File results = new File(sPath);
 
 		//go through all solutions in the given directory
-		File[] listOfFiles = folder.listFiles();
-		for (File file : listOfFiles) {
+		File[] listOfResults = results.listFiles();
+		for (File file : listOfResults) {
 			if (file.isFile()) {
 				String fName = file.getName();
 				String[] name = fName.split("_");
