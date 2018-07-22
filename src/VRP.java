@@ -77,8 +77,6 @@ public class VRP {
 			//add customer to vehicle and omit the depot
 			vehicle[i].insertBetween(customer[i+1], vehicle[i].firstCustomer, vehicle[i].lastCustomer);
 		}
-
-
 	}
 
 	/**

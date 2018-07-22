@@ -13,7 +13,6 @@ public class RandomSolution {
 	private int availableV;
 	private ArrayList<Vehicle> soln;
 
-	//TODO do I need to memorise in which vehicle the customers were? I.e since they are all identical
 	/**
 	 * Constructor for the solution
 	 * @param cost double, the cost of the solution
@@ -27,24 +26,6 @@ public class RandomSolution {
 		this.neededV = needed;
 		this.availableV = available;
 		this.soln = v;
-
-	}
-
-	/**
-	 * Compares the object to another solution and returns the better one
-	 * @param rs RandomSolution, the solution with which to compare
-	 * @return RandomSolution, the better solution
-	 */
-	public RandomSolution compare(RandomSolution rs) {
-		if(rs.getCost() < this.cost) {
-			return rs;
-		}
-		else if(rs.getCost() == this.cost) {
-			if(rs.neededV < this.neededV) {
-				return rs;
-			}
-		}
-		return this;
 	}
 
 	/**
@@ -78,11 +59,7 @@ public class RandomSolution {
 	public void writeSolutionToFile(String fOut) {
 		//create a writer
 		FileWriter writer;
-		
-//		double upCost = 0;
-//		for(Vehicle v : soln) {
-//			upCost += v.cost;
-//		}
+
 		try {
 			writer 	= new FileWriter(fOut);
 			//write the cost of the solution

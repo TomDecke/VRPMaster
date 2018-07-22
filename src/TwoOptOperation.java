@@ -46,7 +46,6 @@ public class TwoOptOperation implements Operation{
 		twoOptMatrix[v2.index] = findBestOption(v2, v2);
 	}
 
-
 	/**
 	 * Executes the reversal by extracting the information from the option and passing them on
 	 * @see reverserRoute()
@@ -74,7 +73,6 @@ public class TwoOptOperation implements Operation{
 
 			//remove the customer of this visit
 			v.remove(cCur.succ);
-
 		}
 
 		//try to insert the customers that were taken back into the route
@@ -297,6 +295,4 @@ public class TwoOptOperation implements Operation{
 		//check if the crossing happens between the end points of both routes
 		return (c1c2 >= 0 && c1c2 <= 1) && (c3c4 >= 0 && c3c4 <= 1);
 	}
-
-
 }

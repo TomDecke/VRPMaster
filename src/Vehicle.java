@@ -227,14 +227,5 @@ public class Vehicle {
 	 */
 	public static void main(String[] args)  throws IOException {
 
-//		//get the input
-//		String in = args[0];
-//		int numCustomer = Integer.parseInt(args[1]);
-//
-//		VRP vrp = new VRP(in,numCustomer);
-//
-//		String fileOut = in.substring(0, in.length()-4);
-//		fileOut += "_Solution.txt";
-
 	}
 }

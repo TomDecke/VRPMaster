@@ -7,6 +7,7 @@ import java.util.ArrayList;
  *
  */
 public class MainVRP {
+	//TODO update the main
 	public static void main(String[] args) throws IOException{
 
 		//get the input
@@ -31,14 +32,13 @@ public class MainVRP {
 		TwoOptOperation	  two = new TwoOptOperation(vrp, numCustomer);
 		CrossExOperation  ceo = new CrossExOperation(vrp, numCustomer);
 		ops.add(rlo);
-// 		ops.add(exo);
-// 		ops.add(two);
- 		ops.add(ceo);
-		
+		ops.add(exo);
+		ops.add(two);
+		ops.add(ceo);
+
 
 		stDesc.solve(ops, true);
-		//TODO update the main		
-		//stDesc.solve(0);
+
 
 
 		//show all vehicles after the search finished

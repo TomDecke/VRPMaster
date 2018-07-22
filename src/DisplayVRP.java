@@ -178,11 +178,6 @@ public class DisplayVRP {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String vrpInstance = "H:\\Masterthesis\\visualization\\r101.txt";
-		int numCust = 100;
-		String sol = "H:\\Masterthesis\\visualization\\r101-100.txt";
-		DisplayVRP distVRP = new DisplayVRP(vrpInstance, numCust, sol);
-		distVRP.plotVRPSolution();
 
 	}
 }

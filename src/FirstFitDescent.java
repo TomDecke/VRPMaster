@@ -8,7 +8,6 @@ import java.util.ArrayList;
  */
 public class FirstFitDescent extends Descent{
 
-
 	private ArrayList<Customer> cDesc;
 	private Vehicle[] vehicles;
 	private TwoOptOperation tOPt;
@@ -49,7 +48,7 @@ public class FirstFitDescent extends Descent{
 	/**
 	 * Run first fit descent to find a solution for the given VRP-instance
 	 */
-	public void solve(int mode) {
+	public void solve(ArrayList<Operation> ops, boolean random) {
 		Customer cCur = null;
 		while(!cDesc.isEmpty()) {
 			cCur = cDesc.remove(0);
@@ -122,15 +121,9 @@ public class FirstFitDescent extends Descent{
 			System.out.println(""+c.custNo +  " " + c.earliestStart);
 		}
 
-		ffd.solve(-1);
+		ffd.solve(null,false);
 		//TestSolution.runTest(vrp, ffd.getTotalCost(), ffd.getVehicles());
 		DisplayVRP disp = new DisplayVRP(in, num, fileOut);
 		disp.plotVRPSolution();
-	}
-
-	@Override
-	public void solve(ArrayList<Operation> ops, boolean random) {
-		// TODO Auto-generated method stub
-		
 	}
 }

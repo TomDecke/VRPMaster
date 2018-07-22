@@ -55,7 +55,7 @@ public class RelocateOperation implements Operation{
 			//if the vehicle can accommodate the customer find the best position for him
 			if(vTo.canAccomodate(cFrom)) {
 
-				
+
 				//determine how the total distance of vFrom would change
 				double newDistVFrom = vFrom.getDistance() + vrp.distance(cFrom.pred, cFrom.succ) 
 				- vrp.distance(cFrom.pred, cFrom)
@@ -71,7 +71,7 @@ public class RelocateOperation implements Operation{
 				while(!cToPred.equals(vTo.lastCustomer)) {
 					// a customer can not be inserted before/after himself
 					if(!(cFrom.equals(cToPred)||cFrom.equals(cToSucc))) {
-						
+
 						if(cFrom.canBeInsertedBetween(cToPred, cToSucc)) {
 							//determine how the total distance of vTo would change
 							double newDistVTo = vTo.getDistance() - vrp.distance(cToPred, cToSucc)
@@ -112,45 +112,6 @@ public class RelocateOperation implements Operation{
 		}
 		return bestToMove;
 	}
-	
-	private boolean checkPropagation(Vehicle v) {
-		Customer cCur = v.firstCustomer;
-		while(cCur != null) {
-			cCur.checkEarliest = cCur.earliestStart;
-			cCur.checkLatest = cCur.latestStart;
-			cCur = cCur.succ;
-		}
-
-		//execute forward propagation
-		cCur = v.firstCustomer;
-		Customer cSucc = cCur.succ;
-		while(cSucc != null) {
-			cSucc.checkEarliest = Math.max(cSucc.readyTime,cCur.checkEarliest+cCur.serviceTime+vrp.distance(cCur,cSucc));
-			cCur = cSucc;
-			cSucc = cSucc.succ;
-		}
-
-		//execute backward propagation
-		cCur = v.lastCustomer;
-		Customer cPred = cCur.pred;
-		while(cPred != null) {
-			cPred.checkLatest = Math.min(cPred.dueDate, cCur.checkLatest - cCur.serviceTime - vrp.distance(cPred, cCur));
-			cCur = cPred;
-			cPred = cPred.pred;
-		}
-
-		//check for constraint violation
-		cCur = v.firstCustomer;
-		while(cCur != null) {
-			if(cCur.checkLatest < cCur.checkEarliest) {
-				//System.out.println("Time window violation");
-				return false;
-			}
-			cCur = cCur.succ;
-		}
-		return true;
-	}
-
 
 	/**
 	 * Find the best relocation in the matrix of possible relocations

@@ -1,10 +1,5 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.util.Locale.FilteringMode;
+import java.io.*;
+import java.util.*;
 
 /**
  * A class to verify the validity of a solution for an instance of the CVRPTW
@@ -51,10 +46,6 @@ public class TestSolution {
 			//set distance traveled of a single vehicle for distance check
 			double vehicleDist = 0;
 
-			//print vehicle route and cost 
-//TODO uncomment			v.show();
-//			System.out.println("cost: "+v.cost);
-
 			//Check the route of the vehicle
 			while(!cCur.equals(v.lastCustomer)) {
 
@@ -72,15 +63,11 @@ public class TestSolution {
 					return false;
 				}
 
-				//compute and print the distance between the current customers
+				//compute the distance between the current customers and add it to the overall distance
 				double distTraveled = vrp.distance(cCur, cSucc);
-				//TODO uncomment System.out.println("Distance from " + cCur.custNo + " to "+ cSucc.custNo +": "+ distTraveled);
-
-				//add the distance to the overall distance and show the intermediate distance
 				vehicleDist += distTraveled;
-				//TODO uncomment System.out.println(vehicleDist);
 
-				//the time of travel and the time of leave(pred) determine the arrival at succ
+				//the time of travel and the time of leave(pred) determines the arrival at succ
 				double arrival = distTraveled + leave;
 
 				//check if the vehicle arrives after the due date of the customer
@@ -116,12 +103,8 @@ public class TestSolution {
 				return false;
 			}
 
-
 			//sum up the total cost of the solution for later comparison
 			totalDist += vehicleDist * v.costOfUse;
-//TODO uncomment			System.out.println("Vehicle cost: " + vehicleDist * v.costOfUse);
-//			System.out.println("Total distance so far: " + totalDist);
-//			System.out.println("");
 		}
 
 		//check if all customers have been visited exactly once
@@ -145,13 +128,20 @@ public class TestSolution {
 			System.out.println("Actual solution: " + totalDist);
 			return false;
 		}
-		//System.out.println("Total distance: " + totalDist);
 
 		//if all tests were passed, the solution is valid
 		System.out.println("The solution is valid!");
 		return true;
 	}
 
+	/**
+	 * Extracts the proposed solution from a file and tests it
+	 * @param vrpIn String, path to the problem instance
+	 * @param numCust int, number of customers in the instance
+	 * @param vrpSoln String, the path to the proposed solution
+	 * @return boolean, whether or not the solution is valid for the given vrp-instance
+	 * @throws IOException
+	 */
 	public static boolean testFile(String vrpIn, int numCust, String vrpSoln) throws IOException {
 
 		int neededVehicles = 0;
@@ -194,6 +184,7 @@ public class TestSolution {
 
 		VRP vrp = new VRP(vrpIn,numCust);
 
+		//Add the customers to their corresponding vehicles
 		ArrayList<Vehicle> vSoln = new ArrayList<Vehicle>();
 		for(int i = 0; i < vehicles.size() ; i++) {
 			Vehicle cV = new Vehicle(vrp, i, vrp.capacity, 1, vrp.depot);
@@ -207,6 +198,7 @@ public class TestSolution {
 			vSoln.add(cV);		
 		}
 
+		//run the test
 		return runTest(vrp, costSoln, vSoln);
 	}
 
@@ -224,6 +216,7 @@ public class TestSolution {
 		//create verification instance and solver
 		VRP vrp = new VRP(fileIn,numCustomer);
 
+		//create a distance matrix
 		System.out.print(String.format("%s", "\\|"));
 		for(Customer c : vrp.customer) {
 			System.out.print(String.format("%5d|", c.custNo));

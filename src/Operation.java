@@ -1,6 +1,6 @@
 /**
  * Interface to determine the structure for an operation
- * @author Tom
+ * @author Tom Decke
  *
  */
 public interface Operation {

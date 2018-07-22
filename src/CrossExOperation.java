@@ -47,7 +47,6 @@ public class CrossExOperation implements Operation{
 		Customer cV1 = v1.firstCustomer;
 		Customer cV2 = v2.firstCustomer;
 
-
 		//memorize the demand of the routes 
 		int newLoadV1 = checkLoad(v1);
 		int newLoadV2 = checkLoad(v2);
@@ -109,10 +108,6 @@ public class CrossExOperation implements Operation{
 						//if the swap is conform to time window constraints remember the option
 						if(checkPropagation(v1) && checkPropagation(v2)) {
 							bestCrossEx = new CrossExOption(v1, v2, cV1, cV2, newLoadV1, newLoadV2, delta,this);
-							double nD1 = distUpToC1  + distAfterC2 + vrp.distance(cV1, cV2Succ) - vrp.distance(cV1, cV1Succ);
-							double nD2 = distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ) - vrp.distance(cV2, cV2Succ);
-							VehicleUpdate vUp = new VehicleUpdate(nD1,nD2,newLoadV1,newLoadV2);
-							bestCrossEx.setVup(vUp);
 						}
 					}
 
@@ -165,7 +160,7 @@ public class CrossExOperation implements Operation{
 	 */
 	private boolean checkPropagation(Vehicle v) {
 		Customer cCur = v.firstCustomer;
-		
+
 		//get the current earliest and latest start
 		while(cCur != null) {
 			cCur.checkEarliest = cCur.earliestStart;
@@ -262,11 +257,9 @@ public class CrossExOperation implements Operation{
 		v1.lastCustomer.vehicle = v1;
 		v2.lastCustomer.vehicle = v2;
 
-		VehicleUpdate vUp = bCE.getVup();
-
 		//update the load of the vehicles after the exchange
-		v1.load = vUp.getNewLoadV1(); 
-		v2.load = vUp.getNewLoadV2();
+		v1.load = bCE.getLoadForV1(); 
+		v2.load = bCE.getLoadForV2();
 
 		//update distance and cost of the vehicle
 		updateVehicle(v1);
@@ -278,6 +271,10 @@ public class CrossExOperation implements Operation{
 
 	}
 
+	/**
+	 * Update earliest and latest start of a vehicle
+	 * @param v Vehicle, the vehicle to update
+	 */
 	private void propagateVehicle(Vehicle v) {
 		Customer cCur = v.firstCustomer;
 		//execute forward propagation
@@ -299,14 +296,19 @@ public class CrossExOperation implements Operation{
 		}
 	}
 
+	/**
+	 * Updates the distance and cost of a vehicle
+	 * @param v Vehicle, the vehicle to update
+	 */
 	private void updateVehicle(Vehicle v) {
 
+		//clear empty vehicles
 		if(v.firstCustomer.succ.equals(v.lastCustomer)) {
 			v.setDistance(0);
 			v.cost = 0;
 		}
 		else {
-			//re-evaluate the cost of occupied cars
+			//re-evaluate the cost of occupied vehicles
 			double dist = 0;
 			Customer cCur = v.firstCustomer;
 			Customer cSucc = cCur.succ;
@@ -319,8 +321,6 @@ public class CrossExOperation implements Operation{
 			v.cost = dist * v.costOfUse;
 		}
 	}
-
-
 
 	/**
 	 * Update the cross-exchange matrix by finding new best crossings for the involved vehicles
@@ -385,13 +385,6 @@ public class CrossExOperation implements Operation{
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		//	String in = args[0];
-		//	int num = Integer.parseInt(args[1]);
-		//	VRP vrp = new VRP(in, num);
-		//
-		//	String fileOut = in.substring(0, in.length()-4);
-		//	fileOut += "_Solution.txt";
-
 
 	}
 }

@@ -1,6 +1,6 @@
 /**
  * Abstract class to represent an option, which could be executed to improve the solution to a VRP
- * @author Tom
+ * @author Tom Decke
  *
  */
 public abstract class Option {
@@ -13,7 +13,6 @@ public abstract class Option {
 	protected Customer c1;
 	protected Customer c2;
 	protected double delta;
-	protected VehicleUpdate vup;
 
 	/**
 	 * Create an option
@@ -57,28 +56,20 @@ public abstract class Option {
 		return this.operator;
 	}
 
+	/**
+	 * Accessor for the new load of vehicle 1
+	 * @return int, the new load
+	 */
 	public int getLoadForV1() {
 		return loadForV1;
 	}
 
-	public void setLoadForV1(int loadForV1) {
-		this.loadForV1 = loadForV1;
-	}
-
+	/**
+	 * Accessor for the new load of vehicle 2
+	 * @return int, the new load
+	 */
 	public int getLoadForV2() {
 		return loadForV2;
-	}
-
-	public void setLoadForV2(int loadForV2) {
-		this.loadForV2 = loadForV2;
-	}
-
-	public VehicleUpdate getVup() {
-		return vup;
-	}
-
-	public void setVup(VehicleUpdate vup) {
-		this.vup = vup;
 	}
 
 	/**

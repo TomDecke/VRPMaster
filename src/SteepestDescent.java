@@ -1,5 +1,4 @@
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -10,7 +9,7 @@ import java.util.Random;
  */
 public class SteepestDescent extends Descent{
 
-	private RandomSolution soln = null;
+
 
 	/**
 	 * Constructor for the steepest descent
@@ -27,7 +26,6 @@ public class SteepestDescent extends Descent{
 	 */
 	public void solve(ArrayList<Operation> operators, boolean random) {
 
-
 		//create operation matrix
 		for(Operation op : operators) {
 			op.createOptionMatrix();
@@ -43,10 +41,9 @@ public class SteepestDescent extends Descent{
 			}
 		}
 
-		//get the vehicles
+		//get the involved vehicles
 		Vehicle v1 = execute.getV1();
 		Vehicle v2 = execute.getV2();
-
 
 		int iterationCounter = 0;
 		//As long as there are improving moves execute them
@@ -110,26 +107,11 @@ public class SteepestDescent extends Descent{
 			v1 = execute.getV1();
 			v2 = execute.getV2();	
 		}
-		
+
 		printResultsToConsole();
 		printResultsToFile();
-				
-		
 
-		//if the solution was random, memorize the result
-		if(random) {
-			soln = new RandomSolution(super.getTotalCost(), super.getVehicleCount(),super.vrp.m, super.getVehicles());
-		}
 	}
-
-	/**
-	 * Accessor for the solution
-	 * @return RandomSolution, the solution obtained by using random operations
-	 */
-	public RandomSolution getRandomSolution() {
-		return this.soln;
-	}
-
 
 	/**
 	 * Main method for testing
@@ -148,16 +130,16 @@ public class SteepestDescent extends Descent{
 		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
 
 		ArrayList<Operation> ops = new ArrayList<Operation>();
-		
+
 		RelocateOperation rlo = new RelocateOperation(vrp, num);
 		ExchangeOperation exo = new ExchangeOperation(vrp, num);
 		TwoOptOperation	  two = new TwoOptOperation(vrp, num);
 		CrossExOperation  ceo = new CrossExOperation(vrp, num);
-//		ops.add(rlo);
-// 		ops.add(exo);
-// 		ops.add(two);
- 		ops.add(ceo);
-		
+		ops.add(rlo);
+		ops.add(exo);
+		ops.add(two);
+		ops.add(ceo);
+
 
 		stDesc.solve(ops, true);
 
