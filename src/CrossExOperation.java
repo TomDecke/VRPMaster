@@ -1,9 +1,11 @@
 
 import java.io.IOException;
 
-import addOns.TimeConstraintViolationException;
-
-
+/**
+ * Class to represent the cross-exchange-heuristic
+ * @author Tom
+ *
+ */
 public class CrossExOperation implements Operation{
 
 	private final double EPSILON = 1E-8;
@@ -11,6 +13,11 @@ public class CrossExOperation implements Operation{
 	private int numCustomers;
 	private Option[][] crossExMatrix;
 
+	/**
+	 * Constructor for the cross-exchange operation
+	 * @param vrp VRP, the VRP to which the operation is to be applied
+	 * @param numCustomers int, the number of customers in the VRP
+	 */
 	public CrossExOperation(VRP vrp, int numCustomers) {
 		this.vrp=vrp;
 		this.numCustomers = numCustomers;
@@ -60,24 +67,21 @@ public class CrossExOperation implements Operation{
 
 			//reset distance, load and starting point for the new combination
 			cV2 = v2.firstCustomer;
-
 			distUpToC2 = vrp.distance(v2.firstCustomer, cV2);
 			distAfterC2 = v2.getDistance() - distUpToC2;
 
-
 			while(!cV2.equals(v2.lastCustomer)) {
-
 
 				//get the succeeding customers
 				Customer cV1Succ = cV1.succ;
 				Customer cV2Succ = cV2.succ;
-
 
 				//calculate the change in cost due to this move
 				double delta = (distUpToC1  + distAfterC2 + vrp.distance(cV1, cV2Succ) - vrp.distance(cV1, cV1Succ)) * v1.costOfUse
 						+ (distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ) - vrp.distance(cV2, cV2Succ)) * v2.costOfUse
 						- (v1.cost + v2.cost);
 
+				//omit the exchange of depot-connection
 				if(cV2Succ.equals(v2.lastCustomer) && cV1Succ.equals(v1.lastCustomer)) {
 					delta = 0;
 				}
@@ -97,10 +101,10 @@ public class CrossExOperation implements Operation{
 					cV1Succ.pred = cV2;
 					cV2Succ.pred = cV1;
 
+					//check capacity constraints
 					newLoadV1 = checkLoad(v1);
 					newLoadV2 = checkLoad(v2);
 					if(newLoadV1 <= v1.capacity && newLoadV2 <= v2.capacity) {
-
 
 						//if the swap is conform to time window constraints remember the option
 						if(checkPropagation(v1) && checkPropagation(v2)) {
@@ -118,12 +122,10 @@ public class CrossExOperation implements Operation{
 
 					cV1Succ.pred = cV1;
 					cV2Succ.pred = cV2;
-
 				}
 
 				//move to the next customer of vehicle 2
 				cV2 = cV2.succ;	
-
 
 				//update the distance towards/after the second customer
 				distUpToC2 += vrp.distance(cV2.pred, cV2);
@@ -133,17 +135,21 @@ public class CrossExOperation implements Operation{
 			//move to the next customer of vehicle 1
 			cV1 = cV1.succ;		
 
-
-			//update the distance towards/after the second customer
+			//update the distance towards/after the first customer
 			distUpToC1 += vrp.distance(cV1.pred, cV1);
 			distAfterC1 -= vrp.distance(cV1.pred, cV1);
 		}
-
 		return bestCrossEx;
 	}
 
+	/**
+	 * Determine the load carried by a vehicle
+	 * @param v Vehicle, the vehicle to be checked
+	 * @return int, the load carried by v
+	 */
 	private int checkLoad(Vehicle v) {
 		int load = 0;
+		//go through the customers in the vehicle and sum up the load
 		Customer cCur = v.firstCustomer;
 		while(cCur != null) {
 			load += cCur.demand;
@@ -151,10 +157,16 @@ public class CrossExOperation implements Operation{
 		}
 		return load;
 	}
-	
 
+	/**
+	 * Check if the vehicle violates time window constraints
+	 * @param v Vehicle, the vehicle to be checked
+	 * @return boolean, true if there are no time window violations
+	 */
 	private boolean checkPropagation(Vehicle v) {
 		Customer cCur = v.firstCustomer;
+		
+		//get the current earliest and latest start
 		while(cCur != null) {
 			cCur.checkEarliest = cCur.earliestStart;
 			cCur.checkLatest = cCur.latestStart;
@@ -183,7 +195,6 @@ public class CrossExOperation implements Operation{
 		cCur = v.firstCustomer;
 		while(cCur != null) {
 			if(cCur.checkLatest < cCur.checkEarliest) {
-				//System.out.println("Time window violation");
 				return false;
 			}
 			cCur = cCur.succ;
@@ -260,13 +271,13 @@ public class CrossExOperation implements Operation{
 		//update distance and cost of the vehicle
 		updateVehicle(v1);
 		updateVehicle(v2);
-		
+
 		//update earliest and latest start
 		propagateVehicle(v1);
 		propagateVehicle(v2);
 
 	}
-	
+
 	private void propagateVehicle(Vehicle v) {
 		Customer cCur = v.firstCustomer;
 		//execute forward propagation

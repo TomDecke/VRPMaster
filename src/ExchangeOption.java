@@ -11,7 +11,7 @@ public class ExchangeOption extends Option {
 	 * @param v2 Vehicle, the second vehicle of the exchange
 	 * @param cV1 Customer, the customer located in v1
 	 * @param cV2 Customer, the customer located in v2
-	 * @param cost double, the change of cost incurred by this move
+	 * @param delta double, the change of cost incurred by this move
  	 * @param op Operation, the operation to which the exchange option belongs
 	 */
 	public ExchangeOption(Vehicle v1, Vehicle v2, Customer cV1, Customer cV2, double delta, Operation op) {

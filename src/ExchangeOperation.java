@@ -1,6 +1,6 @@
 /**
  * Class to represent the exchange-heuristic
- * @author Tom
+ * @author Tom Decke
  *
  */
 public class ExchangeOperation implements Operation {

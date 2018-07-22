@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 /**
- * Class to obtain results from multiple input files in a given directory
+ * Class to obtain results from multiple input files in a given directory and test them for their validity
  * @author Tom Decke
  *
  */
@@ -11,19 +11,19 @@ public class RunDescents {
 	private static final int RANDOM_RUNS = 8;
 
 	public static void main(String[] args) throws IOException {
-		
+
 		//get information from the input
 		String folderpath = args[0];
-		String resultpath = folderpath+"results\\";
 		int numCustomers = Integer.parseInt(args[1]);
-		
+		String resultpath = folderpath+"results\\";
+
 		boolean steepest = true;
-		ArrayList<Operation> ops = null;
 		boolean rand = false;
 
-		//set up the descent and the problem instance
+		//set up the descent, the problem instance and the operators
 		Descent desc = null;
 		VRP vrp = null; 
+		ArrayList<Operation> ops = null;
 
 		//create a folder for the results
 		File result = new File(resultpath);
@@ -33,16 +33,18 @@ public class RunDescents {
 		File folder = new File(folderpath);
 		File[] listOfFiles = folder.listFiles();
 
-		//set up the output-file
+		//set up the output-file for all results
 		FileWriter writer = new FileWriter(resultpath+"soln_"+numCustomers+".txt");
 
 		//go through the files in the directory
 		for (File file : listOfFiles) {
 			if (file.isFile()) {
+				String fInName = file.getName();
 
 				writer.write(file.getName()+"\n");
-				String vrpInstance = folderpath +file.getName();
+				String vrpInstance = folderpath +fInName;
 
+				//TODO re-think the placement of the steepest-check
 				//execute the first four modes for steepest descent 
 				for(int i = 10; i < 12; i++) {
 
@@ -50,10 +52,10 @@ public class RunDescents {
 					ops = getMoves(vrp, numCustomers, i);
 					//get the descent specified by the input
 					if(steepest) {
-						desc = new SteepestDescent(vrp, resultpath + "mode_" + i + "_"+  file.getName());
+						desc = new SteepestDescent(vrp, resultpath + "mode_" + i + "_"+  fInName);
 					}
 					else {
-						desc = new FirstFitDescent(vrp, resultpath + "mode_" + i + "_"+  file.getName());
+						desc = new FirstFitDescent(vrp, resultpath + "mode_" + i + "_"+  fInName);
 					}
 					//make sure that first descent only executes once, if chosen
 					if(steepest) {
@@ -63,20 +65,24 @@ public class RunDescents {
 						writer.write("mode " + i + ": ");
 						writer.write(String.format("cost: %.1f needed Vehicles: %d%n", desc.getTotalCost(),desc.getVehicleCount()));
 					}
+
 				}
 
 				//determine the random result
 				if(rand) {
-					
+
 					//get problem instance
 					vrp = new VRP(vrpInstance, numCustomers);
 					//get operators
 					ops = getMoves(vrp, numCustomers, 11);
 					desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
 					desc.solve(ops,rand);
-					
+
+					//create the first random solution
 					RandomSolution randSoln = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
-				for(int i = 0 ; i < RANDOM_RUNS ; i++) {
+					
+					//execute the random solver a given number of times and remember the one with the best result
+					for(int i = 0 ; i < RANDOM_RUNS ; i++) {
 						vrp = new VRP(vrpInstance, numCustomers);
 						desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
 						ops = getMoves(vrp, numCustomers, 11);
@@ -87,6 +93,7 @@ public class RunDescents {
 						}
 					}
 
+					//write the best result to the files
 					randSoln.writeSolutionToFile(resultpath + "mode_rSoln_"+  file.getName());
 					writer.write("mode r: ");
 					writer.write(String.format("cost: %.1f needed Vehicles: %d%n", randSoln.getCost(),randSoln.getNeededV()));
@@ -96,8 +103,6 @@ public class RunDescents {
 			}
 		}
 		writer.close();
-		
-		
 
 		//Test the solutions
 		//path to the solution
@@ -111,6 +116,7 @@ public class RunDescents {
 				String fName = file.getName();
 				String[] name = fName.split("_");
 				String vrpName = folderpath+name[2];
+
 				//test if the solution is valid
 				System.out.println(fName);
 				boolean testResult = TestSolution.testFile(vrpName, numCustomers,file.getAbsolutePath());
@@ -119,17 +125,22 @@ public class RunDescents {
 				}
 			}
 		}
-		System.out.println("Valid solution!");
 	}
-	
-	
+
+	/**
+	 * Creates an array list containing different improvement operators
+	 * @param vrp VRP, the problem instance to which the operators are to be applied
+	 * @param numCustomer int, the number of customers in the vrp
+	 * @param mode int, number corresponding to the combination of desired operators
+	 * @return ArrayList<Operation>, the operators which are to be applied
+	 */
 	private static ArrayList<Operation> getMoves(VRP vrp, int numCustomer, int mode){
 		ArrayList<Operation> ops = new ArrayList<Operation>();
 		RelocateOperation rlo = new RelocateOperation(vrp, numCustomer);
 		ExchangeOperation exo = new ExchangeOperation(vrp, numCustomer);
 		TwoOptOperation	  two = new TwoOptOperation(vrp, numCustomer);
 		CrossExOperation  ceo = new CrossExOperation(vrp, numCustomer);
-		
+
 		switch(mode) {
 		case 0:
 			ops.add(rlo);
@@ -182,8 +193,7 @@ public class RunDescents {
 			ops.add(exo);
 			ops.add(two);
 			ops.add(ceo);
-			break;
-		
+			break;	
 		}
 		return ops;
 	}

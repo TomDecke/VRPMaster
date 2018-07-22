@@ -1,5 +1,4 @@
 /solomon_100/
-/addOns/
 /CrossExOperation.class
 /CrossExOption.class
 /Customer.class
@@ -11,6 +10,7 @@
 /MainVRP.class
 /Operation.class
 /Option.class
+/addOns/
 /RandomSolution.class
 /RelocateOperation.class
 /RelocateOption.class
