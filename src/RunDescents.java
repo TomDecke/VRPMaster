@@ -16,9 +16,9 @@ public class RunDescents {
 		String folderpath = args[0];
 		int numCustomers = Integer.parseInt(args[1]);
 		String resultpath = folderpath+"results\\";
+		
+		int[] modes = {0,1,2,3,10,11};
 
-		boolean steepest = true;
-		boolean rand = false;
 
 		//set up the descent, the problem instance and the operators
 		Descent desc = null;
@@ -44,49 +44,44 @@ public class RunDescents {
 				writer.write(file.getName()+"\n");
 				String vrpInstance = folderpath +fInName;
 
-				//TODO re-think the placement of the steepest-check
-				//execute the first four modes for steepest descent 
-				for(int i = 10; i < 12; i++) {
+				
+					//execute the the wanted modes for steepest descent 
+					for(int i : modes) {
 
-					vrp = new VRP(vrpInstance, numCustomers);
-					ops = getMoves(vrp, numCustomers, i);
-					//get the descent specified by the input
-					if(steepest) {
+						vrp = new VRP(vrpInstance, numCustomers);
+						ops = getMoves(vrp, numCustomers, i);
+
+						//get the descent specified by the input
 						desc = new SteepestDescent(vrp, resultpath + "mode_" + i + "_"+  fInName);
-					}
-					else {
-						desc = new FirstFitDescent(vrp, resultpath + "mode_" + i + "_"+  fInName);
-					}
-					//make sure that first descent only executes once, if chosen
-					if(steepest) {
-						//solve the VRP-instance
-						desc.solve(ops,rand);
+
+						//make sure that first descent only executes once, if chosen
+						//solve the VRP-instance without use of random
+						desc.solve(ops,false);
+
 						//write the results to the output file
 						writer.write("mode " + i + ": ");
 						writer.write(String.format("cost: %.1f needed Vehicles: %d%n", desc.getTotalCost(),desc.getVehicleCount()));
 					}
 
-				}
-
-				//determine the random result
-				if(rand) {
-
+					//determine the random result
+					
 					//get problem instance
 					vrp = new VRP(vrpInstance, numCustomers);
 					//get operators
 					ops = getMoves(vrp, numCustomers, 11);
-					desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
-					desc.solve(ops,rand);
+					//calculate the first random solution
+					desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  fInName);
+					desc.solve(ops,true);
 
 					//create the first random solution
 					RandomSolution randSoln = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
-					
+
 					//execute the random solver a given number of times and remember the one with the best result
 					for(int i = 0 ; i < RANDOM_RUNS ; i++) {
 						vrp = new VRP(vrpInstance, numCustomers);
-						desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  file.getName());
+						desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  fInName);
 						ops = getMoves(vrp, numCustomers, 11);
-						desc.solve(ops,rand);
+						desc.solve(ops,true);
 						RandomSolution rsTmp = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
 						if(rsTmp.getCost() < randSoln.getCost()) {
 							randSoln = rsTmp;
@@ -97,9 +92,14 @@ public class RunDescents {
 					randSoln.writeSolutionToFile(resultpath + "mode_rSoln_"+  file.getName());
 					writer.write("mode r: ");
 					writer.write(String.format("cost: %.1f needed Vehicles: %d%n", randSoln.getCost(),randSoln.getNeededV()));
-					writer.write("\n");
 
-				}
+					//write the result for the first fit descent
+					vrp = new VRP(vrpInstance, numCustomers);
+					desc = new FirstFitDescent(vrp, resultpath + "mode_FD_"+  fInName);
+					desc.solve(null, false);
+					writer.write("mode ffd: ");
+					writer.write(String.format("cost: %.1f needed Vehicles: %d%n", desc.getTotalCost(),desc.getVehicleCount()));
+					writer.write("\n");
 			}
 		}
 		writer.close();
@@ -134,7 +134,7 @@ public class RunDescents {
 	 * @param mode int, number corresponding to the combination of desired operators
 	 * @return ArrayList<Operation>, the operators which are to be applied
 	 */
-	private static ArrayList<Operation> getMoves(VRP vrp, int numCustomer, int mode){
+	public static ArrayList<Operation> getMoves(VRP vrp, int numCustomer, int mode){
 		ArrayList<Operation> ops = new ArrayList<Operation>();
 		RelocateOperation rlo = new RelocateOperation(vrp, numCustomer);
 		ExchangeOperation exo = new ExchangeOperation(vrp, numCustomer);

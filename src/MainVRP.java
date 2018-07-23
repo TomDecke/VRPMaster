@@ -7,12 +7,17 @@ import java.util.ArrayList;
  *
  */
 public class MainVRP {
-	//TODO update the main
 	public static void main(String[] args) throws IOException{
 
 		//get the input
 		String in = args[0];
 		int numCustomer = Integer.parseInt(args[1]);
+		int mode = Integer.parseInt(args[2]);
+		String random = args[3];
+		boolean rand = false;
+		if(random.equals("random")) {
+			rand = true;
+		}
 
 		String fileOut = in.substring(0, in.length()-4);
 		fileOut += "_Solution.txt";
@@ -24,20 +29,10 @@ public class MainVRP {
 
 		//run the solver
 		System.out.println("");
-		ArrayList<Operation> ops = new ArrayList<Operation>();
-
-		//instantiate the heuristics
-		RelocateOperation rlo = new RelocateOperation(vrp, numCustomer);
-		ExchangeOperation exo = new ExchangeOperation(vrp, numCustomer);
-		TwoOptOperation	  two = new TwoOptOperation(vrp, numCustomer);
-		CrossExOperation  ceo = new CrossExOperation(vrp, numCustomer);
-		ops.add(rlo);
-		ops.add(exo);
-		ops.add(two);
-		ops.add(ceo);
+		ArrayList<Operation> ops = RunDescents.getMoves(vrp, numCustomer, mode);
 
 
-		stDesc.solve(ops, true);
+		stDesc.solve(ops, rand);
 
 
 
