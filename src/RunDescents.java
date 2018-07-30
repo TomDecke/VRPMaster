@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class RunDescents {
 
-	private static final int RANDOM_RUNS = 8;
+	private static final int RANDOM_RUNS = 0;
 
 	public static void main(String[] args) throws IOException {
 
@@ -17,7 +17,7 @@ public class RunDescents {
 		int numCustomers = Integer.parseInt(args[1]);
 		String resultpath = folderpath+"results\\";
 		
-		int[] modes = {0,1,2,3,10,11};
+		int[] modes = {0};//,1,2,3,10,11};
 
 
 		//set up the descent, the problem instance and the operators
@@ -67,8 +67,8 @@ public class RunDescents {
 					
 					//get problem instance
 					vrp = new VRP(vrpInstance, numCustomers);
-					//get operators
-					ops = getMoves(vrp, numCustomers, 11);
+					//get operators //TODO choose the combination of working operators
+					ops = getMoves(vrp, numCustomers, 0);
 					//calculate the first random solution
 					desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  fInName);
 					desc.solve(ops,true);

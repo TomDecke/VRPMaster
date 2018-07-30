@@ -1,3 +1,5 @@
+import addOns.TimeConstraintViolationException;
+
 /**
  * Class to represent the relocate-heuristic
  * @author Tom Decke
@@ -43,6 +45,9 @@ public class RelocateOperation implements Operation{
 
 		double cCost = vFrom.cost + vTo.cost;
 
+		//check if the customer would be relocated within the vehicle
+		boolean sameVehicle = vTo.equals(vFrom);
+		
 		//create an empty move with no improvement
 		//thus prevent the moving of one customer to another vehicle if there would be no benefit
 		RelocateOption bestToMove = new RelocateOption(null, 0, vFrom, vTo,this);
@@ -50,16 +55,22 @@ public class RelocateOperation implements Operation{
 
 		//start checking from the first customer, who is not the depot-connection
 		Customer cFrom = vFrom.firstCustomer.succ;
+		Customer cFPred = cFrom.pred;
+		Customer cFSucc = cFrom.succ;
 		while(!cFrom.equals(vFrom.lastCustomer)) {
+			
+			cFPred = cFrom.pred;
+			cFSucc = cFrom.succ;
+			
 
 			//if the vehicle can accommodate the customer find the best position for him
-			if(vTo.canAccomodate(cFrom)) {
+			if(vTo.canAccomodate(cFrom) || sameVehicle) {
 
 
 				//determine how the total distance of vFrom would change
-				double newDistVFrom = vFrom.getDistance() + vrp.distance(cFrom.pred, cFrom.succ) 
-				- vrp.distance(cFrom.pred, cFrom)
-				- vrp.distance(cFrom, cFrom.succ);
+				double newDistVFrom = vFrom.getDistance() + vrp.distance(cFPred, cFSucc) 
+				- vrp.distance(cFPred, cFrom)
+				- vrp.distance(cFrom, cFSucc);
 
 				//catch computational inaccuracy
 				if(Math.abs(newDistVFrom) < EPSILON) {
@@ -77,6 +88,7 @@ public class RelocateOperation implements Operation{
 							double newDistVTo = vTo.getDistance() - vrp.distance(cToPred, cToSucc)
 									+ vrp.distance(cToPred, cFrom)
 									+ vrp.distance(cFrom, cToSucc);
+
 
 							//catch computational inaccuracy
 							if(Math.abs(newDistVTo) < EPSILON) {
@@ -107,6 +119,7 @@ public class RelocateOperation implements Operation{
 					cToSucc = cToSucc.succ;
 				}
 			}
+			
 			//go to the next customer
 			cFrom = cFrom.succ;
 		}
