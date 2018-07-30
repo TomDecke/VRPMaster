@@ -77,8 +77,8 @@ public class CrossExOperation implements Operation{
 				Customer cV2Succ = cV2.succ;
 
 				//calculate the change in cost due to this move
-				double delta = (distUpToC1  + distAfterC2 + vrp.distance(cV1, cV2Succ) - vrp.distance(cV1, cV1Succ)) * v1.costOfUse
-						+ (distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ) - vrp.distance(cV2, cV2Succ)) * v2.costOfUse
+				double delta = (distUpToC1  + distAfterC2 + vrp.distance(cV1, cV2Succ) - vrp.distance(cV2, cV2Succ)) * v1.costOfUse
+						+ (distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ) - vrp.distance(cV1, cV1Succ)) * v2.costOfUse
 						- (v1.cost + v2.cost);
 
 				//omit the exchange of depot-connection
@@ -336,16 +336,16 @@ public class CrossExOperation implements Operation{
 
 			//only consider inter-route and one way crossing
 			if(indV1 < i) {
-				crossExMatrix[indV1][i] = findBestOption(v1, cV);
+				crossExMatrix[indV1][i] = findBestOption(v1,cV);
 			}
 			else if(indV1 > i) {
-				crossExMatrix[i][indV1] = findBestOption(v1, cV);
+				crossExMatrix[i][indV1] = findBestOption(cV,v1);
 			}
 			if(indV2 < i) {
-				crossExMatrix[indV2][i] = findBestOption(v2, cV);		
+				crossExMatrix[indV2][i] = findBestOption(v2,cV);		
 			}
 			else if(indV2 > i) {
-				crossExMatrix[i][indV2] = findBestOption(v2, cV);		
+				crossExMatrix[i][indV2] = findBestOption(cV,v2);		
 			}
 		}
 	}
@@ -401,8 +401,6 @@ public class CrossExOperation implements Operation{
 
 
 		stDesc.solve(ops, true);
-
-
 
 		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
 		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
