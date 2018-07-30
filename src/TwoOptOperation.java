@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -136,7 +137,7 @@ public class TwoOptOperation implements Operation{
 					//check if a reversal is possible and what benefit it would bring
 					double delta = checkReversal(v,c3, c2);
 
-					if(delta < 0) {
+					if(delta < twoOpt.getDelta()) {
 						twoOpt = new TwoOptOption(c3, c2, v, delta, this);
 					}
 				}
@@ -160,31 +161,16 @@ public class TwoOptOperation implements Operation{
 	 */
 	private double checkReversal(Vehicle v, Customer newStart, Customer newEnd) {
 
-		double oldCost = 0;
-		double newCost = 0;
-
 		Customer oldEnd = newStart.succ;
 		Customer oldStart = newEnd.pred;
-
-		Customer cCur = oldStart;
-
-		//calculate the cost of the old route
-		while(!cCur.equals(oldEnd)) {
-			oldCost += vrp.distance(cCur, cCur.succ);
-			cCur = cCur.succ;
-		}
-
-		//calculate the cost of the new route
-		cCur = newStart;
-		while(!cCur.equals(newEnd)) {
-			newCost += vrp.distance(cCur, cCur.pred);
-			cCur = cCur.pred;
-
-		}
-		newCost += vrp.distance(newEnd, oldEnd) + vrp.distance(oldStart, newStart);
+		
+		//calculate the change in distance
+		double oldCost = vrp.distance(oldStart, newEnd) + vrp.distance(newStart, oldEnd);
+		double newCost = vrp.distance(oldStart, newStart) + vrp.distance(newEnd, oldEnd);
 
 		double deltaCost = newCost - oldCost;
 
+		Customer cCur = oldStart;
 		//check for improvement and catch computational error
 		if(deltaCost < EPSILON) {
 			cCur = v.firstCustomer;
@@ -295,4 +281,33 @@ public class TwoOptOperation implements Operation{
 		//check if the crossing happens between the end points of both routes
 		return (c1c2 >= 0 && c1c2 <= 1) && (c3c4 >= 0 && c3c4 <= 1);
 	}
+	
+	/**
+	 * Main method for testing
+	 * @param args
+	 * @throws IOException
+	 */
+	public static void main(String[] args) throws IOException {
+		//get information from the input
+		String folderpath = args[0];
+		int numCustomers = Integer.parseInt(args[1]);
+		VRP vrp = new VRP(folderpath, numCustomers);
+		Vehicle testV = vrp.vehicle[7];
+		Customer[] c = vrp.customer;
+		testV.show();
+		testV.insertBetween(c[10], testV.firstCustomer, testV.lastCustomer);
+		testV.insertBetween(c[4], c[10], testV.lastCustomer);
+		testV.insertBetween(c[6], c[4], testV.lastCustomer);
+		testV.insertBetween(c[8], c[6], testV.lastCustomer);
+		testV.insertBetween(c[7], c[8], testV.lastCustomer);
+		testV.show();
+		
+		TwoOptOperation two = new TwoOptOperation(vrp, numCustomers);
+		
+		Option x = two.findBestOption(testV, testV);
+		x.printOption();
+		two.executeOption(x);
+		testV.show();
+	}
 }
+
