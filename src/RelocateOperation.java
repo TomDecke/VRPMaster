@@ -48,6 +48,10 @@ public class RelocateOperation implements Operation{
 		//check if the customer would be relocated within the vehicle
 		boolean sameVehicle = vTo.equals(vFrom);
 		
+		if(sameVehicle) {
+			cCost = vFrom.cost;
+		}
+		
 		//create an empty move with no improvement
 		//thus prevent the moving of one customer to another vehicle if there would be no benefit
 		RelocateOption bestToMove = new RelocateOption(null, 0, vFrom, vTo,this);
@@ -97,6 +101,16 @@ public class RelocateOperation implements Operation{
 
 							//the new cost for the vehicles, if this move was to be made
 							double resultingCost = newDistVFrom * vFrom.costOfUse + newDistVTo * vTo.costOfUse;
+							
+							if(sameVehicle) {
+								resultingCost = (vTo.getDistance() 
+										+ vrp.distance(cFPred, cFSucc) 
+										+ vrp.distance(cToPred, cFrom)
+										+ vrp.distance(cFrom, cToSucc) 
+										- vrp.distance(cToPred, cToSucc)
+										- vrp.distance(cFPred, cFrom)
+										- vrp.distance(cFrom, cFSucc)) *vTo.costOfUse;
+							}
 
 							//the change in cost
 							double deltaCost =  resultingCost - cCost;

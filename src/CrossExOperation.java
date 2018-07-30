@@ -1,5 +1,6 @@
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Class to represent the cross-exchange-heuristic
@@ -385,6 +386,26 @@ public class CrossExOperation implements Operation{
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
+		String in = args[0];
+		int num = Integer.parseInt(args[1]);
+		VRP vrp = new VRP(in, num);
 
+		String fileOut = in.substring(0, in.length()-4);
+		fileOut += "_Solution.txt";
+
+		SteepestDescent stDesc = new SteepestDescent(vrp,fileOut);
+
+		ArrayList<Operation> ops = new ArrayList<Operation>();
+		CrossExOperation  ceo = new CrossExOperation(vrp, num);
+		ops.add(ceo);
+
+
+		stDesc.solve(ops, true);
+
+
+
+		TestSolution.runTest(stDesc.vrp, stDesc.getTotalCost(), stDesc.getVehicles());
+		DisplayVRP dVRP = new DisplayVRP(in, num, args[2]);
+		dVRP.plotVRPSolution();
 	}
 }
