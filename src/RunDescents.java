@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class RunDescents {
 
-	private static final int RANDOM_RUNS = 0;
+	private static final int RANDOM_RUNS = 3;
 
 	public static void main(String[] args) throws IOException {
 
@@ -17,7 +17,7 @@ public class RunDescents {
 		int numCustomers = Integer.parseInt(args[1]);
 		String resultpath = folderpath+"results\\";
 		
-		int[] modes = {0};//,1,2,3,10,11};
+		int[] modes = {0,1,2,3,4,5,6,7,8,9,10,11};
 
 
 		//set up the descent, the problem instance and the operators

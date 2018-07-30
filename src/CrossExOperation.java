@@ -44,6 +44,8 @@ public class CrossExOperation implements Operation{
 	 * @return boolean, whether or not the cross exchange was successful
 	 */
 	public Option findBestOption(Vehicle v1, Vehicle v2) {
+		
+		double oldCost = v1.cost + v2.cost;
 
 		Customer cV1 = v1.firstCustomer;
 		Customer cV2 = v2.firstCustomer;
@@ -77,9 +79,10 @@ public class CrossExOperation implements Operation{
 				Customer cV2Succ = cV2.succ;
 
 				//calculate the change in cost due to this move
-				double delta = (distUpToC1  + distAfterC2 + vrp.distance(cV1, cV2Succ) - vrp.distance(cV2, cV2Succ)) * v1.costOfUse
-						+ (distUpToC2  + distAfterC1 + vrp.distance(cV2, cV1Succ) - vrp.distance(cV1, cV1Succ)) * v2.costOfUse
-						- (v1.cost + v2.cost);
+				double newCost = (distUpToC1 + vrp.distance(cV1, cV2Succ) + distAfterC2  - vrp.distance(cV2, cV2Succ)) * v1.costOfUse
+						+ (distUpToC2 + vrp.distance(cV2, cV1Succ) + distAfterC1  - vrp.distance(cV1, cV1Succ)) * v2.costOfUse;
+				
+				double delta = newCost - oldCost;
 
 				//omit the exchange of depot-connection
 				if(cV2Succ.equals(v2.lastCustomer) && cV1Succ.equals(v1.lastCustomer)) {
@@ -134,6 +137,14 @@ public class CrossExOperation implements Operation{
 			//update the distance towards/after the first customer
 			distUpToC1 += vrp.distance(cV1.pred, cV1);
 			distAfterC1 -= vrp.distance(cV1.pred, cV1);
+		}
+		
+		//if there are no more improvements move customers from virtual to real vehicles
+		if(bestCrossEx.getDelta() == 0 && v1.firstCustomer.succ.equals(v1.lastCustomer)&&!v2.firstCustomer.succ.equals(v2.lastCustomer)) {
+			if(v1.costOfUse < v2.costOfUse) {
+				double delta = v2.getDistance() - v2.cost;
+				bestCrossEx = new CrossExOption(v1, v2, v1.firstCustomer, v2.firstCustomer, v2.load, 0, delta, this);
+			}
 		}
 		return bestCrossEx;
 	}
