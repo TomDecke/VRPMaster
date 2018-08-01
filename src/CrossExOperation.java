@@ -139,8 +139,8 @@ public class CrossExOperation implements Operation{
 			distAfterC1 -= vrp.distance(cV1.pred, cV1);
 		}
 		
-		//if there are no more improvements move customers from virtual to real vehicles
-		if(bestCrossEx.getDelta() == 0 && v1.firstCustomer.succ.equals(v1.lastCustomer)&&!v2.firstCustomer.succ.equals(v2.lastCustomer)) {
+		//if possible move customer from virtual to real vehicle
+		if(v1.firstCustomer.succ.equals(v1.lastCustomer)&&!v2.firstCustomer.succ.equals(v2.lastCustomer)) {
 			if(v1.costOfUse < v2.costOfUse) {
 				double delta = v2.getDistance() - v2.cost;
 				bestCrossEx = new CrossExOption(v1, v2, v1.firstCustomer, v2.firstCustomer, v2.load, 0, delta, this);
