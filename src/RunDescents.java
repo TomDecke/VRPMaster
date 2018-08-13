@@ -8,7 +8,7 @@ import java.util.ArrayList;
  */
 public class RunDescents {
 
-	private static final int RANDOM_RUNS = 10;
+	private static final int RANDOM_RUNS = 9;
 
 	public static void main(String[] args) throws IOException {
 
@@ -18,8 +18,10 @@ public class RunDescents {
 		String resultpath = folderpath+"results\\";
 
 		int[] modes = {0,1,2,4,6,5,7,3,8,9,10,11};
+		long[] times = new long[14];
 		
 		long t0 = 0;
+		long t1 = 0;
 
 
 		//set up the descent, the problem instance and the operators
@@ -37,7 +39,9 @@ public class RunDescents {
 
 		//set up the output-file for all results
 		FileWriter writer = new FileWriter(resultpath+"soln_"+numCustomers+".txt");
+		FileWriter w2 = new FileWriter(resultpath+"time_"+numCustomers+".txt");
 
+		long time = System.currentTimeMillis();
 		//go through the files in the directory
 		for (File file : listOfFiles) {
 			if (file.isFile()) {
@@ -50,7 +54,8 @@ public class RunDescents {
 				//execute the the wanted modes for steepest descent 
 				for(int i : modes) {
 
-					//get the system
+					//get the system time
+					t0 = System.currentTimeMillis();
 					
 					vrp = new VRP(vrpInstance, numCustomers);
 					ops = getMoves(vrp, numCustomers, i);
@@ -58,19 +63,26 @@ public class RunDescents {
 					//get the descent specified by the input
 					desc = new SteepestDescent(vrp, resultpath + "mode_" + i + "_"+  fInName);
 
+					
 					//make sure that first descent only executes once, if chosen
 					//solve the VRP-instance without use of random
 					desc.solve(ops,false);
 
+					
 					//write the results to the output file in the format cost/vehicles
 					writer.write(String.format(" & %.2f/%d", desc.getTotalCost(),desc.getVehicleCount()));
 					if(i == 7) {
 						writer.write(String.format("%n"));
 					}
+					
+					//write the time
+					t1 = System.currentTimeMillis();
+					times[i] += t1-t0;
 				}
 
 				//determine the random result
-
+				t0 = System.currentTimeMillis();
+				
 				//get problem instance
 				vrp = new VRP(vrpInstance, numCustomers);
 				//get operators
@@ -81,12 +93,14 @@ public class RunDescents {
 
 				//create the first random solution
 				RandomSolution randSoln = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
+				
 
 				//execute the random solver a given number of times and remember the one with the best result
 				for(int i = 0 ; i < RANDOM_RUNS ; i++) {
 					vrp = new VRP(vrpInstance, numCustomers);
 					desc = new SteepestDescent(vrp, resultpath + "mode_r_"+  fInName);
 					ops = getMoves(vrp, numCustomers, 11);
+
 					desc.solve(ops,true);
 					RandomSolution rsTmp = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
 					if(rsTmp.getCost() < randSoln.getCost()) {
@@ -94,19 +108,39 @@ public class RunDescents {
 					}
 				}
 
+						
 				//write the best result to the files
 				randSoln.writeSolutionToFile(resultpath + "mode_rSoln_"+  file.getName());
 				writer.write(String.format(" & %.2f/%d", randSoln.getCost(),randSoln.getNeededV()));
 
+				times[12] += System.currentTimeMillis() - t0;
+
 				//write the result for the first fit descent
+				t0 = System.currentTimeMillis();
 				vrp = new VRP(vrpInstance, numCustomers);
 				desc = new FirstFitDescent(vrp, resultpath + "mode_FD_"+  fInName);
+			
+				
 				desc.solve(null, false);
+							
+				
 				writer.write(String.format(" & %.2f/%d%n", desc.getTotalCost(),desc.getVehicleCount()));
 				writer.write("\n");
+				t1 = System.currentTimeMillis();
+				times[13] += t1-t0;
 			}
 		}
 		writer.close();
+		System.out.println((System.currentTimeMillis()-time));
+		
+		int counter = 0;
+		for(long l : times) {
+			w2.write(counter + " "+ l + "\n");
+			counter++;
+		}
+		w2.close();
+		
+
 
 		//Test the solutions
 		//path to the solution
