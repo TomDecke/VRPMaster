@@ -46,10 +46,10 @@ public class MainVRP {
 
 		//show all vehicles after the search finished
 		for(int i = 0 ; i<numCustomer; i++) {
-			Vehicle v = stDesc.getVRP().vehicle[i];
-			System.out.println("Customer of vehicle "+v.id +": " +v.firstCustomer.succ.toString());
+			Vehicle v = stDesc.getVRP().getVehicle()[i];
+			System.out.println("Customer of vehicle "+v.getId() +": " +v.getFirstCustomer().getSucc().toString());
 			v.show();
-			System.out.println("Cost for vehicle "+v.id+": "+v.cost);	
+			System.out.println("Cost for vehicle "+v.getId()+": "+v.getCost());	
 		}
 		System.out.println(" ");
 

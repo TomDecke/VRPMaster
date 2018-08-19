@@ -72,6 +72,6 @@ public class TwoOptOption extends Option{
 	 */
 	@Override
 	public void printOption() {
-		System.out.println(String.format("Reverse the route between C%s and C%s in V%s. Cost benefit: %.2f", getC2().custNo,getC1().custNo,getV1().id,getDelta()));
+		System.out.println(String.format("Reverse the route between C%s and C%s in V%s. Cost benefit: %.2f", getC2().getCustNo(),getC1().getCustNo(),getV1().getId(),getDelta()));
 	}
 }

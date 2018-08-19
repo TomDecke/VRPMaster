@@ -108,7 +108,7 @@ public abstract class Descent {
 	 * Determine the number of vehicles that are needed in the solution
 	 * @return int, the number of vehicles
 	 */
-	protected int getVehicleCount() {
+	public int getVehicleCount() {
 		int vehicleCount = 0; //number of vehicles needed in the solution
 		for(int i = 0 ; i<numCustomers; i++) {
 			Vehicle v = vrp.getVehicle()[i];

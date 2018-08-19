@@ -105,7 +105,7 @@ public class RunDescents {
 				desc.solve(ops,true);
 
 				//create the first random solution
-				RandomSolution randSoln = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
+				RandomSolution randSoln = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().getM(), desc.getVehicles());
 				
 
 				//execute the random solver a given number of times and remember the one with the best result
@@ -115,7 +115,7 @@ public class RunDescents {
 					ops = getMoves(vrp, numCustomers, 11);
 
 					desc.solve(ops,true);
-					RandomSolution rsTmp = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().m, desc.getVehicles());
+					RandomSolution rsTmp = new RandomSolution(desc.getTotalCost(), desc.getVehicleCount(), desc.getVRP().getM(), desc.getVehicles());
 					if(rsTmp.getCost() < randSoln.getCost()) {
 						randSoln = rsTmp;
 					}

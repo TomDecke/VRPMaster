@@ -71,7 +71,7 @@ public class ExchangeOption extends Option {
 			System.out.println(String.format("There are no customers to swap"));
 		}
 		else {
-			System.out.println(String.format("Swap customer c%d from vehicle v%d with customer c%d from vehicle v%d. Improvement: %.2f",c1.custNo,v1.id,c2.custNo,v2.id,getDelta()));
+			System.out.println(String.format("Swap customer c%d from vehicle v%d with customer c%d from vehicle v%d. Improvement: %.2f",c1.getCustNo(),v1.getId(),c2.getCustNo(),v2.getId(),getDelta()));
 
 		}
 	}

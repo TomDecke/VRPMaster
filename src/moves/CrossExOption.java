@@ -82,7 +82,7 @@ public class CrossExOption extends Option{
 			System.out.println(String.format("There are no customers to swap"));
 		}
 		else {
-			System.out.println(String.format("Exchange after c%d from vehicle %d with part after c%d from vehicle %d. Improvement: %.2f",c1.custNo,v1.id,c2.custNo,v2.id,delta));
+			System.out.println(String.format("Exchange after c%d from vehicle %d with part after c%d from vehicle %d. Improvement: %.2f",c1.getCustNo(),v1.getId(),c2.getCustNo(),v2.getId(),delta));
 
 		}
 	}	

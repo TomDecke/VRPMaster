@@ -92,10 +92,10 @@ public class RelocateOption extends Option{
 	 */
 	public void printOption() {
 		if(cToMove != null) {
-			System.out.println("Move c"+cToMove.custNo+" from v" +v1.id + " to v" + v2.id+ " at cost: "+delta);
+			System.out.println("Move c"+cToMove.getCustNo()+" from v" +v1.getId() + " to v" + v2.getId()+ " at cost: "+delta);
 		}
 		else {
-			System.out.println("Move cX from v" +v1.id + " to v" + v2.id+ " at cost: "+delta);	
+			System.out.println("Move cX from v" +v1.getId() + " to v" + v2.getId()+ " at cost: "+delta);	
 		}
 	}
 }
