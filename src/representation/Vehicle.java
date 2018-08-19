@@ -1,5 +1,4 @@
 package representation;
-import java.io.IOException;
 import addOns.TimeConstraintViolationException;
 
 /**
@@ -50,7 +49,7 @@ public class Vehicle {
 	 * @param cInsert Customer, the customer which is to be inserted 
 	 * @return boolean, whether or not the insertion was successful
 	 */
-	boolean insertBetween(Customer cInsert, Customer cPred, Customer cSucc){		
+	public boolean insertBetween(Customer cInsert, Customer cPred, Customer cSucc){		
 
 
 		//tell the customer he now belongs to this vehicle
@@ -101,7 +100,7 @@ public class Vehicle {
 	 * @param c Customer, the customer which should be removed
 	 * @return boolean, true if successful, false otherwise
 	 */
-	boolean remove(Customer c){
+	public boolean remove(Customer c){
 		Customer currentCustomer = firstCustomer;
 
 		//search for customer c

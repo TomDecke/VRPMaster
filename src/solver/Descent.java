@@ -29,7 +29,7 @@ public abstract class Descent {
 	 */
 	public Descent(VRP vrp, String fOut) {
 		this.vrp = vrp;
-		this.numCustomers = vrp.n;
+		this.numCustomers = vrp.getN();
 		this.fOut = fOut;
 	}
 
@@ -48,9 +48,9 @@ public abstract class Descent {
 	public ArrayList<Vehicle> getVehicles(){
 		ArrayList<Vehicle> vehicles = new ArrayList<Vehicle>();
 		for(int i = 0 ; i<numCustomers; i++) {
-			Vehicle v = vrp.vehicle[i];
+			Vehicle v = vrp.getVehicle()[i];
 			//check if there are still customers in between the dummies
-			if(!v.firstCustomer.succ.equals(v.lastCustomer)) {
+			if(!v.getFirstCustomer().getSucc().equals(v.getLastCustomer())) {
 				vehicles.add(v);
 			}
 		}
@@ -83,15 +83,15 @@ public abstract class Descent {
 		try {
 			writer 	= new FileWriter(fOut);
 			//write the cost of the solution
-			writer.write(""+vrp.m +" "+this.getVehicleCount()+"\n");
+			writer.write(""+vrp.getM() +" "+this.getVehicleCount()+"\n");
 
 			//write the customers of each vehicle as a route
 			for(Vehicle v : getVehicles()) {
 				StringBuilder sBuild = new StringBuilder();
-				Customer customer = v.firstCustomer.succ;
-				while (!customer.equals(v.lastCustomer)){
-					sBuild.append(customer.custNo + " ");
-					customer = customer.succ;
+				Customer customer = v.getFirstCustomer().getSucc();
+				while (!customer.equals(v.getLastCustomer())){
+					sBuild.append(customer.getCustNo() + " ");
+					customer = customer.getSucc();
 				}
 				sBuild.append(String.format(" -1%n"));
 				//write the tour of the vehicle
@@ -111,11 +111,11 @@ public abstract class Descent {
 	protected int getVehicleCount() {
 		int vehicleCount = 0; //number of vehicles needed in the solution
 		for(int i = 0 ; i<numCustomers; i++) {
-			Vehicle v = vrp.vehicle[i];
+			Vehicle v = vrp.getVehicle()[i];
 			//check if there are still customers in between the dummies
-			if(!v.firstCustomer.succ.equals(v.lastCustomer)) {
+			if(!v.getFirstCustomer().getSucc().equals(v.getLastCustomer())) {
 				v.show();
-				System.out.println("Distance Vehicle: " + v.cost);
+				System.out.println("Distance Vehicle: " + v.getCost());
 				vehicleCount++;
 			}
 		}

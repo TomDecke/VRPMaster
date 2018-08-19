@@ -1,6 +1,6 @@
 package representation;
 import addOns.TimeConstraintViolationException;
-import java.io.*;
+
 
 /**
  * Class modeling a customer for a VRP-instance
@@ -53,7 +53,7 @@ public class Customer {
 	 * @param z Customer, potential successor
 	 * @return boolean, true if this customer fits between y and z
 	 */
-	boolean canBeInsertedBetween(Customer y,Customer z){
+	public boolean canBeInsertedBetween(Customer y,Customer z){
 		double es = Math.max(this.readyTime,y.earliestStart + y.serviceTime + vrp.distance(y,this));
 		double ls = Math.min(this.dueDate,z.latestStart - (this.serviceTime + vrp.distance(this,z)));
 		return es <= ls;
@@ -65,7 +65,7 @@ public class Customer {
 	 * @param z Customer, potential successor
 	 * @throws TimeConstraintViolationException 
 	 */
-	void insertBetween(Customer y,Customer z) throws TimeConstraintViolationException{
+	public void insertBetween(Customer y,Customer z) throws TimeConstraintViolationException{
 		earliestStart = Math.max(this.readyTime,y.earliestStart + y.serviceTime + vrp.distance(y,this));
 		latestStart = Math.min(this.dueDate,z.latestStart - (this.serviceTime + vrp.distance(this,z)));
 		propagateLatestStart();

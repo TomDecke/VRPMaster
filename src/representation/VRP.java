@@ -86,7 +86,7 @@ public class VRP {
 	 * @param y Customer, customer no. 2
 	 * @return double, the euclidean distance
 	 */
-	double distance(Customer x,Customer y){
+	public double distance(Customer x,Customer y){
 		if (x == null && y == null) return Double.MAX_VALUE;
 		if (x == null) return distance[0][y.getCustNo()];
 		if (y == null) return distance[0][x.getCustNo()];

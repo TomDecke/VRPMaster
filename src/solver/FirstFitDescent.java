@@ -1,8 +1,6 @@
 package solver;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import addOns.DisplayVRP;
 import moves.Option;
 import operators.Operation;
 import operators.TwoOptOperation;
@@ -29,25 +27,25 @@ public class FirstFitDescent extends Descent{
 	public FirstFitDescent(VRP vrp, String fOut) {
 		super(vrp,fOut);
 		cDesc = new ArrayList<Customer>();
-		vehicles = new Vehicle[vrp.m];
+		vehicles = new Vehicle[vrp.getM()];
 		tOPt = new TwoOptOperation(vrp, super.numCustomers);
 
 		//iterate through vehicles and customers
-		for(int i = 0 ; i < vrp.n ; i++) {
-			Vehicle vCur = vrp.vehicle[i];
-			Customer cCur = vrp.customer[i+1];
+		for(int i = 0 ; i < vrp.getN() ; i++) {
+			Vehicle vCur = vrp.getVehicle()[i];
+			Customer cCur = vrp.getCustomer()[i+1];
 
 			//clear the vehicles
 			vCur.remove(cCur);
 			//remember the non-penalizing vehicles
-			if(i < vrp.m) {
+			if(i < vrp.getM()) {
 				vehicles[i] = vCur;
 			}
 
-			double curStart = Math.max(cCur.earliestStart, vrp.distance(vrp.depot, cCur));
+			double curStart = Math.max(cCur.getEarliestStart(), vrp.distance(vrp.getDepot(), cCur));
 			int pos = 0;
 			//order customers by distance taking earliest start into account
-			while(pos < cDesc.size() && curStart  < Math.max(cDesc.get(pos).earliestStart, vrp.distance(vrp.depot, cDesc.get(pos)))) {
+			while(pos < cDesc.size() && curStart  < Math.max(cDesc.get(pos).getEarliestStart(), vrp.distance(vrp.getDepot(), cDesc.get(pos)))) {
 				pos++;
 			}
 			cDesc.add(pos, cCur);
@@ -73,10 +71,10 @@ public class FirstFitDescent extends Descent{
 	private void placeCustomer(Customer c) {
 		for(Vehicle v : vehicles) {
 			if(v.canAccomodate(c)) {
-				Customer cCur = v.firstCustomer;
-				Customer cSucc = cCur.succ;
+				Customer cCur = v.getFirstCustomer();
+				Customer cSucc = cCur.getSucc();
 				//find the first position where the customer can be inserted
-				while(!cCur.equals(v.lastCustomer)) {
+				while(!cCur.equals(v.getLastCustomer())) {
 					if(c.canBeInsertedBetween(cCur, cSucc)) {
 						v.insertBetween(c, cCur, cSucc);
 
@@ -88,7 +86,7 @@ public class FirstFitDescent extends Descent{
 						return;	
 					}
 					cCur = cSucc;
-					cSucc = cSucc.succ;
+					cSucc = cSucc.getSucc();
 				}
 			}
 		}
@@ -116,23 +114,6 @@ public class FirstFitDescent extends Descent{
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws IOException {
-		String in = args[0];
-		int num = Integer.parseInt(args[1]);
 
-		VRP vrp = new VRP(in,num);
-
-		String fileOut = in.substring(0, in.length()-4);
-		fileOut += "_Solution.txt";
-
-		FirstFitDescent ffd = new FirstFitDescent(vrp,fileOut);
-
-		for(Customer c: ffd.getcDesc()) {
-			System.out.println(""+c.custNo +  " " + c.earliestStart);
-		}
-
-		ffd.solve(null,false);
-		//TestSolution.runTest(vrp, ffd.getTotalCost(), ffd.getVehicles());
-		DisplayVRP disp = new DisplayVRP(in, num, fileOut);
-		disp.plotVRPSolution();
 	}
 }
