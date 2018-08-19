@@ -1,5 +1,5 @@
 /**
- * Class to represent the exchange-heuristic
+ * Class to represent the exchange-operator
  * @author Tom Decke
  *
  */

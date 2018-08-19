@@ -26,6 +26,12 @@ public class TestSolution {
 
 		//distance of all vehicles
 		double totalDist = 0; 
+		
+		//check if the solution would need more vehicles than available
+		if(vehicles.size() > vrp.m) {
+			System.out.println("To many vehicles");
+			return false;
+		}
 
 		//Check all vehicles/routes
 		for(Vehicle v : solVehicles) {

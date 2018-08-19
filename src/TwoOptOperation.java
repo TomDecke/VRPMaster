@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Class to represent the 2-opt-heuristic
+ * Class to represent the 2-opt operator
  * @author Tom Decke
  *
  */

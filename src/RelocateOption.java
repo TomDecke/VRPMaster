@@ -6,7 +6,7 @@
 public class RelocateOption extends Option{
 
 	/**
-	 * Constructor to create a relocation-object
+	 * Constructor to create a relocation move
 	 * @param c Customer, the customer who is to be moved
 	 * @param delta double, the cost-reduction which occurs by the moving the customer
 	 * @param vFrom Vehicle, the vehicle from which the customer would be taken

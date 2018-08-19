@@ -1,5 +1,5 @@
 /**
- * Abstract class to represent an option, which could be executed to improve the solution to a VRP
+ * Abstract class to represent a move, which could be executed to improve the solution to a VRP
  * @author Tom Decke
  *
  */

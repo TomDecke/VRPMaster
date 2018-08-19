@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Class to represent the cross-exchange-heuristic
+ * Class to represent the cross-exchange-operator
  * @author Tom
  *
  */

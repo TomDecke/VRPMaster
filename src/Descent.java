@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Super class to accomodate the basic functionality for optimization-processes.
+ * Super class to accommodate the basic functionality for optimization-processes, i.e. solvers.
  * @author Tom Decke
  *
  */

@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
- * Class to apply first fit descent to a VRP-instance
+ * Class to apply first fit decreasing to a VRP-instance
  * @author Tom
  *
  */

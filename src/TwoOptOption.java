@@ -1,5 +1,5 @@
 /**
- * Class to represent a possible 2-opt-move
+ * Class to represent a possible 2-opt move
  * @author Tom Decke
  *
  */

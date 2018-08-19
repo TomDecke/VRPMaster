@@ -1,7 +1,5 @@
-import addOns.TimeConstraintViolationException;
-
 /**
- * Class to represent the relocate-heuristic
+ * Class to represent the relocate-operator
  * @author Tom Decke
  *
  */
@@ -13,7 +11,7 @@ public class RelocateOperation implements Operation{
 	private Option[][] relocateMatrix;
 
 	/**
-	 * Constructor for the relocate operation
+	 * Constructor for the relocate operator
 	 * @param vrp VRP, the VRP to which the operation is to be applied
 	 * @param numCustomers int, the number of customers in the VRP
 	 */
