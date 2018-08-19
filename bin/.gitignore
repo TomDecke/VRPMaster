@@ -29,3 +29,8 @@
 /TwoOptOption.class
 /VRP.class
 /Vehicle.class
+/operators/
+/moves/
+/solver/
+/representation/
+/executable/
