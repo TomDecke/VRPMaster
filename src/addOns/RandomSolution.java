@@ -72,10 +72,10 @@ public class RandomSolution {
 			//write the customers of each vehicle as a route
 			for(Vehicle v : soln) {
 				StringBuilder sBuild = new StringBuilder();
-				Customer customer = v.firstCustomer.succ;
-				while (!customer.equals(v.lastCustomer)){
-					sBuild.append(customer.custNo + " ");
-					customer = customer.succ;
+				Customer customer = v.getFirstCustomer().getSucc();
+				while (!customer.equals(v.getLastCustomer())){
+					sBuild.append(customer.getCustNo() + " ");
+					customer = customer.getSucc();
 				}
 				sBuild.append(String.format(" -1%n"));
 				//write the tour of the vehicle

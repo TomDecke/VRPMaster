@@ -27,13 +27,13 @@ public class TestSolution {
 		VRP vrp = vrpIn;
 		double solDist = solDistIn;
 		ArrayList<Vehicle> solVehicles = vehicles;
-		int[] cVisited = new int[vrp.customer.length] ;		
+		int[] cVisited = new int[vrp.getCustomer().length] ;		
 
 		//distance of all vehicles
 		double totalDist = 0; 
-		
+
 		//check if the solution would need more vehicles than available
-		if(vehicles.size() > vrp.m) {
+		if(vehicles.size() > vrp.getM()) {
 			System.out.println("To many vehicles");
 			return false;
 		}
@@ -41,12 +41,12 @@ public class TestSolution {
 		//Check all vehicles/routes
 		for(Vehicle v : solVehicles) {
 			//check the vehicle
-			if(v.id > vrp.m) {
+			if(v.getId() > vrp.getM()) {
 				System.out.println("Vehicle does not belong to VRP");
 				return false;
 			}
-			Customer cCur = v.firstCustomer;
-			Customer cSucc = cCur.succ;
+			Customer cCur = v.getFirstCustomer();
+			Customer cSucc = cCur.getSucc();
 
 			//initialise leave-time to zero, as the vehicle starts from the depot at time 0 
 			double leave = 0;
@@ -58,10 +58,10 @@ public class TestSolution {
 			double vehicleDist = 0;
 
 			//Check the route of the vehicle
-			while(!cCur.equals(v.lastCustomer)) {
+			while(!cCur.equals(v.getLastCustomer())) {
 
 				//check if the customer actually is in the vehicle
-				if(!v.equals(cCur.vehicle)) {
+				if(!v.equals(cCur.getVehicle())) {
 					System.out.println(cCur);
 					System.out.println(v);
 					System.out.println("Customer in wrong vehicle");
@@ -69,7 +69,7 @@ public class TestSolution {
 				}
 
 				//check if the target of travel belongs to the vrp
-				if(cSucc.custNo > vrp.n) {
+				if(cSucc.getCustNo() > vrp.getN()) {
 					System.out.println("Customer does not belong to the VRP.");
 					return false;
 				}
@@ -82,7 +82,7 @@ public class TestSolution {
 				double arrival = distTraveled + leave;
 
 				//check if the vehicle arrives after the due date of the customer
-				if(arrival > cSucc.dueDate) {
+				if(arrival > cSucc.getDueDate()) {
 					System.out.println("Violated time window constraint");
 					return false;
 				}
@@ -90,32 +90,32 @@ public class TestSolution {
 
 				//if the vehicle arrives before the ready time, wait for the customer to be ready
 				double start = arrival;
-				if(arrival < cSucc.readyTime) {
-					start = cSucc.readyTime;
+				if(arrival < cSucc.getReadyTime()) {
+					start = cSucc.getReadyTime();
 				}
 
 				//calculate the time at which the car leaves the customer(pred)
-				leave = start + cCur.serviceTime;
+				leave = start + cCur.getServiceTime();
 
 				//mark the customer as visited
-				cVisited[cCur.custNo] += 1;
+				cVisited[cCur.getCustNo()] += 1;
 
 				//increase the load of the vehicle
-				carriedLoad += cCur.demand;
+				carriedLoad += cCur.getDemand();
 
 				//prepare to move to the next customer
 				cCur = cSucc;
-				cSucc = cCur.succ;
+				cSucc = cCur.getSucc();
 			}
 
 			//make sure the vehicle does not carry more goods than it has capacity
-			if(carriedLoad > v.capacity) {
+			if(carriedLoad > v.getCapacity()) {
 				System.out.println("Violated capacity constraint");
 				return false;
 			}
 
 			//sum up the total cost of the solution for later comparison
-			totalDist += vehicleDist * v.costOfUse;
+			totalDist += vehicleDist * v.getCostOfUse();
 		}
 
 		//check if all customers have been visited exactly once
@@ -198,12 +198,12 @@ public class TestSolution {
 		//Add the customers to their corresponding vehicles
 		ArrayList<Vehicle> vSoln = new ArrayList<Vehicle>();
 		for(int i = 0; i < vehicles.size() ; i++) {
-			Vehicle cV = new Vehicle(vrp, i, vrp.capacity, 1, vrp.depot);
+			Vehicle cV = new Vehicle(vrp, i, vrp.getCapacity(), 1, vrp.getDepot());
 			int[] customerIds = vehicles.get(i);
-			Customer cPred = cV.firstCustomer;
+			Customer cPred = cV.getFirstCustomer();
 			for(int id : customerIds) {
-				Customer cC = vrp.customer[id];
-				cV.insertBetween(cC, cPred, cV.lastCustomer);
+				Customer cC = vrp.getCustomer()[id];
+				cV.insertBetween(cC, cPred, cV.getLastCustomer());
 				cPred = cC;
 			}
 			vSoln.add(cV);		
@@ -229,39 +229,41 @@ public class TestSolution {
 
 		//create a distance matrix
 		System.out.print(String.format("%s", "\\|"));
-		for(Customer c : vrp.customer) {
-			System.out.print(String.format("%5d|", c.custNo));
+		for(Customer c : vrp.getCustomer()) {
+			System.out.print(String.format("%5d|", c.getCustNo()));
 		}
 		System.out.println("");
-		for(Customer c : vrp.customer) {
-			System.out.print(String.format("%d|", c.custNo));
-			for(Customer c2 : vrp.customer) {
+		for(Customer c : vrp.getCustomer()) {
+			System.out.print(String.format("%d|", c.getCustNo()));
+			for(Customer c2 : vrp.getCustomer()) {
 				System.out.print(String.format("%5.2f|", vrp.distance(c,c2)));
 			}	
 			System.out.println("");
 		}
 
 		//get customers
-		Customer c1 = vrp.customer[1];
-		Customer c2 = vrp.customer[2];
-		Customer c3 = vrp.customer[3];
-		Customer c4 = vrp.customer[4];
-		Customer c5 = vrp.customer[5];
+		Customer[] customers = vrp.getCustomer();
+		Customer c1 = customers[1];
+		Customer c2 = customers[2];
+		Customer c3 = customers[3];
+		Customer c4 = customers[4];
+		Customer c5 = customers[5];
 
 		//create unknown customer 
 		Customer cX = new Customer(7,48,48, 20,666,666,5);
-		cX.earliestStart = 666;
-		cX.latestStart = 666;
+		cX.setEarliestStart(666);
+		cX.setLatestStart(666);
 
 		//get vehicles
-		Vehicle v1 = vrp.vehicle[0];
-		Vehicle v2 = vrp.vehicle[1];
-		Vehicle v3 = vrp.vehicle[2];
-		Vehicle v4 = vrp.vehicle[3];
-		Vehicle v5 = vrp.vehicle[4];
+		Vehicle[] vehicles = vrp.getVehicle();
+		Vehicle v1 = vehicles[0];
+		Vehicle v2 = vehicles[1];
+		Vehicle v3 = vehicles[2];
+		Vehicle v4 = vehicles[3];
+		Vehicle v5 = vehicles[4];
 
 		//create unknown vehicle
-		Vehicle vX = new Vehicle(vrp, 6, 30, 1, vrp.depot);
+		Vehicle vX = new Vehicle(vrp, 6, 30, 1, vrp.getDepot());
 
 		//create array-list
 		ArrayList<Vehicle> testV = new ArrayList<Vehicle>();
@@ -269,58 +271,58 @@ public class TestSolution {
 		double dist = 0;
 
 		//Test unknown customer
-		//		cX.vehicle = v3;
-		//		cX.succ = v3.lastCustomer;
-		//		v3.lastCustomer.pred = cX;
-		//		c3.succ = cX;
-		//		cX.pred = c3;
-		//		testV.add(v3);
+		//	cX.setVehicle(v3);
+		//	cX.setSucc(v3.getLastCustomer());
+		//	v3.getLastCustomer().setPred(cX);
+		//	c3.setSucc(cX);
+		//	cX.setPred(c3);
+		//	testV.add(v3);
 
 
 		//Test re-visit custoemr
-		//		c3.succ = cX;
-		//		cX.pred = c3;
-		//		cX.succ = v3.lastCustomer;
-		//		v3.lastCustomer.pred = cX;
-		//		cX.custNo = 3;
-		//		cX.vehicle = v3;
-		//		testV.add(v3);
-		//		testV.add(v2);
-		//		testV.add(v1);
-		//		testV.add(v4);
-		//		testV.add(v5);
-		//		v3.show();
+		c3.setSucc(cX);
+		cX.setPred(c3);
+		cX.setSucc(v3.getLastCustomer());
+		v3.getLastCustomer().setPred(cX);
+		cX.setCustNo(3); 
+		cX.setVehicle(v3);
+		testV.add(v3);
+		testV.add(v2);
+		testV.add(v1);
+		testV.add(v4);
+		testV.add(v5);
+		v3.show();
 
 
 		//Test customer in multiple vehicles
-		//		v5.insertBetween(c1, c5, v5.lastCustomer);
-		//		testV.add(v1);
-		//		testV.add(v5);
+		//	v5.insertBetween(c1, c5, v5.getLastCustomer());
+		//	testV.add(v1);
+		//	testV.add(v5);
 
 		//Test omit customers
-		//		testV.add(v1);
-		//		testV.add(v2);
+		//	testV.add(v1);
+		//	testV.add(v2);
 
 		//Test overloading a vehicle
-		//		v2.insertBetween(c1, c2, v2.lastCustomer);
-		//		testV.add(v2);
+		//	v2.insertBetween(c1, c2, v2.getLastCustomer());
+		//	testV.add(v2);
 
 		//Test time constraint violation
-		//		v1.insertBetween(c5, c1, v1.lastCustomer);
-		//		testV.add(v1);
+		//	v1.insertBetween(c5, c1, v1.getLastCustomer());
+		//	testV.add(v1);
 
 		//Test non-existing vehicle
-		//		testV.add(vX);
+		//	testV.add(vX);
 
 		//Test wrong distance proposal
-		//		dist = -1;
-		//		testV.add(v1);
-		//		testV.add(v2);
-		//		testV.add(v3);
-		//		testV.add(v4);
-		//		testV.add(v5);
+		//	dist = -1;
+		//	testV.add(v1);
+		//	testV.add(v2);
+		//	testV.add(v3);
+		//	testV.add(v4);
+		//	testV.add(v5);
 
-		//TestSolution.runTest(vrp, dist, testV);
+		TestSolution.runTest(vrp, dist, testV);
 
 	}
 

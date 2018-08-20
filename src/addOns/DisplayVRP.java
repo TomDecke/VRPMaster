@@ -33,8 +33,8 @@ public class DisplayVRP {
 			this.vrp = new VRP(vrpInstance,numCust);
 			vehicles = new ArrayList<int[]>();
 
-			this.xDepot = vrp.depot.xCoord;
-			this.yDepot = vrp.depot.yCoord;
+			this.xDepot = vrp.getDepot().getxCoord();
+			this.yDepot = vrp.getDepot().getyCoord();
 
 			//create reader to take in the solution
 			FileReader reader;
@@ -64,13 +64,13 @@ public class DisplayVRP {
 
 
 			//Get the size of the map
-			xMax = vrp.customer[0].xCoord;
+			xMax = vrp.getCustomer()[0].getxCoord();
 			xMin = xMax;
-			yMax = vrp.customer[0].yCoord;
+			yMax = vrp.getCustomer()[0].getyCoord();
 			yMin = yMax;
-			for(Customer c : vrp.customer) {
-				int currentX = c.xCoord;
-				int currentY = c.yCoord;
+			for(Customer c : vrp.getCustomer()) {
+				int currentX = c.getxCoord();
+				int currentY = c.getyCoord();
 				if(currentX > xMax) {
 					xMax = currentX;
 				}
@@ -126,8 +126,8 @@ public class DisplayVRP {
 
 		//set customer size and print them to the map
 		StdDraw.setPenRadius(0.005);
-		for(Customer c : vrp.customer){
-			StdDraw.point(c.xCoord, c.yCoord);
+		for(Customer c : vrp.getCustomer()){
+			StdDraw.point(c.getxCoord(), c.getyCoord());
 		}
 
 		StdDraw.show(0);
@@ -148,8 +148,8 @@ public class DisplayVRP {
 
 		//determine customer size and print them to the map
 		StdDraw.setPenRadius(0.008);
-		for(Customer c : vrp.customer){
-			StdDraw.point(c.xCoord, c.yCoord);
+		for(Customer c : vrp.getCustomer()){
+			StdDraw.point(c.getxCoord(), c.getyCoord());
 		}
 
 		//reset the pen-size and draw the connections
@@ -158,18 +158,18 @@ public class DisplayVRP {
 
 			//draw the line from the depot to the first customer
 			int firstCustomer = vehicle[0];
-			StdDraw.line(xDepot, yDepot,vrp.customer[firstCustomer].xCoord,vrp.customer[firstCustomer].yCoord);
+			StdDraw.line(xDepot, yDepot,vrp.getCustomer()[firstCustomer].getxCoord(),vrp.getCustomer()[firstCustomer].getyCoord());
 
 			//draw the tour-intermediates
 			for(int i = 0; i< vehicle.length-1; i++) {
-				Customer cCur = vrp.customer[vehicle[i]];
-				Customer cSucc = vrp.customer[vehicle[i+1]];
-				StdDraw.line(cCur.xCoord, cCur.yCoord, cSucc.xCoord, cSucc.yCoord);
+				Customer cCur = vrp.getCustomer()[vehicle[i]];
+				Customer cSucc = vrp.getCustomer()[vehicle[i+1]];
+				StdDraw.line(cCur.getxCoord(), cCur.getyCoord(), cSucc.getxCoord(), cSucc.getyCoord());
 			}
 
 			//draw the line from the last customer back to the depot
 			int lastCustomer = vehicle[vehicle.length-1];
-			StdDraw.line(vrp.customer[lastCustomer].xCoord,vrp.customer[lastCustomer].yCoord,xDepot, yDepot);
+			StdDraw.line(vrp.getCustomer()[lastCustomer].getxCoord(),vrp.getCustomer()[lastCustomer].getyCoord(),xDepot, yDepot);
 		}
 
 
