@@ -23,4 +23,7 @@ public class CostAdjustment {
 	public void setCostMove(double costMove) {
 		this.costMove = costMove;
 	}
+	public void set() {
+		
+	}
 }
