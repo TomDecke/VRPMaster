@@ -39,7 +39,7 @@ public class TwoOptOperation implements Operation{
 	@Override
 	public void createOptionMatrix() {
 		for(int i = 0; i < numCustomers; i++) {
-			twoOptMatrix[i] = findBestOption(vrp.vehicle[i], vrp.vehicle[i]);
+			twoOptMatrix[i] = findBestOption(vrp.getVehicle()[i], vrp.getVehicle()[i]);
 		}
 	}
 
@@ -50,8 +50,8 @@ public class TwoOptOperation implements Operation{
 	 */
 	@Override
 	public void updateOptionMatrix(Vehicle v1, Vehicle v2) {
-		twoOptMatrix[v1.index] = findBestOption(v1, v1);
-		twoOptMatrix[v2.index] = findBestOption(v2, v2);
+		twoOptMatrix[v1.getIndex()] = findBestOption(v1, v1);
+		twoOptMatrix[v2.getIndex()] = findBestOption(v2, v2);
 	}
 
 	/**
@@ -61,13 +61,13 @@ public class TwoOptOperation implements Operation{
 	@Override
 	public void executeOption(Option o) {
 		//the vehicle of interest
-		Vehicle v = o.v1;
+		Vehicle v = o.getV1();
 		//the new start and end point of the route-part which is to be reversed
-		Customer newStart = o.c1;
-		Customer newEnd = o.c2;
+		Customer newStart = o.getC1();
+		Customer newEnd = o.getC2();
 
-		Customer last = newStart.succ;
-		Customer limit = newEnd.pred;
+		Customer last = newStart.getSucc();
+		Customer limit = newEnd.getPred();
 		ArrayList<Customer> customers = new ArrayList<Customer>();
 
 
@@ -77,10 +77,10 @@ public class TwoOptOperation implements Operation{
 			customers.add(cCur);
 
 			//move on to the next customer
-			cCur = cCur.pred;
+			cCur = cCur.getPred();
 
 			//remove the customer of this visit
-			v.remove(cCur.succ);
+			v.remove(cCur.getSucc());
 		}
 
 		//try to insert the customers that were taken back into the route
@@ -125,17 +125,17 @@ public class TwoOptOperation implements Operation{
 		Option twoOpt = new TwoOptOption(null, null, v, 0, this);
 
 		//get the first route of the vehicle
-		Customer c1 = v.firstCustomer;
-		Customer c2 = c1.succ;
+		Customer c1 = v.getFirstCustomer();
+		Customer c2 = c1.getSucc();
 		//go through all routes
 
-		while(!c2.equals(v.lastCustomer)) {
+		while(!c2.equals(v.getLastCustomer())) {
 
 			//get the succeeding route
 			Customer c3 = c2;
-			Customer c4 = c3.succ;
+			Customer c4 = c3.getSucc();
 			//compare each route with all following routes
-			while(!c3.equals(v.lastCustomer)) {
+			while(!c3.equals(v.getLastCustomer())) {
 
 				//check if the routes cross
 				if(lineCollision(c1, c2, c3, c4)) {
@@ -150,11 +150,11 @@ public class TwoOptOperation implements Operation{
 				}
 				//move to the following route
 				c3 = c4;
-				c4 = c4.succ;
+				c4 = c4.getSucc();
 			}
 			//move to the next route
 			c1 = c2;
-			c2 = c2.succ;
+			c2 = c2.getSucc();
 		}
 		//return the best two opt
 		return twoOpt;
@@ -168,8 +168,8 @@ public class TwoOptOperation implements Operation{
 	 */
 	private double checkReversal(Vehicle v, Customer newStart, Customer newEnd) {
 
-		Customer oldEnd = newStart.succ;
-		Customer oldStart = newEnd.pred;
+		Customer oldEnd = newStart.getSucc();
+		Customer oldStart = newEnd.getPred();
 		
 		//calculate the change in distance
 		double oldCost = vrp.distance(oldStart, newEnd) + vrp.distance(newStart, oldEnd);
@@ -180,59 +180,59 @@ public class TwoOptOperation implements Operation{
 		Customer cCur = oldStart;
 		//check for improvement and catch computational error
 		if(deltaCost < EPSILON) {
-			cCur = v.firstCustomer;
+			cCur = v.getFirstCustomer();
 
 			//get the propagation times
 			while(cCur != null) {
-				cCur.checkEarliest = cCur.earliestStart;
-				cCur.checkLatest = cCur.latestStart;
-				cCur = cCur.succ;
+				cCur.setCheckEarliest(cCur.getEarliestStart());
+				cCur.setCheckLatest(cCur.getLatestStart());
+				cCur = cCur.getSucc();
 			}
 
 			//forward propagation for the reversal part
 			cCur = oldStart;
 			Customer cSucc = newStart;
 			while (!cSucc.equals(oldStart)) {
-				cSucc.checkEarliest = Math.max(cSucc.readyTime,cCur.checkEarliest+cCur.serviceTime+vrp.distance(cCur,cSucc));
+				cSucc.setCheckEarliest(Math.max(cSucc.getReadyTime(),cCur.getCheckEarliest()+cCur.getServiceTime()+vrp.distance(cCur,cSucc)));
 				//take the predecessor instead of the successor because of reversion
 				cCur = cSucc;
-				cSucc = cSucc.pred;
+				cSucc = cSucc.getPred();
 			}
 
 			//forward propagation for the remaining customers after the reversal (regular forward propagation)
 			cSucc = oldEnd;
 			while(cSucc != null) {
-				cSucc.checkEarliest = Math.max(cSucc.readyTime,cCur.checkEarliest+cCur.serviceTime+vrp.distance(cCur,cSucc));
+				cSucc.setCheckEarliest(Math.max(cSucc.getReadyTime(),cCur.getCheckEarliest()+cCur.getServiceTime()+vrp.distance(cCur,cSucc)));
 				cCur = cSucc;
-				cSucc = cSucc.succ;
+				cSucc = cSucc.getSucc();
 			}
 
 			//backward propagation for the reversal part 
 			cCur = oldEnd;
 			Customer cPred = newEnd;
 			while(!cPred.equals(newStart) ) {
-				cPred.checkLatest = Math.min(cPred.dueDate, cCur.checkLatest - cCur.serviceTime - vrp.distance(cPred, cCur));
+				cPred.setCheckLatest(Math.min(cPred.getDueDate(), cCur.getCheckLatest() - cCur.getServiceTime() - vrp.distance(cPred, cCur)));
 				//take the successor instead of the predecessor because of reversion
 				cCur = cPred;
-				cPred = cPred.succ;
+				cPred = cPred.getSucc();
 			}
 
 			//backward propagation for the remaining customers before the reversal (regular backward propagation)
 			cCur = oldStart;
 			while(cPred != null) {
-				cPred.checkLatest = Math.min(cPred.dueDate, cCur.checkLatest - cCur.serviceTime - vrp.distance(cPred, cCur));
+				cPred.setCheckLatest(Math.min(cPred.getDueDate(), cCur.getCheckLatest() - cCur.getServiceTime() - vrp.distance(cPred, cCur)));
 				cCur = cPred;
-				cPred = cPred.pred;
+				cPred = cPred.getPred();
 			}
 
 			//check for time-constraint violations
-			cCur = v.firstCustomer;
+			cCur = v.getFirstCustomer();
 			while(cCur != null) {
-				if(cCur.checkLatest < cCur.checkEarliest) {
+				if(cCur.getCheckLatest() < cCur.getCheckEarliest()) {
 					System.out.println("Time window violation");
 					return 0;
 				}
-				cCur = cCur.succ;
+				cCur = cCur.getSucc();
 			}
 
 			return deltaCost;
@@ -255,14 +255,14 @@ public class TwoOptOperation implements Operation{
 	private boolean lineCollision(Customer c1, Customer c2, Customer c3, Customer c4  ) {
 
 		//extract the coordinates of the routes
-		double xC1 = c1.xCoord;
-		double yC1 = c1.yCoord;
-		double xC2 = c2.xCoord;
-		double yC2 = c2.yCoord;
-		double xC3 = c3.xCoord;
-		double yC3 = c3.yCoord;
-		double xC4 = c4.xCoord;
-		double yC4 = c4.yCoord;
+		double xC1 = c1.getxCoord();
+		double yC1 = c1.getyCoord();
+		double xC2 = c2.getxCoord();
+		double yC2 = c2.getyCoord();
+		double xC3 = c3.getxCoord();
+		double yC3 = c3.getyCoord();
+		double xC4 = c4.getxCoord();
+		double yC4 = c4.getyCoord();
 
 		//check if the routes are contiguous
 		if((xC1 == xC3 && yC1 == yC3) || (xC1 == xC4 && yC1 == yC4)) {
@@ -299,14 +299,14 @@ public class TwoOptOperation implements Operation{
 		String folderpath = args[0];
 		int numCustomers = Integer.parseInt(args[1]);
 		VRP vrp = new VRP(folderpath, numCustomers);
-		Vehicle testV = vrp.vehicle[7];
-		Customer[] c = vrp.customer;
+		Vehicle testV = vrp.getVehicle()[7];
+		Customer[] c = vrp.getCustomer();
 		testV.show();
-		testV.insertBetween(c[10], testV.firstCustomer, testV.lastCustomer);
-		testV.insertBetween(c[4], c[10], testV.lastCustomer);
-		testV.insertBetween(c[6], c[4], testV.lastCustomer);
-		testV.insertBetween(c[8], c[6], testV.lastCustomer);
-		testV.insertBetween(c[7], c[8], testV.lastCustomer);
+		testV.insertBetween(c[10], testV.getFirstCustomer(), testV.getLastCustomer());
+		testV.insertBetween(c[4], c[10], testV.getLastCustomer());
+		testV.insertBetween(c[6], c[4], testV.getLastCustomer());
+		testV.insertBetween(c[8], c[6], testV.getLastCustomer());
+		testV.insertBetween(c[7], c[8], testV.getLastCustomer());
 		testV.show();
 		
 		TwoOptOperation two = new TwoOptOperation(vrp, numCustomers);
@@ -317,4 +317,3 @@ public class TwoOptOperation implements Operation{
 		testV.show();
 	}
 }
-

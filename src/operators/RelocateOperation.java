@@ -35,7 +35,7 @@ public class RelocateOperation implements Operation{
 		//go through the matrix and determine the best move for each combination 
 		for(int i = 0; i < numCustomers; i++) {
 			for(int j = 0; j < numCustomers; j++) {
-				relocateMatrix[i][j] = findBestOption(vrp.vehicle[i], vrp.vehicle[j]);			
+				relocateMatrix[i][j] = findBestOption(vrp.getVehicle()[i], vrp.getVehicle()[j]);			
 			}
 		}
 	}
@@ -48,13 +48,13 @@ public class RelocateOperation implements Operation{
 	 */
 	public Option findBestOption(Vehicle vFrom, Vehicle vTo) {
 
-		double cCost = vFrom.cost + vTo.cost;
+		double cCost = vFrom.getCost() + vTo.getCost();
 
 		//check if the customer would be relocated within the vehicle
 		boolean sameVehicle = vTo.equals(vFrom);
 		
 		if(sameVehicle) {
-			cCost = vFrom.cost;
+			cCost = vFrom.getCost();
 		}
 		
 		//create an empty move with no improvement
@@ -63,13 +63,13 @@ public class RelocateOperation implements Operation{
 
 
 		//start checking from the first customer, who is not the depot-connection
-		Customer cFrom = vFrom.firstCustomer.succ;
-		Customer cFPred = cFrom.pred;
-		Customer cFSucc = cFrom.succ;
-		while(!cFrom.equals(vFrom.lastCustomer)) {
+		Customer cFrom = vFrom.getFirstCustomer().getSucc();
+		Customer cFPred = cFrom.getPred();
+		Customer cFSucc = cFrom.getSucc();
+		while(!cFrom.equals(vFrom.getLastCustomer())) {
 			
-			cFPred = cFrom.pred;
-			cFSucc = cFrom.succ;
+			cFPred = cFrom.getPred();
+			cFSucc = cFrom.getSucc();
 			
 
 			//if the vehicle can accommodate the customer find the best position for him
@@ -86,9 +86,9 @@ public class RelocateOperation implements Operation{
 					newDistVFrom = 0;
 				}
 
-				Customer cToPred = vTo.firstCustomer;
-				Customer cToSucc = cToPred.succ;
-				while(!cToPred.equals(vTo.lastCustomer)) {
+				Customer cToPred = vTo.getFirstCustomer();
+				Customer cToSucc = cToPred.getSucc();
+				while(!cToPred.equals(vTo.getLastCustomer())) {
 					// a customer can not be inserted before/after himself
 					if(!(cFrom.equals(cToPred)||cFrom.equals(cToSucc))) {
 
@@ -105,7 +105,7 @@ public class RelocateOperation implements Operation{
 							}
 
 							//the new cost for the vehicles, if this move was to be made
-							double resultingCost = newDistVFrom * vFrom.costOfUse + newDistVTo * vTo.costOfUse;
+							double resultingCost = newDistVFrom * vFrom.getCostOfUse() + newDistVTo * vTo.getCostOfUse();
 							
 							if(sameVehicle) {
 								resultingCost = (vTo.getDistance() 
@@ -114,7 +114,7 @@ public class RelocateOperation implements Operation{
 										+ vrp.distance(cFrom, cToSucc) 
 										- vrp.distance(cToPred, cToSucc)
 										- vrp.distance(cFPred, cFrom)
-										- vrp.distance(cFrom, cFSucc)) *vTo.costOfUse;
+										- vrp.distance(cFrom, cFSucc)) *vTo.getCostOfUse();
 							}
 
 							//the change in cost
@@ -135,12 +135,12 @@ public class RelocateOperation implements Operation{
 					}
 					//move to the next spot where the customer could be inserted
 					cToPred = cToSucc;
-					cToSucc = cToSucc.succ;
+					cToSucc = cToSucc.getSucc();
 				}
 			}
 			
 			//go to the next customer
-			cFrom = cFrom.succ;
+			cFrom = cFrom.getSucc();
 		}
 		return bestToMove;
 	}
@@ -191,14 +191,14 @@ public class RelocateOperation implements Operation{
 	 */
 	public void updateOptionMatrix(Vehicle vFrom, Vehicle vTo) {
 		for(int i = 0; i < numCustomers; i++) {
-			Vehicle vCheck = vrp.vehicle[i];
+			Vehicle vCheck = vrp.getVehicle()[i];
 			//recalculate the giving and receiving of the first vehicle
-			relocateMatrix[vFrom.index][i] = findBestOption(vFrom, vCheck);
-			relocateMatrix[i][vFrom.index] = findBestOption(vCheck,vFrom);
+			relocateMatrix[vFrom.getIndex()][i] = findBestOption(vFrom, vCheck);
+			relocateMatrix[i][vFrom.getIndex()] = findBestOption(vCheck,vFrom);
 
 			//recalculate the giving and receiving of the second vehicle
-			relocateMatrix[i][vTo.index] = findBestOption(vCheck, vTo);
-			relocateMatrix[vTo.index][i] = findBestOption(vFrom, vCheck);
+			relocateMatrix[i][vTo.getIndex()] = findBestOption(vCheck, vTo);
+			relocateMatrix[vTo.getIndex()][i] = findBestOption(vFrom, vCheck);
 		}
 	}
 
@@ -211,14 +211,14 @@ public class RelocateOperation implements Operation{
 		String format = "\\ |";
 		System.out.print(String.format("%4s",format));
 		for(int i = 0 ; i < numCustomers; i++) {
-			format = "v"+vrp.vehicle[i].id+"|";
+			format = "v"+vrp.getVehicle()[i].getId()+"|";
 			System.out.print(String.format("%4s", format));
 		}
 		System.out.println("");
 
 		//print the move options line by line
 		for(int j = 0 ; j< numCustomers ; j++) {
-			format = "v"+vrp.vehicle[j].id+"|";
+			format = "v"+vrp.getVehicle()[j].getId()+"|";
 			System.out.print(String.format("%4s", format));
 			for(int k = 0; k<numCustomers;k++) {
 				Customer current = relocateMatrix[j][k].getCToMove();
@@ -227,7 +227,7 @@ public class RelocateOperation implements Operation{
 				}
 				else {
 					//	format = ""+(int)bestMoveMatrix[j][k].getCostOfMove()+"|";
-					format ="c"+current.custNo+"|";
+					format ="c"+current.getCustNo()+"|";
 
 					System.out.print(String.format("%4s", format));
 				}

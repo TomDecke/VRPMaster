@@ -35,7 +35,7 @@ public class ExchangeOperation implements Operation {
 		//fill half of the matrix since swapping a & b is equivalent to swapping b & a
 		for(int i = 0 ; i < numCustomers ; i++) {
 			for(int j = i+1; j < numCustomers; j++) {
-				exchangeMatrix[i][j] = findBestOption(vrp.vehicle[i], vrp.vehicle[j]);
+				exchangeMatrix[i][j] = findBestOption(vrp.getVehicle()[i], vrp.getVehicle()[j]);
 			}
 		}
 	}
@@ -52,32 +52,32 @@ public class ExchangeOperation implements Operation {
 		ExchangeOption bestExchange = new ExchangeOption(v1, v2, null, null, 0,this);
 
 		//set up the encapsulating customers
-		Customer cV1Pred = v1.firstCustomer;
-		Customer cV1Succ = cV1Pred.succ;
-		Customer cV2Pred = v2.firstCustomer;
-		Customer cV2Succ = cV2Pred.succ;
+		Customer cV1Pred = v1.getFirstCustomer();
+		Customer cV1Succ = cV1Pred.getSucc();
+		Customer cV2Pred = v2.getFirstCustomer();
+		Customer cV2Succ = cV2Pred.getSucc();
 
 		//Iterate through the customers from the first vehicle
-		Customer cV1 = v1.firstCustomer.succ;
-		while(!cV1.equals(v1.lastCustomer)) {
+		Customer cV1 = v1.getFirstCustomer().getSucc();
+		while(!cV1.equals(v1.getLastCustomer())) {
 
 			//get the encapsulating customers for c1
-			cV1Pred = cV1.pred;
-			cV1Succ = cV1.succ;
+			cV1Pred = cV1.getPred();
+			cV1Succ = cV1.getSucc();
 
 			//check the exchange with every customer from the second vehicle
-			Customer cV2 = v2.firstCustomer.succ;
-			while(!cV2.equals(v2.lastCustomer)) {
+			Customer cV2 = v2.getFirstCustomer().getSucc();
+			while(!cV2.equals(v2.getLastCustomer())) {
 
 				//get the encapsulating customers for c2
-				cV2Pred = cV2.pred;
-				cV2Succ = cV2.succ;
+				cV2Pred = cV2.getPred();
+				cV2Succ = cV2.getSucc();
 
 				//make sure the exchange does not violate time window constraints
 				if(cV1.canBeInsertedBetween(cV2Pred, cV2Succ) && cV2.canBeInsertedBetween(cV1Pred, cV1Succ)) {
 
 					//ensure that the vehicles possess the capacity for the exchange
-					if((v1.load-cV1.demand+cV2.demand)<=v1.capacity && (v2.load-cV2.demand+cV1.demand)<=v2.capacity) {
+					if((v1.getLoad()-cV1.getDemand()+cV2.getDemand())<=v1.getCapacity() && (v2.getLoad()-cV2.getDemand()+cV1.getDemand())<=v2.getCapacity()) {
 						//get the change in distance for v1
 						double deltaDistV1 = 
 								- vrp.distance(cV1Pred, cV1) - vrp.distance(cV1, cV1Succ)
@@ -94,9 +94,9 @@ public class ExchangeOperation implements Operation {
 							deltaDistV2 = 0;
 						}
 
-						double delta  =  ((v1.getDistance()+deltaDistV1) * v1.costOfUse 
-								+(v2.getDistance()+deltaDistV2) * v2.costOfUse)
-								-(v1.cost + v2.cost);
+						double delta  =  ((v1.getDistance()+deltaDistV1) * v1.getCostOfUse() 
+								+(v2.getDistance()+deltaDistV2) * v2.getCostOfUse())
+								-(v1.getCost() + v2.getCost());
 
 						if(delta < bestExchange.getDelta()) {
 							bestExchange = new ExchangeOption(v1,v2, cV1, cV2, delta,this);
@@ -105,11 +105,11 @@ public class ExchangeOperation implements Operation {
 				}
 
 				//move on to the next customer of vehicle two
-				cV2 = cV2.succ;
+				cV2 = cV2.getSucc();
 			}
 
 			//move on to the next vehicle of customer one
-			cV1 = cV1.succ;
+			cV1 = cV1.getSucc();
 		}
 		return bestExchange;
 	}
@@ -138,14 +138,14 @@ public class ExchangeOperation implements Operation {
 	public void executeOption(Option bE) {
 		//obtain information of customer from vehicle 1
 		Customer c1		= bE.getC1();
-		Customer c1Pred = c1.pred;
-		Customer c1Succ = c1.succ;
+		Customer c1Pred = c1.getPred();
+		Customer c1Succ = c1.getSucc();
 		Vehicle v1 = bE.getV1();
 
 		//obtain information of customer from vehicle 2
 		Customer c2		= bE.getC2();
-		Customer c2Pred = c2.pred;
-		Customer c2Succ = c2.succ;
+		Customer c2Pred = c2.getPred();
+		Customer c2Succ = c2.getSucc();
 		Vehicle v2 = bE.getV2();
 
 		if(v1.remove(c1)) {
@@ -167,10 +167,10 @@ public class ExchangeOperation implements Operation {
 	 * @param v2 Vehicle, the second vehicles that was involved in the exchange
 	 */
 	public void updateOptionMatrix(Vehicle v1, Vehicle v2){
-		int indV1 = v1.index;
-		int indV2 = v2.index;
+		int indV1 = v1.getIndex();
+		int indV2 = v2.getIndex();
 		for(int i = 0; i < numCustomers; i++) {
-			Vehicle cV = vrp.vehicle[i];
+			Vehicle cV = vrp.getVehicle()[i];
 			//only consider inter-route changes and one way swapping
 			if(indV1 < i) {
 				exchangeMatrix[indV1][i] = findBestOption(v1, cV);
