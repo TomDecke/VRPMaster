@@ -187,74 +187,145 @@ public class Vehicle {
 		this.distance=distance;
 	}
 
+	/**
+	 * Accessor for the id of the vehicle
+	 * @return int, the id
+	 */
 	public int getId() {
 		return id;
 	}
 
+	/**
+	 * Mutator for the id of the vehicle
+	 * @param id int, the new id
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
+	/**
+	 * Accesor for the index of the vehicle in the VRP vehicle array
+	 * @return int, the index
+	 */
 	public int getIndex() {
 		return index;
 	}
 
+	/**
+	 * Mutator for the index of the vehicle in the VRP vehicle array
+	 * @param index int, the new index
+	 */
 	public void setIndex(int index) {
 		this.index = index;
 	}
 
+	/**
+	 * Accessor for the capacity of a vehicle
+	 * @return int, the capacity
+	 */
 	public int getCapacity() {
 		return capacity;
 	}
 
+	/**
+	 * Mutator for the capacity of a vehicle
+	 * @param capacity int, the new capacity
+	 */
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
 	}
 
+	/**
+	 * Accessor for the load carried by a vehicle
+	 * @return int, the load
+	 */
 	public int getLoad() {
 		return load;
 	}
 
+	/**
+	 * Mutator for the load carried by a vehicle
+	 * @param load int, the new load
+	 */
 	public void setLoad(int load) {
 		this.load = load;
 	}
 
+	/**
+	 * Accessor for the cost of use incurred by a vehicle
+	 * @return int, the cost of use
+	 */
 	public int getCostOfUse() {
 		return costOfUse;
 	}
 
+	/**
+	 * Mutator for the cost of use for a vehicle
+	 * @param costOfUse int, the new cost of use
+	 */
 	public void setCostOfUse(int costOfUse) {
 		this.costOfUse = costOfUse;
 	}
 
+	/**
+	 * Accessor for the total cost incurred by a vehicle (distance x cost of use)
+	 * @return double, the cost
+	 */
 	public double getCost() {
 		return cost;
 	}
 
+	/**
+	 * Mutator for the cost of a vehicle
+	 * @param cost double, the new cost
+	 */
 	public void setCost(double cost) {
 		this.cost = cost;
 	}
 
+	/**
+	 * Accessor for the first customer of a vehicle (depot)
+	 * @return Customer, the first customer
+	 */
 	public Customer getFirstCustomer() {
 		return firstCustomer;
 	}
 
+	/**
+	 * Mutator for the first customer of a vehicle
+	 * @param firstCustomer Customer, the new first customer
+	 */
 	public void setFirstCustomer(Customer firstCustomer) {
 		this.firstCustomer = firstCustomer;
 	}
-
+	/**
+	 * Accessor for the last customer of a vehicle (depot)
+	 * @return Customer, the last customer
+	 */
 	public Customer getLastCustomer() {
 		return lastCustomer;
 	}
 
+	/**
+	 * Mutator for the last customer of a vehicle
+	 * @param lastCustomer Customer, the new last customer
+	 */
 	public void setLastCustomer(Customer lastCustomer) {
 		this.lastCustomer = lastCustomer;
 	}
 
+	/**
+	 * Accessor for the VRP of a vehicle
+	 * @return VRP, the VRP to which the vehicle belongs
+	 */
 	public VRP getVrp() {
 		return vrp;
 	}
 
+	/**
+	 * Mutator for the VRP of a vehicle
+	 * @param vrp VRP, the new VRP
+	 */
 	public void setVrp(VRP vrp) {
 		this.vrp = vrp;
 	}

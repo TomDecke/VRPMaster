@@ -106,66 +106,130 @@ public class VRP {
 		return totalCost;
 	}
 
+	/**
+	 * Accessor for the name of the VRP
+	 * @return String, the name
+	 */
 	public String getName() {
 		return name;
 	}
 
+	/**
+	 * Mutator for the name of the VRP
+	 * @param name String, the new name
+	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
+	/**
+	 * Accessor for the customers
+	 * @return Customer[], all customers of the VRP
+	 */
 	public Customer[] getCustomer() {
 		return customer;
 	}
 
+	/**
+	 * Mutator for the customers
+	 * @param customer Customer[], the new customers
+	 */
 	public void setCustomer(Customer[] customer) {
 		this.customer = customer;
 	}
 
+	/**
+	 * Accessor for the vehicles
+	 * @return Vehicle[], all vehicles of the VRP
+	 */
 	public Vehicle[] getVehicle() {
 		return vehicle;
 	}
 
+	/**
+	 * Mutator for the vehicles
+	 * @param vehicle Vehicle[], the new vehicles
+	 */
 	public void setVehicle(Vehicle[] vehicle) {
 		this.vehicle = vehicle;
 	}
 
+	/**
+	 * Accessor for the distance-matrix
+	 * @return double[][], the distance-matrix
+	 */
 	public double[][] getDistance() {
 		return distance;
 	}
 
+	/**
+	 * Mutator for the distance-matrix
+	 * @param distance double[][], the new distance-matrix
+	 */
 	public void setDistance(double[][] distance) {
 		this.distance = distance;
 	}
 
+	/**
+	 * Accessor for the number of customers
+	 * @return n, the number of customers
+	 */
 	public int getN() {
 		return n;
 	}
 
+	/**
+	 * Mutator for the number of customers
+	 * @param n, the new number of customers
+	 */
 	public void setN(int n) {
 		this.n = n;
 	}
 
+	/**
+	 * Accessor for the number of vehicles
+	 * @return m, the number of vehicles
+	 */
 	public int getM() {
 		return m;
 	}
 
+	/**
+	 * Accessor for the number of vehicles
+	 * @param m, the number of vehicles
+	 */
 	public void setM(int m) {
 		this.m = m;
 	}
 
+	/**
+	 * Accessor for the capacity of vehicles in this VRP
+	 * @return int, the capacity
+	 */
 	public int getCapacity() {
 		return capacity;
 	}
 
+	/**
+	 * Mutator for the capacity of vehicles in this VRP 
+	 * @param capacity int, the new capacity for the vehicles in this VRP
+	 */
 	public void setCapacity(int capacity) {
 		this.capacity = capacity;
 	}
 
+	/**
+	 * Accessor for the depot of the VRP
+	 * @return Customer, the depot
+	 */
 	public Customer getDepot() {
 		return depot;
 	}
 
+	/**
+	 * Mutator for the depot of the VRP
+	 * @param depot Customer, the new depot
+	 */
 	public void setDepot(Customer depot) {
 		this.depot = depot;
 	}
